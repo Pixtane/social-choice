@@ -10,6 +10,66 @@ from voting_rules import VOTING_RULES, CANDIDATES, _get_positions
 #   0: ABC, 1: ACB, 2: BAC, 3: BCA, 4: CAB, 5: CBA
 RANKINGS_6_STR = ["ABC", "ACB", "BAC", "BCA", "CAB", "CBA"]
 
+# 13 weak-order ("type") labels used by the UI (includes ties).
+TYPE_13_LABELS = [
+    "A>B>C",
+    "A>C>B",
+    "C>A>B",
+    "C>B>A",
+    "B>C>A",
+    "B>A>C",
+    "A>B~C",
+    "A~C>B",
+    "C>A~B",
+    "C~B>A",
+    "B>C~A",
+    "B~A>C",
+    "A~B~C",
+]
+
+# Mapping from 13-type (weak order) to compatible strict rankings (indices into RANKINGS_6_STR).
+_TYPE13_TO_RANKING6 = {
+    1: [0],  # A>B>C  -> ABC
+    2: [1],  # A>C>B  -> ACB
+    3: [4],  # C>A>B  -> CAB
+    4: [5],  # C>B>A  -> CBA
+    5: [3],  # B>C>A  -> BCA
+    6: [2],  # B>A>C  -> BAC
+    7: [0, 1],  # A>B~C -> {ABC, ACB}
+    8: [1, 4],  # A~C>B -> {ACB, CAB}
+    9: [4, 5],  # C>A~B -> {CAB, CBA}
+    10: [3, 5],  # C~B>A -> {BCA, CBA}
+    11: [2, 3],  # B>C~A -> {BAC, BCA}
+    12: [0, 2],  # B~A>C -> {ABC, BAC}
+    13: [0, 1, 2, 3, 4, 5],  # A~B~C -> all
+}
+
+
+def ranking6_weights_from_type13_weights(type13_weights):
+    """
+    Convert a length-13 type-vector (weights over weak orders) into a length-6 strict-ranking
+    distribution by splitting each weak-order's weight uniformly among its linear extensions.
+    """
+    w13 = np.asarray(type13_weights, dtype=np.float64)
+    if w13.shape != (13,):
+        raise ValueError("type13_weights must be length 13")
+    if np.any(w13 < 0):
+        raise ValueError("type13_weights must be nonnegative")
+
+    total = float(np.sum(w13))
+    if total <= 0:
+        w13 = np.ones(13, dtype=np.float64) / 13.0
+    else:
+        w13 = w13 / total
+
+    w6 = np.zeros(6, dtype=np.float64)
+    for t in range(1, 14):
+        idxs = _TYPE13_TO_RANKING6[t]
+        share = float(w13[t - 1]) / float(len(idxs))
+        for j in idxs:
+            w6[j] += share
+    return w6
+
 # Pairwise contributions per ranking, in order: [A>B, A>C, B>C]
 # (matches the example the user provided)
 PAIRWISE = np.array(
@@ -238,13 +298,20 @@ def classify_majority_relation_from_freq(freq, eps=1e-12):
         return None, "cycle"
 
     order = tuple(sorted(wins.keys(), key=lambda k: wins[k], reverse=True))
+    # Type numbering matches the user's 13-type list (first 6 are strict orders):
+    #  1: A>B>C
+    #  2: A>C>B
+    #  3: C>A>B
+    #  4: C>B>A
+    #  5: B>C>A
+    #  6: B>A>C
     order_to_type = {
         ("A", "B", "C"): 1,  # A>B>C
         ("A", "C", "B"): 2,  # A>C>B
-        ("B", "A", "C"): 3,  # B>A>C
-        ("B", "C", "A"): 4,  # B>C>A
-        ("C", "A", "B"): 5,  # C>A>B
-        ("C", "B", "A"): 6,  # C>B>A
+        ("C", "A", "B"): 3,  # C>A>B
+        ("C", "B", "A"): 4,  # C>B>A
+        ("B", "C", "A"): 5,  # B>C>A
+        ("B", "A", "C"): 6,  # B>A>C
     }
     return order_to_type.get(order), "transitive"
 
@@ -466,10 +533,10 @@ def get_majority_type_and_cycle(profile):
     Type mapping (transitive majority only):
       1: A > B > C
       2: A > C > B
-      3: B > A > C
-      4: B > C > A
-      5: C > A > B
-      6: C > B > A
+      3: C > A > B
+      4: C > B > A
+      5: B > C > A
+      6: B > A > C
 
     Returns:
       (type_num, is_circular)
@@ -486,38 +553,77 @@ def has_condorcet_cycle(profile):
     return is_circular
 
 
-def get_majority_type_from_barycentric(bary, eps=1e-9):
+def get_type_from_barycentric(bary, mode=6, eps=1e-9):
     """
-    Deterministic "type" classification from barycentric coordinates.
+    Classify a point by the (x,y,z) barycentric strengths for A,B,C.
 
-    In this UI, barycentric coordinates (x,y,z) represent the strength of support
-    for A,B,C respectively. The 3 medians partition the simplex into 6 regions
-    corresponding to the 6 strict orders of (x,y,z). This function returns that
-    order mapped to the same 1..6 type numbering used by get_majority_type_and_cycle.
+    mode=6:
+      - returns type 1..6 for strict orders
+      - returns None for any tie (caller typically displays 'T')
 
-    Returns:
-      (type_num, is_circular)
-      - type_num is int 1..6 when x,y,z are all distinct
-      - (None, True) when any pair is (near) equal (treated like "X" in the UI)
+    mode=13:
+      - returns one of the 13 weak-order types (includes tie-cases)
+
+    13-type list (and 6-type numbering is the first 6 of this list):
+      1.  A>B>C
+      2.  A>C>B
+      3.  C>A>B
+      4.  C>B>A
+      5.  B>C>A
+      6.  B>A>C
+      7.  A>B~C
+      8.  A~C>B
+      9.  C>A~B
+      10. C~B>A
+      11. B>C~A
+      12. B~A>C
+      13. A~B~C
     """
-    x, y, z = bary
+    x, y, z = bary  # A,B,C
 
-    # Treat near-equalities as ambiguous (show "X")
-    if abs(x - y) < eps or abs(x - z) < eps or abs(y - z) < eps:
-        return None, True
+    def _cmp(a, b):
+        if a > b + eps:
+            return 1
+        if b > a + eps:
+            return -1
+        return 0
 
-    strengths = {0: x, 1: y, 2: z}
-    order = tuple(sorted(strengths.keys(), key=lambda c: strengths[c], reverse=True))
+    xy = _cmp(x, y)
+    xz = _cmp(x, z)
+    yz = _cmp(y, z)
 
+    # All tied
+    if xy == 0 and xz == 0 and yz == 0:
+        return 13 if mode == 13 else None
+
+    # Any (near) equality: in 6-mode this is a tie/ambiguous boundary
+    if mode == 6 and (xy == 0 or xz == 0 or yz == 0):
+        return None
+
+    # 13-type weak orders (tie-aware)
+    if mode == 13 and (xy == 0 or xz == 0 or yz == 0):
+        # exactly one pair tied (the all-tied case handled above)
+        if xy == 0:
+            # A~B ? C
+            return 12 if x > z + eps else 9  # A~B>C OR C>A~B
+        if xz == 0:
+            # A~C ? B
+            return 8 if x > y + eps else 11  # A~C>B OR B>C~A (B>A~C)
+        # yz == 0: B~C ? A
+        return 10 if y > x + eps else 7  # B~C>A OR A>B~C
+
+    # Strict orders (shared by 6-mode and 13-mode)
+    strengths = {"A": x, "B": y, "C": z}
+    order = tuple(sorted(strengths.keys(), key=lambda k: strengths[k], reverse=True))
     order_to_type = {
-        (0, 1, 2): 1,  # A>B>C
-        (0, 2, 1): 2,  # A>C>B
-        (1, 0, 2): 3,  # B>A>C
-        (1, 2, 0): 4,  # B>C>A
-        (2, 0, 1): 5,  # C>A>B
-        (2, 1, 0): 6,  # C>B>A
+        ("A", "B", "C"): 1,
+        ("A", "C", "B"): 2,
+        ("C", "A", "B"): 3,
+        ("C", "B", "A"): 4,
+        ("B", "C", "A"): 5,
+        ("B", "A", "C"): 6,
     }
-    return order_to_type.get(order), False
+    return order_to_type.get(order)
 
 def has_conflicting_results(results_dict, index):
     """
@@ -567,6 +673,8 @@ stats_lines_per_page = 50  # Approximate lines visible per page
 selected_point_idx = None  # index into points_data, or None when nothing selected
 selected_voting_rules = set(VOTING_RULES.keys())  # rules included in calculation/statistics
 point_generation_mode = 'coordinates'  # 'coordinates' or 'ranking_vector'
+type_display_mode = 6  # 6 or 13
+ranking_vector_mode = 6  # experimental: 6 or 13 (used only for point_generation_mode == 'ranking_vector')
 
 # Create figure
 fig = plt.figure(figsize=(16, 10))
@@ -603,14 +711,14 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
         if current_view in ['calculate', 'statistics'] and points_data:
             results = calculate_voting_outcomes(points_data, n_voters_sim, generation_method)
             
-            # Color map for profile types (1-6)
+            # Color map for strict types (1-6) using the user's new numbering.
             type_colors = {
-                1: 'red',      # ABC
-                2: 'orange',   # ACB
-                3: 'blue',     # BAC
-                4: 'cyan',     # BCA
-                5: 'green',    # CAB
-                6: 'lime'      # CBA
+                1: 'red',      # A>B>C
+                2: 'orange',   # A>C>B
+                3: 'green',    # C>A>B
+                4: 'lime',     # C>B>A
+                5: 'cyan',     # B>C>A
+                6: 'blue',     # B>A>C
             }
             
             for i, point_data in enumerate(points_data):
@@ -618,23 +726,19 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
                 bary = point_data['barycentric']
                 ranking_weights = point_data.get('ranking_weights')
                 
-                # Determine type/circularity.
-                # - If the point has an explicit 6-ranking distribution, use it.
-                # - Otherwise use the deterministic barycentric-region type.
+                # Determine display type.
+                # - Type is derived from barycentric strengths (x,y,z) in either 6- or 13-type mode.
+                # - For points with explicit 6-ranking weights, we may still overlay C/T markers
+                #   if the implied pairwise-majority relation is a cycle or has a pairwise tie.
+                profile_type = get_type_from_barycentric(bary, mode=type_display_mode)
+                rel = None
                 if ranking_weights is not None:
-                    # Type is based on first-choice shares (barycentric location),
-                    # while circularity is based on the pairwise-majority relation
-                    # implied by the 6-ranking distribution (cycles only; ties are not cycles).
-                    profile_type, _ = get_majority_type_from_barycentric(bary)
                     _, rel = classify_majority_relation_from_freq(ranking_weights)
-                    is_circular = (rel != "transitive")
-                else:
-                    profile_type, is_circular = get_majority_type_from_barycentric(bary)
                 
                 # Check for conflicting results
                 has_conflict = has_conflicting_results(results, i)
                 
-                # Get color based on majority type (or gray if circular/tie)
+                # Get color based on strict type (or gray for tie/13-type tie cases)
                 color = type_colors.get(profile_type, 'gray')
                 
                 # Draw point with appropriate styling
@@ -647,46 +751,33 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
                 ax.plot(cart_x, cart_y, 'o', color=color, markersize=marker_size, 
                        markeredgecolor=edge_color, markeredgewidth=edge_width, alpha=0.8)
                 
-                # Add profile type number or X
-                if is_circular or profile_type is None:
-                    # Show C (cycle) or T (tie) instead of number
-                    marker = 'X'
-                    bbox_color = 'red'
-                    if ranking_weights is not None:
-                        _, rel = classify_majority_relation_from_freq(ranking_weights)
-                        if rel == "cycle":
-                            marker = 'C'
-                            bbox_color = 'red'
-                        elif rel == "tie":
-                            marker = 'T'
-                            bbox_color = 'gray'
-                    else:
-                        # Barycentric boundary -> treat as tie marker
-                        marker = 'T'
-                        bbox_color = 'gray'
+                # Add marker:
+                # - Always show 'C' for Condorcet cycles implied by ranking_weights.
+                # - Show 'T' for pairwise-majority ties ONLY in 6-type display mode.
+                # - Otherwise show numeric type: 1..6 (strict) or 1..13 (weak orders) depending on mode.
+                if rel == "cycle" or (rel == "tie" and type_display_mode == 6):
+                    marker = 'C' if rel == "cycle" else 'T'
+                    bbox_color = 'red' if rel == "cycle" else 'gray'
                     ax.text(
-                        cart_x,
-                        cart_y,
-                        marker,
-                        ha='center',
-                        va='center',
-                        fontsize=9,
-                        weight='bold',
-                        color='white',
+                        cart_x, cart_y, marker,
+                        ha='center', va='center',
+                        fontsize=9, weight='bold', color='white',
                         bbox=dict(boxstyle='circle', facecolor=bbox_color, alpha=0.7, pad=0.3),
                     )
+                elif profile_type is None:
+                    # 6-type mode boundary tie (ambiguous) -> show T
+                    ax.text(
+                        cart_x, cart_y, 'T',
+                        ha='center', va='center',
+                        fontsize=9, weight='bold', color='white',
+                        bbox=dict(boxstyle='circle', facecolor='gray', alpha=0.7, pad=0.3),
+                    )
                 else:
-                    # Show majority type number
                     text_color = 'white' if color in ['blue', 'green', 'cyan', 'lime', 'red'] else 'black'
                     ax.text(
-                        cart_x,
-                        cart_y,
-                        str(profile_type),
-                        ha='center',
-                        va='center',
-                        fontsize=8,
-                        weight='bold',
-                        color=text_color,
+                        cart_x, cart_y, str(profile_type),
+                        ha='center', va='center',
+                        fontsize=8, weight='bold', color=text_color,
                     )
                 
                 # Only show labels for manually added points (not generated ones)
@@ -700,22 +791,18 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
                 bary = point_data['barycentric']
                 ranking_weights = point_data.get('ranking_weights')
                 
-                # Determine type/circularity.
+                profile_type = get_type_from_barycentric(bary, mode=type_display_mode)
+                rel = None
                 if ranking_weights is not None:
-                    profile_type, _ = get_majority_type_from_barycentric(bary)
                     _, rel = classify_majority_relation_from_freq(ranking_weights)
-                    is_circular = (rel != "transitive")
-                else:
-                    profile_type, is_circular = get_majority_type_from_barycentric(bary)
                 
-                # Color map for profile types
                 type_colors = {
-                    1: 'red',      # ABC
-                    2: 'orange',    # ACB
-                    3: 'blue',      # BAC
-                    4: 'cyan',      # BCA
-                    5: 'green',     # CAB
-                    6: 'lime'       # CBA
+                    1: 'red',      # A>B>C
+                    2: 'orange',   # A>C>B
+                    3: 'green',    # C>A>B
+                    4: 'lime',     # C>B>A
+                    5: 'cyan',     # B>C>A
+                    6: 'blue',     # B>A>C
                 }
                 
                 color = type_colors.get(profile_type, 'gray')
@@ -723,27 +810,29 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
                 
                 ax.plot(cart_x, cart_y, 'o', color=color, markersize=marker_size, alpha=0.8)
                 
-                # Add profile type number or X
-                if is_circular:
-                    # Show C (cycle) or T (tie)
-                    marker = 'T'
-                    bbox_color = 'gray'
-                    if ranking_weights is not None:
-                        _, rel = classify_majority_relation_from_freq(ranking_weights)
-                        if rel == "cycle":
-                            marker = 'C'
-                            bbox_color = 'red'
-                        elif rel == "tie":
-                            marker = 'T'
-                            bbox_color = 'gray'
-                    ax.text(cart_x, cart_y, marker, ha='center', va='center',
-                           fontsize=9, weight='bold', color='white',
-                           bbox=dict(boxstyle='circle', facecolor=bbox_color, alpha=0.7, pad=0.3))
+                if rel == "cycle" or (rel == "tie" and type_display_mode == 6):
+                    marker = 'C' if rel == "cycle" else 'T'
+                    bbox_color = 'red' if rel == "cycle" else 'gray'
+                    ax.text(
+                        cart_x, cart_y, marker,
+                        ha='center', va='center',
+                        fontsize=9, weight='bold', color='white',
+                        bbox=dict(boxstyle='circle', facecolor=bbox_color, alpha=0.7, pad=0.3),
+                    )
+                elif profile_type is None:
+                    ax.text(
+                        cart_x, cart_y, 'T',
+                        ha='center', va='center',
+                        fontsize=9, weight='bold', color='white',
+                        bbox=dict(boxstyle='circle', facecolor='gray', alpha=0.7, pad=0.3),
+                    )
                 else:
-                    # Show profile type number
                     text_color = 'white' if color in ['blue', 'green', 'cyan', 'lime', 'red'] else 'black'
-                    ax.text(cart_x, cart_y, str(profile_type), ha='center', va='center',
-                           fontsize=8, weight='bold', color=text_color)
+                    ax.text(
+                        cart_x, cart_y, str(profile_type),
+                        ha='center', va='center',
+                        fontsize=8, weight='bold', color=text_color,
+                    )
                 
                 if len(points_data) <= 20:  # Only label if not too many points
                     label = point_data.get('label', f'P{i+1}')
@@ -929,8 +1018,8 @@ def calculate_point_outcomes(point_data, n_voters, method):
     for rule_name in [name for name in VOTING_RULES.keys() if name in selected_voting_rules]:
         outcomes[rule_name] = VOTING_RULES[rule_name](profile)
 
-    # Display type is based on barycentric region (first-choice shares).
-    type_region, _ = get_majority_type_from_barycentric(bary)
+    # Display type is based on barycentric strengths (x,y,z) in the current display mode.
+    type_region = get_type_from_barycentric(bary, mode=type_display_mode)
     # Circularity (cycle) can be derived from explicit weights, when present.
     is_cycle = has_condorcet_cycle_from_ranking_weights(ranking_weights) if ranking_weights is not None else False
     type_sim, sim_is_circular = get_majority_type_and_cycle(profile)
@@ -967,6 +1056,7 @@ def update_point_details(index):
     bary = point_data['barycentric']
     cart = point_data['cartesian']
     ranking_weights = point_data.get('ranking_weights')
+    type_weights_13 = point_data.get('type_weights_13')
 
     info = calculate_point_outcomes(point_data, n_voters_sim, generation_method)
     outcomes = info['outcomes']
@@ -984,8 +1074,18 @@ def update_point_details(index):
         lines.append("")
         lines.append("Ranking distribution (%): [ABC, ACB, BAC, BCA, CAB, CBA]")
         lines.append(f"  {pct.tolist()}")
+    if type_weights_13 is not None:
+        w13 = np.asarray(type_weights_13, dtype=np.float64)
+        total13 = float(np.sum(w13)) if float(np.sum(w13)) > 0 else 1.0
+        pct13 = np.round((w13 / total13) * 100.0, 2)
+        lines.append("")
+        lines.append("13-type vector (%): [1..13 in TYPE_13_LABELS order]")
+        lines.append(f"  {pct13.tolist()}")
     lines.append("")
-    lines.append(f"Type (region): {info['type_region'] if info['type_region'] is not None else 'X'}")
+    if type_display_mode == 6:
+        lines.append(f"Type (region, 6): {info['type_region'] if info['type_region'] is not None else 'T'}")
+    else:
+        lines.append(f"Type (region, 13): {info['type_region'] if info['type_region'] is not None else 'T'}")
     lines.append(f"Type (sample): {info['type_sim'] if info['type_sim'] is not None else 'X'}")
     lines.append(f"Sample majority: {'cycle/tie' if info['sim_is_circular'] else 'transitive'}")
     if ranking_weights is not None:
@@ -1051,6 +1151,16 @@ ax_pointgen = fig.add_axes([0.50, 0.05, 0.12, 0.08])
 ax_pointgen.set_title('Point Gen', fontsize=9)
 radio_pointgen = RadioButtons(ax_pointgen, ['coordinates', 'ranking_vector'], active=0)
 
+# Type display mode (6 vs 13)
+ax_typemode = fig.add_axes([0.36, 0.05, 0.12, 0.08])
+ax_typemode.set_title('Type Display', fontsize=9)
+radio_typemode = RadioButtons(ax_typemode, ['6', '13'], active=0)
+
+# Experimental: ranking-vector size (only affects Point Gen = ranking_vector)
+ax_vectormode = fig.add_axes([0.22, 0.05, 0.12, 0.08])
+ax_vectormode.set_title('Vector Size (exp)', fontsize=9)
+radio_vectormode = RadioButtons(ax_vectormode, ['6', '13'], active=0)
+
 # Voting rule selection (affects calculation/statistics/conflict borders)
 ax_rules = fig.add_axes([0.65, 0.05, 0.32, 0.22])
 ax_rules.set_title('Voting Rules (included)', fontsize=9)
@@ -1099,9 +1209,9 @@ def on_generate_points(event):
     points_data = []
     selected_point_idx = None
     
-    def _sample_ranking_percentages(total=100):
+    def _sample_percentages(n, total=100):
         # Dirichlet -> integer percentages summing to total
-        p = np.random.dirichlet(np.ones(6))
+        p = np.random.dirichlet(np.ones(int(n)))
         raw = p * total
         base = np.floor(raw).astype(int)
         remainder = int(total - np.sum(base))
@@ -1113,9 +1223,16 @@ def on_generate_points(event):
 
     for i in range(n_profiles_sim):
         if point_generation_mode == 'ranking_vector':
-            pct = _sample_ranking_percentages(total=100)  # int percentages
-            weights = pct.astype(np.float64) / 100.0
-            bary = barycentric_from_ranking_weights(weights)
+            if ranking_vector_mode == 13:
+                pct13 = _sample_percentages(13, total=100)
+                w13 = pct13.astype(np.float64) / 100.0
+                weights = ranking6_weights_from_type13_weights(w13)
+                bary = barycentric_from_ranking_weights(weights)
+            else:
+                pct = _sample_percentages(6, total=100)  # int percentages
+                weights = pct.astype(np.float64) / 100.0
+                w13 = None
+                bary = barycentric_from_ranking_weights(weights)
         else:
             # Generate random barycentric coordinates (rejection sampling)
             while True:
@@ -1136,6 +1253,8 @@ def on_generate_points(event):
         }
         if weights is not None:
             pd['ranking_weights'] = weights
+        if point_generation_mode == 'ranking_vector' and ranking_vector_mode == 13 and w13 is not None:
+            pd['type_weights_13'] = w13
         points_data.append(pd)
     
     update_display(reset_scroll=True)
@@ -1187,6 +1306,25 @@ def on_pointgen_change(label):
     """Change how the Generate Points button produces points."""
     global point_generation_mode
     point_generation_mode = label
+
+
+def on_typemode_change(label):
+    """Change whether we display 6 or 13 barycentric types."""
+    global type_display_mode
+    try:
+        type_display_mode = int(label)
+    except ValueError:
+        type_display_mode = 6
+    update_display()
+
+
+def on_vectormode_change(label):
+    """Experimental: change how ranking_vector points are generated (6 vs 13 vector)."""
+    global ranking_vector_mode
+    try:
+        ranking_vector_mode = int(label)
+    except ValueError:
+        ranking_vector_mode = 6
 
 def on_scroll_up(event):
     """Scroll statistics up."""
@@ -1246,6 +1384,8 @@ radio_method.on_clicked(on_method_change)
 radio_view.on_clicked(on_view_change)
 check_medians.on_clicked(on_medians_change)
 radio_pointgen.on_clicked(on_pointgen_change)
+radio_typemode.on_clicked(on_typemode_change)
+radio_vectormode.on_clicked(on_vectormode_change)
 check_rules.on_clicked(on_rules_change)
 button_scroll_up.on_clicked(on_scroll_up)
 button_scroll_down.on_clicked(on_scroll_down)
