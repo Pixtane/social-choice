@@ -6,6 +6,24 @@ from matplotlib.collections import LineCollection
 import matplotlib.patches as mpatches
 from voting_rules import VOTING_RULES, CANDIDATES, _get_positions
 
+# Rank order convention used throughout (0=A, 1=B, 2=C):
+#   0: ABC, 1: ACB, 2: BAC, 3: BCA, 4: CAB, 5: CBA
+RANKINGS_6_STR = ["ABC", "ACB", "BAC", "BCA", "CAB", "CBA"]
+
+# Pairwise contributions per ranking, in order: [A>B, A>C, B>C]
+# (matches the example the user provided)
+PAIRWISE = np.array(
+    [
+        [1, 1, 1],  # ABC
+        [1, 1, 0],  # ACB
+        [0, 1, 1],  # BAC
+        [0, 0, 1],  # BCA
+        [1, 0, 0],  # CAB
+        [0, 0, 0],  # CBA
+    ],
+    dtype=np.int64,
+)
+
 # Equilateral triangle vertices (barycentric coordinates)
 # A at bottom-left, B at bottom-right, C at top
 TRIANGLE_VERTICES = np.array([
@@ -120,11 +138,227 @@ def barycentric_to_profile_distribution(bary, n_voters):
     
     return profile_array
 
-def generate_profile_from_point(bary, n_voters, method='saari', seed=None):
+
+def _rankings_6():
+    """
+    The 6 strict rankings of 3 candidates (0=A,1=B,2=C), matching the index
+    convention used throughout this file:
+      0: ABC, 1: ACB, 2: BAC, 3: BCA, 4: CAB, 5: CBA
+    """
+    return [
+        [0, 1, 2],  # ABC
+        [0, 2, 1],  # ACB
+        [1, 0, 2],  # BAC
+        [1, 2, 0],  # BCA
+        [2, 0, 1],  # CAB
+        [2, 1, 0],  # CBA
+    ]
+
+
+_RANKING_TUPLE_TO_IDX = {
+    (0, 1, 2): 0,  # ABC
+    (0, 2, 1): 1,  # ACB
+    (1, 0, 2): 2,  # BAC
+    (1, 2, 0): 3,  # BCA
+    (2, 0, 1): 4,  # CAB
+    (2, 1, 0): 5,  # CBA
+}
+
+
+def profile_to_ranking_freq(profile):
+    """
+    Convert a (n_voters, 3) profile of permutations into a length-6 frequency vector
+    in the canonical order [ABC, ACB, BAC, BCA, CAB, CBA].
+    """
+    freq = np.zeros(6, dtype=np.int64)
+    for row in profile:
+        idx = _RANKING_TUPLE_TO_IDX.get(tuple(int(x) for x in row))
+        if idx is None:
+            raise ValueError(f"Unexpected ranking row: {row}")
+        freq[idx] += 1
+    return freq
+
+
+def pairwise_counts_from_freq(freq):
+    """
+    Given a length-6 ranking frequency vector, return (A_B, A_C, B_C, total).
+    """
+    # Accept either integer counts or float weights.
+    f = np.asarray(freq, dtype=np.float64)
+    if f.shape != (6,):
+        raise ValueError("freq must be length 6")
+    A_B, A_C, B_C = f @ PAIRWISE
+    total = float(np.sum(f))
+    return float(A_B), float(A_C), float(B_C), total
+
+
+def majority_type_and_cycle_from_freq(freq):
+    """
+    Determine majority type (1-6) and whether the majority relation is cyclic OR tied,
+    using the PAIRWISE-matrix method from the provided example.
+
+    Returns:
+      (type_num, is_circular)
+      - type_num is int 1..6 when strict transitive majority exists
+      - type_num is None when cyclic OR any pairwise tie occurs
+    """
+    t, relation = classify_majority_relation_from_freq(freq)
+    return (t, relation != "transitive")
+
+
+def classify_majority_relation_from_freq(freq, eps=1e-12):
+    """
+    Classify the majority relation implied by a 6-ranking distribution using PAIRWISE.
+
+    Returns: (type_num, relation)
+      - type_num: int 1..6 when relation == 'transitive', else None
+      - relation: 'transitive' | 'cycle' | 'tie'
+    """
+    A_B, A_C, B_C, total = pairwise_counts_from_freq(freq)
+    if total <= 0:
+        return None, "tie"
+
+    # Any pairwise tie (within eps) => relation 'tie'
+    if abs(A_B * 2 - total) <= eps or abs(A_C * 2 - total) <= eps or abs(B_C * 2 - total) <= eps:
+        return None, "tie"
+
+    wins = {
+        "A": int(A_B > total / 2) + int(A_C > total / 2),
+        "B": int((total - A_B) > total / 2) + int(B_C > total / 2),
+        "C": int((total - A_C) > total / 2) + int((total - B_C) > total / 2),
+    }
+
+    # Strict Condorcet cycle iff each candidate has exactly one win.
+    if set(wins.values()) == {1}:
+        return None, "cycle"
+
+    # Otherwise transitive (one candidate has 2 wins)
+    if not any(w == 2 for w in wins.values()):
+        # Shouldn't happen for strict relations with 3 candidates, but keep safe.
+        return None, "cycle"
+
+    order = tuple(sorted(wins.keys(), key=lambda k: wins[k], reverse=True))
+    order_to_type = {
+        ("A", "B", "C"): 1,  # A>B>C
+        ("A", "C", "B"): 2,  # A>C>B
+        ("B", "A", "C"): 3,  # B>A>C
+        ("B", "C", "A"): 4,  # B>C>A
+        ("C", "A", "B"): 5,  # C>A>B
+        ("C", "B", "A"): 6,  # C>B>A
+    }
+    return order_to_type.get(order), "transitive"
+
+
+def is_strict_cycle_from_freq(freq):
+    """
+    True iff the ranking distribution implies a strict Condorcet cycle.
+    (Ties return False.)
+    """
+    _, rel = classify_majority_relation_from_freq(freq)
+    return rel == "cycle"
+
+
+def profile_from_ranking_weights(weights, n_voters, seed=None):
+    """
+    Sample a profile (n_voters rankings) from an explicit 6-ranking distribution.
+
+    weights: length-6 array-like, nonnegative, not necessarily normalized.
+    """
+    if seed is not None:
+        np.random.seed(seed)
+
+    w = np.asarray(weights, dtype=np.float64)
+    if w.shape != (6,):
+        raise ValueError("weights must be length 6")
+    if np.any(w < 0):
+        raise ValueError("weights must be nonnegative")
+
+    total = float(np.sum(w))
+    if total <= 0:
+        w = np.ones(6, dtype=np.float64) / 6.0
+    else:
+        w = w / total
+
+    counts = np.random.multinomial(n_voters, w)
+    rankings = _rankings_6()
+
+    profile = []
+    for i, count in enumerate(counts):
+        for _ in range(int(count)):
+            profile.append(rankings[i])
+
+    profile_array = np.array(profile, dtype=np.int8)
+    np.random.shuffle(profile_array)
+    return profile_array
+
+
+def barycentric_from_ranking_weights(weights):
+    """
+    Map a 6-ranking distribution to barycentric coords by first-choice shares:
+      x = P(A first) = w_ABC + w_ACB
+      y = P(B first) = w_BAC + w_BCA
+      z = P(C first) = w_CAB + w_CBA
+    """
+    w = np.asarray(weights, dtype=np.float64)
+    total = float(np.sum(w))
+    if total <= 0:
+        return (1 / 3, 1 / 3, 1 / 3)
+    w = w / total
+    x = float(w[0] + w[1])
+    y = float(w[2] + w[3])
+    z = float(w[4] + w[5])
+    return (x, y, z)
+
+
+def _pairwise_majority_winner_from_weights(weights, a, b, eps=1e-12):
+    """
+    Majority winner between candidates a and b given a 6-ranking distribution.
+    Returns a, b, or None for tie.
+    """
+    rankings = _rankings_6()
+    w = np.asarray(weights, dtype=np.float64)
+    total = float(np.sum(w))
+    if total <= 0:
+        w = np.ones(6, dtype=np.float64) / 6.0
+    else:
+        w = w / total
+
+    # p(a > b) is sum of weights of rankings where a appears before b
+    p_a = 0.0
+    for i, r in enumerate(rankings):
+        pos = {r[0]: 0, r[1]: 1, r[2]: 2}
+        if pos[a] < pos[b]:
+            p_a += float(w[i])
+
+    if abs(p_a - 0.5) <= eps:
+        return None
+    return a if p_a > 0.5 else b
+
+
+def get_majority_type_from_ranking_weights(weights):
+    """
+    Determine majority type (1-6) and circularity directly from a 6-ranking distribution.
+    Mirrors get_majority_type_and_cycle(profile), but is deterministic (no sampling).
+    """
+    return majority_type_and_cycle_from_freq(weights)
+
+
+def has_condorcet_cycle_from_ranking_weights(weights):
+    """
+    True iff the pairwise-majority relation implied by the 6-ranking distribution
+    is a strict Condorcet cycle (ignores ties; ties return False).
+    """
+    return is_strict_cycle_from_freq(weights)
+
+def generate_profile_from_point(bary, n_voters, method='saari', seed=None, ranking_weights=None):
     """Generate a voting profile from a point in Saari's triangle."""
     # Use seed for deterministic generation based on coordinates
     if seed is not None:
         np.random.seed(seed)
+
+    # If the point comes with an explicit 6-ranking distribution, use it.
+    if ranking_weights is not None:
+        return profile_from_ranking_weights(ranking_weights, n_voters, seed=seed)
     
     if method == 'saari':
         return barycentric_to_profile_distribution(bary, n_voters)
@@ -242,39 +476,8 @@ def get_majority_type_and_cycle(profile):
       - type_num is int 1..6 when majority is transitive
       - type_num is None when cyclic or any pairwise tie
     """
-    # Pairwise majority winners
-    w_ab = _pairwise_majority_winner(profile, 0, 1)
-    w_ac = _pairwise_majority_winner(profile, 0, 2)
-    w_bc = _pairwise_majority_winner(profile, 1, 2)
-
-    # Any tie => not a strict order (treat as "circular" marker)
-    if w_ab is None or w_ac is None or w_bc is None:
-        return None, True
-
-    wins = {0: 0, 1: 0, 2: 0}
-    wins[w_ab] += 1
-    wins[w_ac] += 1
-    wins[w_bc] += 1
-
-    # Cycle iff each candidate wins exactly one pairwise contest
-    if set(wins.values()) == {1}:
-        return None, True
-
-    # Transitive case: one candidate has 2 wins, one has 0 wins, one has 1 win
-    top = max(wins.keys(), key=lambda c: wins[c])
-    bottom = min(wins.keys(), key=lambda c: wins[c])
-    middle = ({0, 1, 2} - {top, bottom}).pop()
-
-    order = (top, middle, bottom)
-    order_to_type = {
-        (0, 1, 2): 1,  # A>B>C
-        (0, 2, 1): 2,  # A>C>B
-        (1, 0, 2): 3,  # B>A>C
-        (1, 2, 0): 4,  # B>C>A
-        (2, 0, 1): 5,  # C>A>B
-        (2, 1, 0): 6,  # C>B>A
-    }
-    return order_to_type.get(order), False
+    freq = profile_to_ranking_freq(profile)
+    return majority_type_and_cycle_from_freq(freq)
 
 
 def has_condorcet_cycle(profile):
@@ -330,20 +533,23 @@ def has_conflicting_results(results_dict, index):
     # Conflicting if we have more than one unique winner
     return len(set(winners)) > 1
 
-def calculate_voting_outcomes(points_data, n_voters, method='saari'):
-    """Calculate voting outcomes for all points using all voting rules."""
+def calculate_voting_outcomes(points_data, n_voters, method='saari', rule_names=None):
+    """Calculate voting outcomes for all points using selected voting rules."""
     results = {}
-    for rule_name in VOTING_RULES.keys():
+    if rule_names is None:
+        rule_names = [name for name in VOTING_RULES.keys() if name in selected_voting_rules]
+    for rule_name in rule_names:
         results[rule_name] = []
     
     for i, point_data in enumerate(points_data):
         bary = point_data['barycentric']
+        ranking_weights = point_data.get('ranking_weights')
         # Use deterministic seed based on coordinates for consistency
         coord_seed = int((bary[0] * 1000 + bary[1] * 100 + bary[2] * 10) * 1000) % (2**31)
-        profile = generate_profile_from_point(bary, n_voters, method, seed=coord_seed)
+        profile = generate_profile_from_point(bary, n_voters, method, seed=coord_seed, ranking_weights=ranking_weights)
         
-        for rule_name, rule_func in VOTING_RULES.items():
-            winner = rule_func(profile)
+        for rule_name in results.keys():
+            winner = VOTING_RULES[rule_name](profile)
             results[rule_name].append(winner)
     
     return results
@@ -358,6 +564,9 @@ generation_method = 'saari'
 stats_text_full = ""  # Full statistics text
 stats_scroll_pos = 0  # Current scroll position (line number)
 stats_lines_per_page = 50  # Approximate lines visible per page
+selected_point_idx = None  # index into points_data, or None when nothing selected
+selected_voting_rules = set(VOTING_RULES.keys())  # rules included in calculation/statistics
+point_generation_mode = 'coordinates'  # 'coordinates' or 'ranking_vector'
 
 # Create figure
 fig = plt.figure(figsize=(16, 10))
@@ -407,14 +616,20 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
             for i, point_data in enumerate(points_data):
                 cart_x, cart_y = point_data['cartesian']
                 bary = point_data['barycentric']
+                ranking_weights = point_data.get('ranking_weights')
                 
-                # Generate profile to determine type (use point index as seed for consistency)
-                # Create a deterministic seed from coordinates
-                coord_seed = int((bary[0] * 1000 + bary[1] * 100 + bary[2] * 10) * 1000) % (2**31)
-                profile = generate_profile_from_point(bary, n_voters_sim, generation_method, seed=coord_seed)
-                # Type is a deterministic classification of the point's region
-                # (independent from the stochastic profile generator).
-                profile_type, is_circular = get_majority_type_from_barycentric(bary)
+                # Determine type/circularity.
+                # - If the point has an explicit 6-ranking distribution, use it.
+                # - Otherwise use the deterministic barycentric-region type.
+                if ranking_weights is not None:
+                    # Type is based on first-choice shares (barycentric location),
+                    # while circularity is based on the pairwise-majority relation
+                    # implied by the 6-ranking distribution (cycles only; ties are not cycles).
+                    profile_type, _ = get_majority_type_from_barycentric(bary)
+                    _, rel = classify_majority_relation_from_freq(ranking_weights)
+                    is_circular = (rel != "transitive")
+                else:
+                    profile_type, is_circular = get_majority_type_from_barycentric(bary)
                 
                 # Check for conflicting results
                 has_conflict = has_conflicting_results(results, i)
@@ -434,17 +649,31 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
                 
                 # Add profile type number or X
                 if is_circular or profile_type is None:
-                    # Show X if circular (instead of number)
+                    # Show C (cycle) or T (tie) instead of number
+                    marker = 'X'
+                    bbox_color = 'red'
+                    if ranking_weights is not None:
+                        _, rel = classify_majority_relation_from_freq(ranking_weights)
+                        if rel == "cycle":
+                            marker = 'C'
+                            bbox_color = 'red'
+                        elif rel == "tie":
+                            marker = 'T'
+                            bbox_color = 'gray'
+                    else:
+                        # Barycentric boundary -> treat as tie marker
+                        marker = 'T'
+                        bbox_color = 'gray'
                     ax.text(
                         cart_x,
                         cart_y,
-                        'X',
+                        marker,
                         ha='center',
                         va='center',
                         fontsize=9,
                         weight='bold',
                         color='white',
-                        bbox=dict(boxstyle='circle', facecolor='red', alpha=0.7, pad=0.3),
+                        bbox=dict(boxstyle='circle', facecolor=bbox_color, alpha=0.7, pad=0.3),
                     )
                 else:
                     # Show majority type number
@@ -469,13 +698,15 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
             for i, point_data in enumerate(points_data):
                 cart_x, cart_y = point_data['cartesian']
                 bary = point_data['barycentric']
+                ranking_weights = point_data.get('ranking_weights')
                 
-                # Generate profile to determine type (use deterministic seed)
-                coord_seed = int((bary[0] * 1000 + bary[1] * 100 + bary[2] * 10) * 1000) % (2**31)
-                profile = generate_profile_from_point(bary, n_voters_sim, generation_method, seed=coord_seed)
-                # Type is a deterministic classification of the point's region
-                # (independent from the stochastic profile generator).
-                profile_type, is_circular = get_majority_type_from_barycentric(bary)
+                # Determine type/circularity.
+                if ranking_weights is not None:
+                    profile_type, _ = get_majority_type_from_barycentric(bary)
+                    _, rel = classify_majority_relation_from_freq(ranking_weights)
+                    is_circular = (rel != "transitive")
+                else:
+                    profile_type, is_circular = get_majority_type_from_barycentric(bary)
                 
                 # Color map for profile types
                 type_colors = {
@@ -494,10 +725,20 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
                 
                 # Add profile type number or X
                 if is_circular:
-                    # Show X if circular
-                    ax.text(cart_x, cart_y, 'X', ha='center', va='center',
+                    # Show C (cycle) or T (tie)
+                    marker = 'T'
+                    bbox_color = 'gray'
+                    if ranking_weights is not None:
+                        _, rel = classify_majority_relation_from_freq(ranking_weights)
+                        if rel == "cycle":
+                            marker = 'C'
+                            bbox_color = 'red'
+                        elif rel == "tie":
+                            marker = 'T'
+                            bbox_color = 'gray'
+                    ax.text(cart_x, cart_y, marker, ha='center', va='center',
                            fontsize=9, weight='bold', color='white',
-                           bbox=dict(boxstyle='circle', facecolor='red', alpha=0.7, pad=0.3))
+                           bbox=dict(boxstyle='circle', facecolor=bbox_color, alpha=0.7, pad=0.3))
                 else:
                     # Show profile type number
                     text_color = 'white' if color in ['blue', 'green', 'cyan', 'lime', 'red'] else 'black'
@@ -507,6 +748,22 @@ def draw_triangle(ax, show_points=True, show_medians_flag=False):
                 if len(points_data) <= 20:  # Only label if not too many points
                     label = point_data.get('label', f'P{i+1}')
                     ax.text(cart_x + 0.02, cart_y + 0.02, label, fontsize=9)
+
+    # Highlight selected point (overlay so it appears on top)
+    global selected_point_idx
+    if show_points and selected_point_idx is not None and 0 <= selected_point_idx < len(points_data):
+        sel = points_data[selected_point_idx]
+        sx, sy = sel['cartesian']
+        ax.plot(
+            sx,
+            sy,
+            marker='o',
+            markersize=18,
+            markerfacecolor='none',
+            markeredgecolor='magenta',
+            markeredgewidth=3,
+            zorder=10,
+        )
     
     ax.set_xlim(-0.1, 1.1)
     ax.set_ylim(-0.1, 1.0)
@@ -539,8 +796,24 @@ def update_statistics(reset_scroll=False):
     if reset_scroll:
         stats_scroll_pos = 0
     
-    # Calculate outcomes for all points
-    results = calculate_voting_outcomes(points_data, n_voters_sim, generation_method)
+    rule_names = [name for name in VOTING_RULES.keys() if name in selected_voting_rules]
+    if not rule_names:
+        stats_text = "VOTING RULE STATISTICS\n"
+        stats_text += "=" * 60 + "\n\n"
+        stats_text += f"Number of Points: {len(points_data)}\n"
+        stats_text += f"Voters per Profile: {n_voters_sim}\n"
+        stats_text += f"Generation Method: {generation_method}\n"
+        stats_text += "Selected Rules: (none)\n\n"
+        stats_text += "Select at least one rule to compute outcomes.\n"
+        stats_text_full = stats_text
+        stats_scroll_pos = 0
+        ax_stats.text(0.02, 0.98, stats_text_full, transform=ax_stats.transAxes,
+                     fontsize=9, fontfamily='monospace', verticalalignment='top',
+                     bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.9))
+        return
+
+    # Calculate outcomes for all points (selected rules only)
+    results = calculate_voting_outcomes(points_data, n_voters_sim, generation_method, rule_names=rule_names)
     
     # Count winners for each rule
     stats_text = "VOTING RULE STATISTICS\n"
@@ -552,7 +825,7 @@ def update_statistics(reset_scroll=False):
     stats_text += "AGGREGATE RESULTS (across all points):\n"
     stats_text += "-" * 60 + "\n\n"
     
-    for rule_name in VOTING_RULES.keys():
+    for rule_name in rule_names:
         winners = results[rule_name]
         winner_counts = {'A': 0, 'B': 0, 'C': 0, None: 0}
         for winner in winners:
@@ -581,7 +854,7 @@ def update_statistics(reset_scroll=False):
         label = point_data.get('label', f'Point {i+1}')
         bary = point_data['barycentric']
         stats_text += f"{label} (x={bary[0]:.3f}, y={bary[1]:.3f}, z={bary[2]:.3f}):\n"
-        for rule_name in VOTING_RULES.keys():
+        for rule_name in rule_names:
             winner = results[rule_name][i]
             display_name = rule_name.replace('_', ' ').title()
             stats_text += f"  {display_name:<20}: {winner}\n"
@@ -618,19 +891,123 @@ def update_display(reset_scroll=False):
     global stats_scroll_pos
     if current_view == 'triangle':
         draw_triangle(ax_triangle, show_points=True, show_medians_flag=show_medians)
-        ax_stats.clear()
-        ax_stats.axis('off')
+        # Show selected point details in the right panel if a point is selected
+        if selected_point_idx is None:
+            ax_stats.clear()
+            ax_stats.axis('off')
+        else:
+            update_point_details(selected_point_idx)
     elif current_view == 'calculate':
         draw_triangle(ax_triangle, show_points=True, show_medians_flag=True)
-        update_statistics(reset_scroll=reset_scroll)
+        # Prefer showing point details when user selected a point
+        if selected_point_idx is not None:
+            update_point_details(selected_point_idx)
+        else:
+            update_statistics(reset_scroll=reset_scroll)
     elif current_view == 'statistics':
         draw_triangle(ax_triangle, show_points=True, show_medians_flag=False)
-        update_statistics(reset_scroll=reset_scroll)
+        # Prefer showing point details when user selected a point
+        if selected_point_idx is not None:
+            update_point_details(selected_point_idx)
+        else:
+            update_statistics(reset_scroll=reset_scroll)
     
     fig.canvas.draw_idle()
 
 # Initial draw
 draw_triangle(ax_triangle)
+
+
+def calculate_point_outcomes(point_data, n_voters, method):
+    """Compute winners for all rules (and some diagnostics) for a single point."""
+    bary = point_data['barycentric']
+    ranking_weights = point_data.get('ranking_weights')
+    coord_seed = int((bary[0] * 1000 + bary[1] * 100 + bary[2] * 10) * 1000) % (2**31)
+    profile = generate_profile_from_point(bary, n_voters, method, seed=coord_seed, ranking_weights=ranking_weights)
+
+    outcomes = {}
+    for rule_name in [name for name in VOTING_RULES.keys() if name in selected_voting_rules]:
+        outcomes[rule_name] = VOTING_RULES[rule_name](profile)
+
+    # Display type is based on barycentric region (first-choice shares).
+    type_region, _ = get_majority_type_from_barycentric(bary)
+    # Circularity (cycle) can be derived from explicit weights, when present.
+    is_cycle = has_condorcet_cycle_from_ranking_weights(ranking_weights) if ranking_weights is not None else False
+    type_sim, sim_is_circular = get_majority_type_and_cycle(profile)
+
+    winners = [w for w in outcomes.values() if w is not None]
+    has_conflict = len(set(winners)) > 1
+
+    return {
+        'profile': profile,
+        'outcomes': outcomes,
+        'type_region': type_region,
+        'type_sim': type_sim,
+        'sim_is_circular': sim_is_circular,
+        'is_cycle_from_weights': is_cycle,
+        'has_conflict': has_conflict,
+    }
+
+
+def update_point_details(index):
+    """Render details for one selected point into the stats panel."""
+    ax_stats.clear()
+    ax_stats.axis('off')
+
+    if index is None or not (0 <= index < len(points_data)):
+        ax_stats.text(
+            0.5, 0.5, 'No point selected.',
+            ha='center', va='center', fontsize=12,
+            bbox=dict(boxstyle='round', facecolor='lightgray', alpha=0.5),
+        )
+        return
+
+    point_data = points_data[index]
+    label = point_data.get('label', f'P{index+1}')
+    bary = point_data['barycentric']
+    cart = point_data['cartesian']
+    ranking_weights = point_data.get('ranking_weights')
+
+    info = calculate_point_outcomes(point_data, n_voters_sim, generation_method)
+    outcomes = info['outcomes']
+
+    lines = []
+    lines.append("POINT DETAILS (click a point to select, click empty space to clear)")
+    lines.append("=" * 68)
+    lines.append(f"Label: {label}  (index {index+1} of {len(points_data)})")
+    lines.append(f"Barycentric: x={bary[0]:.4f}, y={bary[1]:.4f}, z={bary[2]:.4f}")
+    lines.append(f"Cartesian:   x={cart[0]:.4f}, y={cart[1]:.4f}")
+    if ranking_weights is not None:
+        w = np.asarray(ranking_weights, dtype=np.float64)
+        total = float(np.sum(w)) if float(np.sum(w)) > 0 else 1.0
+        pct = np.round((w / total) * 100.0, 2)
+        lines.append("")
+        lines.append("Ranking distribution (%): [ABC, ACB, BAC, BCA, CAB, CBA]")
+        lines.append(f"  {pct.tolist()}")
+    lines.append("")
+    lines.append(f"Type (region): {info['type_region'] if info['type_region'] is not None else 'X'}")
+    lines.append(f"Type (sample): {info['type_sim'] if info['type_sim'] is not None else 'X'}")
+    lines.append(f"Sample majority: {'cycle/tie' if info['sim_is_circular'] else 'transitive'}")
+    if ranking_weights is not None:
+        lines.append(f"Condorcet cycle (from vector): {'YES' if info.get('is_cycle_from_weights') else 'no'}")
+    lines.append(f"Rule conflict (sample): {'YES' if info['has_conflict'] else 'no'}")
+    lines.append("")
+    lines.append("Winners by rule (this point's sampled profile):")
+    lines.append("-" * 68)
+    rule_names = [name for name in VOTING_RULES.keys() if name in selected_voting_rules]
+    if not rule_names:
+        lines.append("(No rules selected)")
+    else:
+        for rule_name in rule_names:
+            display_name = rule_name.replace('_', ' ').title()
+            lines.append(f"{display_name:<22}: {outcomes[rule_name]}")
+
+    text = "\n".join(lines)
+    ax_stats.text(
+        0.02, 0.98, text, transform=ax_stats.transAxes,
+        fontsize=9, fontfamily='monospace', verticalalignment='top',
+        bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.9),
+    )
 
 # Add point controls
 ax_x_input = fig.add_axes([0.05, 0.28, 0.1, 0.03])
@@ -669,6 +1046,17 @@ radio_view = RadioButtons(ax_view, ['triangle', 'calculate', 'statistics'], acti
 ax_medians = fig.add_axes([0.50, 0.15, 0.12, 0.05])
 check_medians = CheckButtons(ax_medians, ['Show Medians'], [False])
 
+# Point generation mode (used by "Generate Points")
+ax_pointgen = fig.add_axes([0.50, 0.05, 0.12, 0.08])
+ax_pointgen.set_title('Point Gen', fontsize=9)
+radio_pointgen = RadioButtons(ax_pointgen, ['coordinates', 'ranking_vector'], active=0)
+
+# Voting rule selection (affects calculation/statistics/conflict borders)
+ax_rules = fig.add_axes([0.65, 0.05, 0.32, 0.22])
+ax_rules.set_title('Voting Rules (included)', fontsize=9)
+_rule_names_ordered = list(VOTING_RULES.keys())
+check_rules = CheckButtons(ax_rules, _rule_names_ordered, [True] * len(_rule_names_ordered))
+
 # Scroll buttons for statistics
 ax_scroll_up = fig.add_axes([0.96, 0.50, 0.02, 0.05])
 button_scroll_up = Button(ax_scroll_up, '▲')
@@ -700,33 +1088,55 @@ def on_add_point(event):
 
 def on_clear_all(event):
     """Clear all points."""
-    global points_data
+    global points_data, selected_point_idx
     points_data = []
+    selected_point_idx = None
     update_display(reset_scroll=True)
 
 def on_generate_points(event):
     """Generate random points for simulation."""
-    global points_data, n_profiles_sim
+    global points_data, n_profiles_sim, selected_point_idx, point_generation_mode
     points_data = []
+    selected_point_idx = None
     
-    # Generate random barycentric coordinates
+    def _sample_ranking_percentages(total=100):
+        # Dirichlet -> integer percentages summing to total
+        p = np.random.dirichlet(np.ones(6))
+        raw = p * total
+        base = np.floor(raw).astype(int)
+        remainder = int(total - np.sum(base))
+        if remainder > 0:
+            frac = raw - base
+            idxs = np.argsort(frac)[::-1][:remainder]
+            base[idxs] += 1
+        return base
+
     for i in range(n_profiles_sim):
-        # Generate random point in triangle using rejection sampling
-        while True:
-            x = np.random.random()
-            y = np.random.random()
-            if x + y <= 1:
-                break
-        
-        bary = normalize_barycentric(x, y)
+        if point_generation_mode == 'ranking_vector':
+            pct = _sample_ranking_percentages(total=100)  # int percentages
+            weights = pct.astype(np.float64) / 100.0
+            bary = barycentric_from_ranking_weights(weights)
+        else:
+            # Generate random barycentric coordinates (rejection sampling)
+            while True:
+                x = np.random.random()
+                y = np.random.random()
+                if x + y <= 1:
+                    break
+            bary = normalize_barycentric(x, y)
+            weights = None
+
         cart_x, cart_y = barycentric_to_cartesian(bary)
-        
+
         label = f'P{i+1}'
-        points_data.append({
+        pd = {
             'barycentric': bary,
             'cartesian': (cart_x, cart_y),
             'label': label
-        })
+        }
+        if weights is not None:
+            pd['ranking_weights'] = weights
+        points_data.append(pd)
     
     update_display(reset_scroll=True)
 
@@ -761,6 +1171,23 @@ def on_medians_change(label):
     show_medians = check_medians.get_status()[0]
     update_display()
 
+def on_rules_change(label):
+    """Toggle which voting rules are included in calculations/statistics."""
+    global selected_voting_rules
+    if label in selected_voting_rules:
+        selected_voting_rules.remove(label)
+    else:
+        selected_voting_rules.add(label)
+    # Refresh if we are showing any computed information
+    if current_view in ['calculate', 'statistics'] or selected_point_idx is not None:
+        update_display(reset_scroll=True)
+
+
+def on_pointgen_change(label):
+    """Change how the Generate Points button produces points."""
+    global point_generation_mode
+    point_generation_mode = label
+
 def on_scroll_up(event):
     """Scroll statistics up."""
     global stats_scroll_pos
@@ -784,6 +1211,31 @@ def on_scroll_down(event):
             update_statistics()
             fig.canvas.draw_idle()
 
+
+def on_triangle_click(event):
+    """Select a point by clicking near it; clear selection if clicking empty space."""
+    global selected_point_idx
+    if event.inaxes != ax_triangle:
+        return
+    if not points_data:
+        return
+
+    click_xy = np.array([event.x, event.y], dtype=np.float64)  # display (pixel) coords
+    pts_xy = np.array([ax_triangle.transData.transform(p['cartesian']) for p in points_data], dtype=np.float64)
+
+    dists = np.sqrt(np.sum((pts_xy - click_xy) ** 2, axis=1))
+    idx = int(np.argmin(dists))
+
+    # Pixel threshold for selection; scale a bit with point count
+    threshold = 12 if len(points_data) <= 200 else 8
+    if dists[idx] <= threshold:
+        selected_point_idx = idx
+    else:
+        selected_point_idx = None
+
+    update_display()
+
+
 # Connect callbacks
 button_add.on_clicked(on_add_point)
 button_clear.on_clicked(on_clear_all)
@@ -793,8 +1245,11 @@ slider_profiles.on_changed(on_profiles_change)
 radio_method.on_clicked(on_method_change)
 radio_view.on_clicked(on_view_change)
 check_medians.on_clicked(on_medians_change)
+radio_pointgen.on_clicked(on_pointgen_change)
+check_rules.on_clicked(on_rules_change)
 button_scroll_up.on_clicked(on_scroll_up)
 button_scroll_down.on_clicked(on_scroll_down)
+fig.canvas.mpl_connect('button_press_event', on_triangle_click)
 
 plt.show()
 
