@@ -88,14 +88,20 @@ SEGMENT_COLORS = {
 
 CIRCLE_RADIUS = 1.0
 
-# Triangle vertices (inner triangle that divides regions)
-# The triangle is at ~40% of circle radius, pointing upward
-TRIANGLE_RADIUS = 0.4
-TRIANGLE_ANGLES = [np.pi/2, np.pi/2 + 2*np.pi/3, np.pi/2 + 4*np.pi/3]  # 90°, 210°, 330°
+# Equilateral triangle vertices (centered at origin)
 TRIANGLE_VERTICES = np.array([
-    [TRIANGLE_RADIUS * np.cos(a), TRIANGLE_RADIUS * np.sin(a)]
-    for a in TRIANGLE_ANGLES
+    [0.0, 1.0],                          # Y (top)
+    [-np.sqrt(3)/2, -0.5],               # X (bottom-left)
+    [np.sqrt(3)/2, -0.5]                 # Z (bottom-right)
 ], dtype=np.float64)
+
+# Edge normals pointing "outside" the triangle
+# N_AB: normal to edge between vertices 1 and 2 (XZ, bottom edge)
+# N_BC: normal to edge between vertices 2 and 0 (YZ, right edge)
+# N_CA: normal to edge between vertices 0 and 1 (XY, left edge)
+N_AB = np.array([0.0, -1.0])            # normal to XZ (A ~ B)
+N_BC = np.array([np.sqrt(3)/2, 0.5])    # normal to YZ (B ~ C)
+N_CA = np.array([-np.sqrt(3)/2, 0.5])   # normal to XY (C ~ A)
 
 # The 3 lines extend from triangle sides to circle edge
 # Each line is defined by two triangle vertices; we extend it to the circle
@@ -234,69 +240,29 @@ def _three_line_intersection(line1, line2, line3):
     return (avg_x, avg_y)
 
 
-def margins_to_2d(m_ab, m_ac, m_bc):
+def margins_to_2d(m_ab, m_ac, m_bc, scale=CIRCLE_RADIUS):
     """
-    Map pairwise margins to 2D position using parallel line intersections.
+    Map pairwise margins to 2D point using linear combination of edge normals.
     
-    The triangle has 3 edges:
-    - Edge 0 (vertex 0->1): left line, corresponds to C>A
-    - Edge 1 (vertex 1->2): horizontal line, corresponds to B>A  
-    - Edge 2 (vertex 2->0): right line, corresponds to B>C
+    The triangle has 3 edges with normals:
+    - N_AB: normal to bottom edge (A ~ B)
+    - N_BC: normal to right edge (B ~ C)
+    - N_CA: normal to left edge (C ~ A)
     
-    For each margin:
-    - B>A (m_ba = -m_ab): offset from edge 1 (horizontal)
-    - B>C (m_bc): offset from edge 2 (right)
-    - C>A (m_ca = -m_ac): offset from edge 0 (left)
-    
-    Positive margin means "above" the line, negative means "below".
+    Positive margin moves point "outside" along normal.
     """
-    # Get the triangle edges (using the original triangle vertices, not extended lines)
-    # Edge 0: vertex 0 -> vertex 1 (left, C>A)
-    # Edge 1: vertex 1 -> vertex 2 (horizontal, B>A)
-    # Edge 2: vertex 2 -> vertex 0 (right, B>C)
+    # Convert m_ac to m_ca (C vs A margin)
+    m_ca = -m_ac
     
-    v0 = TRIANGLE_VERTICES[0]  # Top vertex (90°)
-    v1 = TRIANGLE_VERTICES[1]  # Bottom-left (210°)
-    v2 = TRIANGLE_VERTICES[2]  # Bottom-right (330°)
+    # Linear combination of normals weighted by margins
+    point = m_ab * N_AB + m_bc * N_BC + m_ca * N_CA
     
-    # Scale margins to appropriate offset distance
-    # Margins are in [-1, 1], we scale them to a reasonable offset range
-    # Maximum offset should be roughly the circle radius
-    max_offset = CIRCLE_RADIUS * 0.8
+    # Optional: scale to fit visualization circle
+    r = np.linalg.norm(point)
+    if r > scale:
+        point = point / r * scale
     
-    # Map margins to offsets:
-    # m_ab: A vs B -> m_ba = -m_ab (B vs A) for edge 1 (horizontal)
-    # m_bc: B vs C -> for edge 2 (right)
-    # m_ac: A vs C -> m_ca = -m_ac (C vs A) for edge 0 (left)
-    
-    offset_ba = -m_ab * max_offset  # B>A margin (horizontal line)
-    offset_bc = m_bc * max_offset   # B>C margin (right line)
-    offset_ca = -m_ac * max_offset  # C>A margin (left line)
-    
-    # Create offset lines parallel to each triangle edge
-    # Edge 0 (left, C>A): v0 -> v1
-    line0_p1, line0_p2 = _line_offset_perpendicular(v0, v1, offset_ca)
-    
-    # Edge 1 (horizontal, B>A): v1 -> v2
-    line1_p1, line1_p2 = _line_offset_perpendicular(v1, v2, offset_ba)
-    
-    # Edge 2 (right, B>C): v2 -> v0
-    line2_p1, line2_p2 = _line_offset_perpendicular(v2, v0, offset_bc)
-    
-    # Find intersection of the three offset lines
-    x, y = _three_line_intersection(
-        (line0_p1, line0_p2),
-        (line1_p1, line1_p2),
-        (line2_p1, line2_p2)
-    )
-    
-    # Clamp to circle if needed (optional, but helps keep points visible)
-    r = np.sqrt(x*x + y*y)
-    if r > CIRCLE_RADIUS * 1.1:  # Allow slight overflow
-        x = x / r * CIRCLE_RADIUS * 1.1
-        y = y / r * CIRCLE_RADIUS * 1.1
-    
-    return float(x), float(y)
+    return float(point[0]), float(point[1])
 
 
 def _clip_line_to_circle(p1, p2, r=CIRCLE_RADIUS):
@@ -367,8 +333,8 @@ def draw_grid(ax):
     v1 = TRIANGLE_VERTICES[1]  # Bottom-left
     v2 = TRIANGLE_VERTICES[2]  # Bottom-right
     
-    # Scale factor for margins (same as in margins_to_2d)
-    max_offset = CIRCLE_RADIUS * 0.8
+    # For grid lines, we'll draw lines perpendicular to normals at constant margin values
+    # The margin values are already normalized, so we can use them directly
     
     # Grid step size in margin space
     step = 0.1
@@ -380,44 +346,36 @@ def draw_grid(ax):
     axis_colors = ['lightblue', 'lightgreen', 'lightcoral']  # B>A (horizontal), B>C (right), C>A (left)
     
     # Draw grid for each axis
-    # Axis 0: C>A (left edge, v0->v1)
-    for margin in margin_values:
-        if abs(margin) < 0.01:  # Skip the zero line (already drawn as triangle edge)
-            continue
-        offset = -margin * max_offset  # C>A margin
-        p1, p2 = _line_offset_perpendicular(v0, v1, offset)
-        # Find intersection with circle
-        circle_p1, circle_p2 = _line_circle_intersections(p1, p2)
-        if circle_p1 is not None and circle_p2 is not None:
-            ax.plot([circle_p1[0], circle_p2[0]], [circle_p1[1], circle_p2[1]], 
-                   color=axis_colors[2], linewidth=0.5, alpha=0.4, linestyle='--')
-            # Add label at one end
-            if abs(margin) >= 0.2:  # Only label every 0.2 to avoid clutter
-                label_pos = circle_p1 if margin > 0 else circle_p2
-                ax.text(label_pos[0], label_pos[1], f'{margin:.1f}', 
-                       fontsize=6, color=axis_colors[2], alpha=0.6, ha='center', va='center')
+    # Grid lines are perpendicular to normals, representing constant margin values
     
-    # Axis 1: B>A (horizontal edge, v1->v2)
+    # Axis 0: m_ab (N_AB = [0, -1], horizontal lines)
     for margin in margin_values:
-        if abs(margin) < 0.01:
+        if abs(margin) < 0.01:  # Skip the zero line
             continue
-        offset = -margin * max_offset  # B>A margin (m_ba = -m_ab)
-        p1, p2 = _line_offset_perpendicular(v1, v2, offset)
-        circle_p1, circle_p2 = _line_circle_intersections(p1, p2)
-        if circle_p1 is not None and circle_p2 is not None:
-            ax.plot([circle_p1[0], circle_p2[0]], [circle_p1[1], circle_p2[1]], 
+        # Line perpendicular to N_AB: y = -margin (horizontal line)
+        y_val = -margin
+        if abs(y_val) <= CIRCLE_RADIUS:
+            x_intersect = np.sqrt(CIRCLE_RADIUS**2 - y_val**2)
+            ax.plot([-x_intersect, x_intersect], [y_val, y_val], 
                    color=axis_colors[0], linewidth=0.5, alpha=0.4, linestyle='--')
             if abs(margin) >= 0.2:
-                label_pos = circle_p1 if margin > 0 else circle_p2
-                ax.text(label_pos[0], label_pos[1], f'{margin:.1f}', 
+                ax.text(x_intersect * 0.8, y_val, f'{margin:.1f}', 
                        fontsize=6, color=axis_colors[0], alpha=0.6, ha='center', va='center')
     
-    # Axis 2: B>C (right edge, v2->v0)
+    # Axis 1: m_bc (N_BC = [sqrt(3)/2, 0.5])
     for margin in margin_values:
         if abs(margin) < 0.01:
             continue
-        offset = margin * max_offset  # B>C margin
-        p1, p2 = _line_offset_perpendicular(v2, v0, offset)
+        # Line perpendicular to N_BC: (sqrt(3)/2)*x + 0.5*y = margin
+        # Find two points on this line far from origin, then clip to circle
+        n_bc_norm = np.linalg.norm(N_BC)
+        c = margin * n_bc_norm
+        perp_dir = np.array([-N_BC[1], N_BC[0]])  # Rotate 90° counterclockwise
+        perp_dir = perp_dir / np.linalg.norm(perp_dir)
+        closest = c * N_BC / (n_bc_norm**2)
+        extend = 2.0 * CIRCLE_RADIUS
+        p1 = tuple(closest + extend * perp_dir)
+        p2 = tuple(closest - extend * perp_dir)
         circle_p1, circle_p2 = _line_circle_intersections(p1, p2)
         if circle_p1 is not None and circle_p2 is not None:
             ax.plot([circle_p1[0], circle_p2[0]], [circle_p1[1], circle_p2[1]], 
@@ -426,6 +384,28 @@ def draw_grid(ax):
                 label_pos = circle_p1 if margin > 0 else circle_p2
                 ax.text(label_pos[0], label_pos[1], f'{margin:.1f}', 
                        fontsize=6, color=axis_colors[1], alpha=0.6, ha='center', va='center')
+    
+    # Axis 2: m_ca (N_CA = [-sqrt(3)/2, 0.5])
+    for margin in margin_values:
+        if abs(margin) < 0.01:
+            continue
+        # Line perpendicular to N_CA: (-sqrt(3)/2)*x + 0.5*y = margin
+        n_ca_norm = np.linalg.norm(N_CA)
+        c = margin * n_ca_norm
+        perp_dir = np.array([-N_CA[1], N_CA[0]])
+        perp_dir = perp_dir / np.linalg.norm(perp_dir)
+        closest = c * N_CA / (n_ca_norm**2)
+        extend = 2.0 * CIRCLE_RADIUS
+        p1 = tuple(closest + extend * perp_dir)
+        p2 = tuple(closest - extend * perp_dir)
+        circle_p1, circle_p2 = _line_circle_intersections(p1, p2)
+        if circle_p1 is not None and circle_p2 is not None:
+            ax.plot([circle_p1[0], circle_p2[0]], [circle_p1[1], circle_p2[1]], 
+                   color=axis_colors[2], linewidth=0.5, alpha=0.4, linestyle='--')
+            if abs(margin) >= 0.2:
+                label_pos = circle_p1 if margin > 0 else circle_p2
+                ax.text(label_pos[0], label_pos[1], f'{margin:.1f}', 
+                       fontsize=6, color=axis_colors[2], alpha=0.6, ha='center', va='center')
 
 
 # =============================================================================
@@ -658,6 +638,7 @@ stats_scroll_pos = 0
 stats_lines_per_page = 50
 selected_point_idx = None
 selected_voting_rules = set(VOTING_RULES.keys())
+display_type = 'all'  # 'only_cycles', 'cycles_gray', 'all'
 
 # 7-vector: counts for segments 1-6 + cycle
 segment_counts = np.zeros(7, dtype=np.int64)
@@ -752,7 +733,21 @@ def draw_hexagon(ax, show_points=True):
             segment = point_data['segment']
             has_conflict = point_data.get('has_conflict', False)
             
-            color = SEGMENT_COLORS.get(segment, 'gray')
+            # Filter/color based on display_type
+            is_cycle = (segment == 7)
+            
+            if display_type == 'only_cycles':
+                if not is_cycle:
+                    continue  # Skip non-cycle points
+                color = SEGMENT_COLORS.get(segment, 'gray')
+            elif display_type == 'cycles_gray':
+                if is_cycle:
+                    color = SEGMENT_COLORS.get(segment, 'gray')
+                else:
+                    color = 'gray'  # Show non-cycles in gray
+            else:  # display_type == 'all'
+                color = SEGMENT_COLORS.get(segment, 'gray')
+            
             marker_size = 10 if len(points_data) <= 100 else 6
             
             edge_width = 2 if has_conflict else 0
@@ -960,6 +955,10 @@ ax_rules.set_title('Voting Rules', fontsize=9)
 rule_names_list = list(VOTING_RULES.keys())
 check_rules = CheckButtons(ax_rules, rule_names_list, [True] * len(rule_names_list))
 
+ax_display = fig.add_axes([0.72, 0.05, 0.12, 0.12])
+ax_display.set_title('Display types', fontsize=9)
+radio_display = RadioButtons(ax_display, ['Only cycles', 'Cycles and normal in gray', 'All'], active=2)
+
 
 # =============================================================================
 # Callbacks
@@ -1045,6 +1044,19 @@ def on_rules_change(label):
         update_point_details(selected_point_idx)
 
 
+def on_display_change(label):
+    """Change display type."""
+    global display_type
+    # Map UI labels to internal values
+    label_map = {
+        'Only cycles': 'only_cycles',
+        'Cycles and normal in gray': 'cycles_gray',
+        'All': 'all'
+    }
+    display_type = label_map.get(label, 'all')
+    update_display()
+
+
 def on_click(event):
     """Handle click to select a point."""
     global selected_point_idx
@@ -1077,6 +1089,7 @@ slider_voters.on_changed(on_voters_change)
 slider_profiles.on_changed(on_profiles_change)
 radio_method.on_clicked(on_method_change)
 check_rules.on_clicked(on_rules_change)
+radio_display.on_clicked(on_display_change)
 fig.canvas.mpl_connect('button_press_event', on_click)
 
 plt.show()
