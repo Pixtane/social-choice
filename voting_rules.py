@@ -124,6 +124,47 @@ def black(profile, positions=None):
     winner = condorcet(profile, positions)
     return winner if winner else borda(profile, positions)
 
+def star_voting(profile, positions=None):
+    """
+    STAR voting: Score Then Automatic Runoff.
+    Converts rankings to scores: 1st=5, 2nd=3, 3rd=0, then top 2 face off.
+    """
+    if positions is None:
+        positions = _get_positions(profile)
+    n = profile.shape[0]
+    
+    # Convert rankings to scores: 1st=5, 2nd=3, 3rd=0
+    scores = np.zeros((n, 3), dtype=np.int32)
+    for v in range(n):
+        for c in range(3):
+            pos = positions[v, c]
+            if pos == 0:
+                scores[v, c] = 5  # 1st place
+            elif pos == 1:
+                scores[v, c] = 3  # 2nd place
+            else:
+                scores[v, c] = 0  # 3rd place
+    
+    # Round 1: Sum scores
+    totals = np.sum(scores, axis=0)
+    
+    # Find top 2 candidates
+    sorted_indices = np.argsort(totals)[::-1]
+    finalist_a = sorted_indices[0]
+    finalist_b = sorted_indices[1]
+    
+    # Round 2: Automatic Runoff - count voters who prefer finalist_a over finalist_b
+    a_preferred = np.sum(positions[:, finalist_a] < positions[:, finalist_b])
+    b_preferred = np.sum(positions[:, finalist_b] < positions[:, finalist_a])
+    
+    if a_preferred > b_preferred:
+        return CANDIDATES[finalist_a]
+    elif b_preferred > a_preferred:
+        return CANDIDATES[finalist_b]
+    else:
+        # Tie in runoff - use total scores as tiebreaker
+        return CANDIDATES[finalist_a if totals[finalist_a] >= totals[finalist_b] else finalist_b]
+
 VOTING_RULES = {
     'plurality': plurality,
     'borda': borda,
@@ -133,4 +174,5 @@ VOTING_RULES = {
     'minimax': minimax,
     'plurality_runoff': plurality_runoff,
     'black': black,
+    'star_voting': star_voting,
 }
