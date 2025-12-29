@@ -4,52 +4,52 @@ overview: Rewrite paradox_simulator.py to use vector-based spatial representatio
 todos:
   - id: create_expanded_rules
     content: Create expanded_rules.py with utility computation, ballot conversion, and voting rule functions
-    status: pending
+    status: completed
   - id: implement_distance_metrics
     content: Implement L2/L1/cosine with vector normalization for cosine, cache d_max
-    status: pending
+    status: completed
   - id: implement_utility_functions
     content: Implement utilities with dimension-aware sigma, clamping, cosine validation
-    status: pending
+    status: completed
   - id: implement_ballot_conversion
     content: Implement ballot conversion with explicit approval policies and rounding rules
-    status: pending
+    status: completed
   - id: separate_cardinal_ordinal
     content: Separate cardinal/ordinal rules, compute rankings once, STAR ordinal runoff
-    status: pending
+    status: completed
   - id: rewrite_generation
     content: Rename and rewrite as spatial_uniform, spatial_clustered, spatial_polarized, etc.
-    status: pending
+    status: completed
   - id: rework_mallows
     content: Replace with spatial_clustered using phi as spatial variance
-    status: pending
+    status: completed
   - id: update_simulation_loop
     content: Update with vectorized utilities, ranking separation, enhanced metrics
-    status: pending
+    status: completed
   - id: implement_vse_metrics
     content: Implement VSE + regret + winner rank + raw social utility
-    status: pending
+    status: completed
   - id: add_config_params
     content: Add CLI args for distance, sigma, approval policy, enhanced logging, RNG seed
-    status: pending
+    status: completed
   - id: vectorize_computations
     content: Vectorize distance/utility computation, cache d_max (None for cosine)
-    status: pending
+    status: completed
   - id: add_reproducibility
     content: Add RNG seed logging and epsilon-tie handling in rankings
-    status: pending
+    status: completed
   - id: update_table_output
     content: Add optional columns for regret, winner rank, raw utility to tables
-    status: pending
+    status: completed
   - id: add_input_validation
     content: Validate cosine + quadratic/linear raises error, document cosine as experimental
-    status: pending
+    status: completed
   - id: test_all_methods
     content: Test all combinations with Score as baseline (VSE ≈ 1.0)
-    status: pending
+    status: completed
   - id: verify_dimension_scaling
     content: Verify sigma scaling, distance metrics, cycle rates vary with config
-    status: pending
+    status: completed
 ---
 
 # Vector-Based Voting Simulator Rewrite
