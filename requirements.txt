@@ -1,0 +1,10 @@
+# Core dependencies
+numpy>=1.20.0
+
+# Textual TUI framework
+textual>=0.47.0
+
+# Rich text formatting (dependency of textual)
+rich>=13.0.0
+
+

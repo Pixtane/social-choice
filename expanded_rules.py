@@ -776,3 +776,5 @@ VOTING_RULES: Dict[str, Dict[str, Any]] = {
 CARDINAL_RULES = [name for name, info in VOTING_RULES.items() if info['type'] == 'cardinal']
 ORDINAL_RULES = [name for name, info in VOTING_RULES.items() if info['type'] == 'ordinal']
 
+
+
