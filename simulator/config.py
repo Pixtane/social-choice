@@ -178,7 +178,7 @@ class UtilityConfig:
     """Configuration for utility computation."""
     
     # Utility function type
-    function: Literal['gaussian', 'quadratic', 'linear', 'exponential'] = 'gaussian'
+    function: Literal['gaussian', 'quadratic', 'linear', 'exponential', 'saturated'] = 'gaussian'
     
     # Distance metric (used when heterogeneous is disabled)
     distance_metric: Literal['l2', 'l1', 'cosine', 'chebyshev'] = 'l2'
@@ -193,6 +193,9 @@ class UtilityConfig:
     
     # Exponential utility parameters
     decay_rate: float = 2.0
+    
+    # Saturated utility parameters
+    saturation_threshold: float = 0.5  # Threshold for saturated utility
 
 
 @dataclass

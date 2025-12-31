@@ -452,3 +452,4 @@ The GUI provides a complete, professional interface for the Spatial Voting Simul
 Enjoy exploring voting systems through the new GUI! 🗳️✨
 
 
+

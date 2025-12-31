@@ -359,3 +359,4 @@ Everything you need to use the GUI is documented! 🗳️✨
 **Status**: Complete and ready to use
 
 
+

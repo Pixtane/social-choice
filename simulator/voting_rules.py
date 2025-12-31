@@ -1022,3 +1022,4 @@ def list_voting_rules() -> Dict[str, Dict[str, str]]:
     return AVAILABLE_VOTING_RULES
 
 
+

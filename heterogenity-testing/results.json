@@ -1,0 +1,919 @@
+{
+  "test_1": {
+    "test_name": "test_1_l2_cosine_fraction",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4684943525443177,
+          "std": 0.06946534977874014
+        },
+        "borda": {
+          "mean": 0.43640750133483247,
+          "std": 0.05052649147095163
+        },
+        "ranked_pairs": {
+          "mean": 0.4358740509374256,
+          "std": 0.0539652291556922
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.2994862610900476,
+          "std": 0.14141385972458176
+        },
+        "borda": {
+          "mean": 0.22926927058980287,
+          "std": 0.12844432469293132
+        },
+        "ranked_pairs": {
+          "mean": 0.2253196130420383,
+          "std": 0.12747944699568242
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.9091158443587612,
+          "std": 0.14592228488435002
+        },
+        "borda": {
+          "mean": 0.8429055445098682,
+          "std": 0.1279000100451535
+        },
+        "ranked_pairs": {
+          "mean": 0.8424685521581354,
+          "std": 0.1294545526104857
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.58,
+        "borda": 0.87,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.55,
+      "rule_disagreement_pct": 55.00000000000001
+    },
+    "compute_time": 0.0,
+    "config_summary": {
+      "l2_fraction": 0.5
+    }
+  },
+  "test_3": {
+    "test_name": "test_3_radius_based_distance",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4476938598467594,
+          "std": 0.05962946365257757
+        },
+        "borda": {
+          "mean": 0.4308513512068382,
+          "std": 0.05185828375153081
+        },
+        "ranked_pairs": {
+          "mean": 0.42974324611768905,
+          "std": 0.04928552216786024
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.26777878910107056,
+          "std": 0.12099519503821145
+        },
+        "borda": {
+          "mean": 0.22183418377175626,
+          "std": 0.1116478930791237
+        },
+        "ranked_pairs": {
+          "mean": 0.226927559407305,
+          "std": 0.11657262298185639
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.8813041457525652,
+          "std": 0.1192628021667563
+        },
+        "borda": {
+          "mean": 0.8319280379030289,
+          "std": 0.11295795240781246
+        },
+        "ranked_pairs": {
+          "mean": 0.834697620675266,
+          "std": 0.1135738414272263
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.65,
+        "borda": 0.87,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.52,
+      "rule_disagreement_pct": 52.0
+    },
+    "compute_time": 0.5513026999997237,
+    "config_summary": {
+      "experiment_id": "7d9b6393",
+      "created_at": "2025-12-31T12:59:52.912366",
+      "n_profiles": 100,
+      "n_voters": 100,
+      "n_candidates": 5,
+      "voting_rules": [
+        "plurality",
+        "borda",
+        "ranked_pairs"
+      ],
+      "geometry_method": "uniform",
+      "geometry_n_dim": 2,
+      "geometry_phi": 0.5,
+      "manipulation_enabled": false,
+      "manipulation_fraction": 0.2,
+      "manipulation_strategy": "compromise",
+      "utility_function": "linear",
+      "utility_distance_metric": "l2",
+      "utility_sigma_factor": 0.5,
+      "rng_seed": null,
+      "epsilon": 1e-09,
+      "heterogeneous_distance_enabled": false
+    }
+  },
+  "test_4": {
+    "test_name": "test_4_random_distance",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4591462273447789,
+          "std": 0.06250724796296883
+        },
+        "borda": {
+          "mean": 0.4321101378322753,
+          "std": 0.0497145453629974
+        },
+        "ranked_pairs": {
+          "mean": 0.4326905538022154,
+          "std": 0.046813731774882364
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.28577306327815605,
+          "std": 0.13476373546089773
+        },
+        "borda": {
+          "mean": 0.2215252445546919,
+          "std": 0.11235547090665281
+        },
+        "ranked_pairs": {
+          "mean": 0.2204511878352583,
+          "std": 0.10732156408667583
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.8898229093927162,
+          "std": 0.13537322292982326
+        },
+        "borda": {
+          "mean": 0.8267952344308139,
+          "std": 0.11248359827742282
+        },
+        "ranked_pairs": {
+          "mean": 0.8267100121798834,
+          "std": 0.1082701047499596
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.59,
+        "borda": 0.87,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.57,
+      "rule_disagreement_pct": 56.99999999999999
+    },
+    "compute_time": 0.5304837000003317,
+    "config_summary": {
+      "experiment_id": "15de281d",
+      "created_at": "2025-12-31T12:59:53.469097",
+      "n_profiles": 100,
+      "n_voters": 100,
+      "n_candidates": 5,
+      "voting_rules": [
+        "plurality",
+        "borda",
+        "ranked_pairs"
+      ],
+      "geometry_method": "uniform",
+      "geometry_n_dim": 2,
+      "geometry_phi": 0.5,
+      "manipulation_enabled": false,
+      "manipulation_fraction": 0.2,
+      "manipulation_strategy": "compromise",
+      "utility_function": "linear",
+      "utility_distance_metric": "l2",
+      "utility_sigma_factor": 0.5,
+      "rng_seed": null,
+      "epsilon": 1e-09,
+      "heterogeneous_distance_enabled": false
+    }
+  },
+  "test_5": {
+    "test_name": "test_5_utility_nonlinearity",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4496318825714245,
+          "std": 0.05486307651282581
+        },
+        "borda": {
+          "mean": 0.42822295323058207,
+          "std": 0.03965637749186495
+        },
+        "ranked_pairs": {
+          "mean": 0.42688730615220843,
+          "std": 0.03968971055221733
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.268748647476594,
+          "std": 0.116320047844765
+        },
+        "borda": {
+          "mean": 0.21767714756809334,
+          "std": 0.10006497355825755
+        },
+        "ranked_pairs": {
+          "mean": 0.2164201272690842,
+          "std": 0.0992810211344643
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.8750438714376451,
+          "std": 0.12362273842257303
+        },
+        "borda": {
+          "mean": 0.8267492426307653,
+          "std": 0.10089398708218371
+        },
+        "ranked_pairs": {
+          "mean": 0.8228892105970135,
+          "std": 0.09723521665246183
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.53,
+        "borda": 0.88,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.63,
+      "rule_disagreement_pct": 63.0
+    },
+    "compute_time": 0.0,
+    "config_summary": {
+      "utility_functions": [
+        "linear",
+        "quadratic",
+        "saturated"
+      ]
+    }
+  },
+  "test_6": {
+    "test_name": "test_6_strategic_misreporting",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.45007778432921586,
+          "std": 0.06366811151204647
+        },
+        "borda": {
+          "mean": 0.42516574431332477,
+          "std": 0.046998014618105134
+        },
+        "ranked_pairs": {
+          "mean": 0.42450889950376025,
+          "std": 0.04717263920983747
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.26941992723127384,
+          "std": 0.1268777263473208
+        },
+        "borda": {
+          "mean": 0.21187788378607356,
+          "std": 0.10681173153619934
+        },
+        "ranked_pairs": {
+          "mean": 0.21242099140370038,
+          "std": 0.10740225296276389
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.8757999302866526,
+          "std": 0.12227289125798568
+        },
+        "borda": {
+          "mean": 0.8229503129063371,
+          "std": 0.10570440206190546
+        },
+        "ranked_pairs": {
+          "mean": 0.8222120468553633,
+          "std": 0.10228097023856145
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.64,
+        "borda": 0.92,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.48,
+      "rule_disagreement_pct": 48.0
+    },
+    "compute_time": 0.0,
+    "config_summary": {
+      "manipulation_fraction": 0.2
+    }
+  },
+  "test_7": {
+    "test_name": "test_7_candidate_clustering",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.5153680687786659,
+          "std": 0.04531416022592435
+        },
+        "borda": {
+          "mean": 0.5152254577333879,
+          "std": 0.04516342654116241
+        },
+        "ranked_pairs": {
+          "mean": 0.5143436562258753,
+          "std": 0.04443435687648963
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.39251709231248355,
+          "std": 0.06252639825098777
+        },
+        "borda": {
+          "mean": 0.3917346696369174,
+          "std": 0.0612430306269704
+        },
+        "ranked_pairs": {
+          "mean": 0.3906322505695971,
+          "std": 0.06001032798221973
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 1.0010933206752315,
+          "std": 0.06991921257440678
+        },
+        "borda": {
+          "mean": 1.0006776914221578,
+          "std": 0.07033568356509756
+        },
+        "ranked_pairs": {
+          "mean": 0.9994173355563001,
+          "std": 0.06915509494284293
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.92,
+        "borda": 0.91,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.2,
+      "rule_disagreement_pct": 20.0
+    },
+    "compute_time": 0.0,
+    "config_summary": {
+      "candidate_cluster": [
+        0.7,
+        1.0
+      ]
+    }
+  },
+  "test_8": {
+    "test_name": "test_8_thresholds",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "approval": {
+          "mean": 0.4273019830113831,
+          "std": 0.04009131865058165
+        }
+      },
+      "winner_extremism": {
+        "approval": {
+          "mean": 0.21818828994477865,
+          "std": 0.09666350446734463
+        }
+      },
+      "worst_off_distance": {
+        "approval": {
+          "mean": 0.8280957253912383,
+          "std": 0.09764839739487975
+        }
+      },
+      "condorcet_consistency": {
+        "approval": 0.72
+      },
+      "rule_disagreement": 0.0,
+      "rule_disagreement_pct": 0.0
+    },
+    "compute_time": 0.1345219999998335,
+    "config_summary": {
+      "experiment_id": "30776c97",
+      "created_at": "2025-12-31T12:59:56.770402",
+      "n_profiles": 100,
+      "n_voters": 100,
+      "n_candidates": 5,
+      "voting_rules": [
+        "approval"
+      ],
+      "geometry_method": "uniform",
+      "geometry_n_dim": 2,
+      "geometry_phi": 0.5,
+      "manipulation_enabled": false,
+      "manipulation_fraction": 0.2,
+      "manipulation_strategy": "compromise",
+      "utility_function": "linear",
+      "utility_distance_metric": "l2",
+      "utility_sigma_factor": 0.5,
+      "rng_seed": null,
+      "epsilon": 1e-09,
+      "heterogeneous_distance_enabled": false
+    }
+  },
+  "test_9": {
+    "test_name": "test_9_dimensionality_sweep",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4810489919415453,
+          "std": 0.07956350940556857
+        },
+        "borda": {
+          "mean": 0.4480534197093744,
+          "std": 0.05635084845319999
+        },
+        "ranked_pairs": {
+          "mean": 0.45280865026452505,
+          "std": 0.06251349595580014
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.3205095541014995,
+          "std": 0.1445839221368442
+        },
+        "borda": {
+          "mean": 0.25648483769493946,
+          "std": 0.11956760187429245
+        },
+        "ranked_pairs": {
+          "mean": 0.26286313963132374,
+          "std": 0.12616092391325168
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.9296947947299127,
+          "std": 0.1465645727067142
+        },
+        "borda": {
+          "mean": 0.8684671005778785,
+          "std": 0.12224273522000488
+        },
+        "ranked_pairs": {
+          "mean": 0.874230745426575,
+          "std": 0.12977775001328062
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.57,
+        "borda": 0.89,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.59,
+      "rule_disagreement_pct": 59.0
+    },
+    "compute_time": 0.0,
+    "config_summary": {
+      "dimensions": [
+        1,
+        2,
+        3,
+        5
+      ]
+    }
+  },
+  "test_10": {
+    "test_name": "test_10_candidate_count_sweep",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4706205133591751,
+          "std": 0.0734808826127588
+        },
+        "borda": {
+          "mean": 0.4246174321764973,
+          "std": 0.042329255871908736
+        },
+        "ranked_pairs": {
+          "mean": 0.42874541429285196,
+          "std": 0.04663207194570672
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.3001602391213631,
+          "std": 0.13868607964129767
+        },
+        "borda": {
+          "mean": 0.2100417694280585,
+          "std": 0.10350766647492893
+        },
+        "ranked_pairs": {
+          "mean": 0.2182071684077637,
+          "std": 0.11386289902288493
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.9077709750171269,
+          "std": 0.1337752399559081
+        },
+        "borda": {
+          "mean": 0.8221089060428883,
+          "std": 0.10242644878937825
+        },
+        "ranked_pairs": {
+          "mean": 0.8306894791356793,
+          "std": 0.1090960551437139
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.46,
+        "borda": 0.86,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.69,
+      "rule_disagreement_pct": 69.0
+    },
+    "compute_time": 0.0,
+    "config_summary": {
+      "candidate_counts": [
+        3,
+        5,
+        10
+      ]
+    }
+  },
+  "test_11": {
+    "test_name": "test_11_outlier_voters",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4522065428370642,
+          "std": 0.0676894531714542
+        },
+        "borda": {
+          "mean": 0.42615611929512326,
+          "std": 0.04113089013974624
+        },
+        "ranked_pairs": {
+          "mean": 0.4237855382821803,
+          "std": 0.03830693387673173
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.2720635075319917,
+          "std": 0.12694366843955693
+        },
+        "borda": {
+          "mean": 0.22142578316713707,
+          "std": 0.10303382061366907
+        },
+        "ranked_pairs": {
+          "mean": 0.21855862697926576,
+          "std": 0.10192740356249243
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.8782995089578626,
+          "std": 0.1300790980693527
+        },
+        "borda": {
+          "mean": 0.8271223555477916,
+          "std": 0.0985943131662508
+        },
+        "ranked_pairs": {
+          "mean": 0.8255439590675226,
+          "std": 0.09525106773084925
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.58,
+        "borda": 0.87,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.52,
+      "rule_disagreement_pct": 52.0
+    },
+    "compute_time": 0.5125867000001563,
+    "config_summary": {
+      "experiment_id": "b9f26a72",
+      "created_at": "2025-12-31T13:00:01.647378",
+      "n_profiles": 100,
+      "n_voters": 100,
+      "n_candidates": 5,
+      "voting_rules": [
+        "plurality",
+        "borda",
+        "ranked_pairs"
+      ],
+      "geometry_method": "uniform",
+      "geometry_n_dim": 2,
+      "geometry_phi": 0.5,
+      "manipulation_enabled": false,
+      "manipulation_fraction": 0.2,
+      "manipulation_strategy": "compromise",
+      "utility_function": "linear",
+      "utility_distance_metric": "l2",
+      "utility_sigma_factor": 0.5,
+      "rng_seed": null,
+      "epsilon": 1e-09,
+      "heterogeneous_distance_enabled": false
+    }
+  },
+  "test_12": {
+    "test_name": "test_12_noise_perception",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4569044445833618,
+          "std": 0.060684661671267466
+        },
+        "borda": {
+          "mean": 0.43030289606717814,
+          "std": 0.0423846161929779
+        },
+        "ranked_pairs": {
+          "mean": 0.42929928816041935,
+          "std": 0.042614716922176575
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.2731189632098967,
+          "std": 0.12463948202473808
+        },
+        "borda": {
+          "mean": 0.2151023161182436,
+          "std": 0.10519386262602146
+        },
+        "ranked_pairs": {
+          "mean": 0.21261695694031704,
+          "std": 0.10657960928387862
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.8841154093483219,
+          "std": 0.12290378534073179
+        },
+        "borda": {
+          "mean": 0.82874629159756,
+          "std": 0.10335193704110004
+        },
+        "ranked_pairs": {
+          "mean": 0.827361733496026,
+          "std": 0.10730069291793788
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.55,
+        "borda": 0.89,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.57,
+      "rule_disagreement_pct": 56.99999999999999
+    },
+    "compute_time": 0.0,
+    "config_summary": {
+      "noise_std": 0.05
+    }
+  },
+  "test_13": {
+    "test_name": "test_13_hybrid_distance_switching",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.535124806289177,
+          "std": 0.06510281052890568
+        },
+        "borda": {
+          "mean": 0.5426770800431969,
+          "std": 0.07188776774690481
+        },
+        "ranked_pairs": {
+          "mean": 0.5442401822675618,
+          "std": 0.07054193090193124
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.4300732246543306,
+          "std": 0.08664757479494405
+        },
+        "borda": {
+          "mean": 0.43730870175324155,
+          "std": 0.09782217188707541
+        },
+        "ranked_pairs": {
+          "mean": 0.4380157768450414,
+          "std": 0.09507792229251956
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 1.0270958820567193,
+          "std": 0.09839013306764784
+        },
+        "borda": {
+          "mean": 1.0332211937142048,
+          "std": 0.11028787728077685
+        },
+        "ranked_pairs": {
+          "mean": 1.0357725579713752,
+          "std": 0.10637290493748572
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.71,
+        "borda": 0.88,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.4,
+      "rule_disagreement_pct": 40.0
+    },
+    "compute_time": 0.0,
+    "config_summary": {
+      "center_threshold": 0.3
+    }
+  },
+  "test_14": {
+    "test_name": "test_14_incremental_heterogeneity",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4596271708712713,
+          "std": 0.06732097108899704
+        },
+        "borda": {
+          "mean": 0.4321876330972047,
+          "std": 0.050145009440776336
+        },
+        "ranked_pairs": {
+          "mean": 0.43058032254273615,
+          "std": 0.04977836903347894
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.2839219292066699,
+          "std": 0.13650973151734577
+        },
+        "borda": {
+          "mean": 0.21305518376391508,
+          "std": 0.11588829317008421
+        },
+        "ranked_pairs": {
+          "mean": 0.2114802542635643,
+          "std": 0.11547068398242118
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.8877567083199321,
+          "std": 0.14504356550060363
+        },
+        "borda": {
+          "mean": 0.8179880401149278,
+          "std": 0.11696326436030195
+        },
+        "ranked_pairs": {
+          "mean": 0.8176199106855491,
+          "std": 0.1135928580809538
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.53,
+        "borda": 0.89,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.57,
+      "rule_disagreement_pct": 56.99999999999999
+    },
+    "compute_time": 0.0,
+    "config_summary": {
+      "non_l2_fractions": [
+        0.0,
+        0.1,
+        0.2,
+        0.30000000000000004,
+        0.4,
+        0.5,
+        0.6000000000000001,
+        0.7000000000000001,
+        0.8,
+        0.9,
+        1.0
+      ]
+    }
+  },
+  "test_15": {
+    "test_name": "test_15_saturated_utility_heterogeneous",
+    "metrics": {
+      "average_distance_to_ideal": {
+        "plurality": {
+          "mean": 0.4672629689608948,
+          "std": 0.06365676358959474
+        },
+        "borda": {
+          "mean": 0.44652766326139776,
+          "std": 0.059199841107247755
+        },
+        "ranked_pairs": {
+          "mean": 0.4501100746854243,
+          "std": 0.06100164601160296
+        }
+      },
+      "winner_extremism": {
+        "plurality": {
+          "mean": 0.29955251129536203,
+          "std": 0.12543178014774947
+        },
+        "borda": {
+          "mean": 0.26002780199431413,
+          "std": 0.13043544526260623
+        },
+        "ranked_pairs": {
+          "mean": 0.26644654990236555,
+          "std": 0.1340908502272889
+        }
+      },
+      "worst_off_distance": {
+        "plurality": {
+          "mean": 0.908012095112751,
+          "std": 0.11970100373580443
+        },
+        "borda": {
+          "mean": 0.8701285628908724,
+          "std": 0.12328912330616962
+        },
+        "ranked_pairs": {
+          "mean": 0.8785532700595851,
+          "std": 0.1268209366088806
+        }
+      },
+      "condorcet_consistency": {
+        "plurality": 0.62,
+        "borda": 0.91,
+        "ranked_pairs": 1.0
+      },
+      "rule_disagreement": 0.56,
+      "rule_disagreement_pct": 56.00000000000001
+    },
+    "compute_time": 0.5009433000000172,
+    "config_summary": {
+      "experiment_id": "2e0bc6d7",
+      "created_at": "2025-12-31T13:00:09.862165",
+      "n_profiles": 100,
+      "n_voters": 100,
+      "n_candidates": 5,
+      "voting_rules": [
+        "plurality",
+        "borda",
+        "ranked_pairs"
+      ],
+      "geometry_method": "uniform",
+      "geometry_n_dim": 2,
+      "geometry_phi": 0.5,
+      "manipulation_enabled": false,
+      "manipulation_fraction": 0.2,
+      "manipulation_strategy": "compromise",
+      "utility_function": "saturated",
+      "utility_distance_metric": "l2",
+      "utility_sigma_factor": 0.5,
+      "rng_seed": null,
+      "epsilon": 1e-09,
+      "heterogeneous_distance_enabled": false
+    }
+  }
+}

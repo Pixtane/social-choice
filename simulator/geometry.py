@@ -405,3 +405,4 @@ def generate_candidate_positions(
     return profile.candidate_positions
 
 
+

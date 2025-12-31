@@ -469,3 +469,106 @@ def compute_social_utility(
         raise ValueError(f"Unknown social utility method: {method}")
 
 
+def compute_average_distance_to_ideal(
+    voter_positions: np.ndarray,
+    candidate_positions: np.ndarray,
+    winner_index: int,
+    metric: str = 'l2'
+) -> float:
+    """
+    Compute average distance from voters to the winner (their ideal).
+    
+    Args:
+        voter_positions: Voter positions (n_voters, n_dim)
+        candidate_positions: Candidate positions (n_candidates, n_dim)
+        winner_index: Index of winning candidate
+        metric: Distance metric to use
+        
+    Returns:
+        Average distance from voters to winner
+    """
+    from .utility import compute_distances
+    
+    winner_pos = candidate_positions[winner_index:winner_index+1]  # (1, n_dim)
+    distances = compute_distances(voter_positions, winner_pos, metric)
+    return float(np.mean(distances))
+
+
+def compute_winner_extremism(
+    candidate_positions: np.ndarray,
+    winner_index: int,
+    center: Optional[np.ndarray] = None,
+    metric: str = 'l2'
+) -> float:
+    """
+    Compute extremism of winner (distance from center).
+    
+    Args:
+        candidate_positions: Candidate positions (n_candidates, n_dim)
+        winner_index: Index of winning candidate
+        center: Center point (default: 0.5 in all dimensions)
+        metric: Distance metric to use
+        
+    Returns:
+        Distance from winner to center
+    """
+    from .utility import compute_distances
+    
+    if center is None:
+        n_dim = candidate_positions.shape[1]
+        center = np.full((1, n_dim), 0.5)
+    else:
+        # Ensure center is 2D
+        if center.ndim == 1:
+            center = center.reshape(1, -1)
+    
+    winner_pos = candidate_positions[winner_index:winner_index+1]  # (1, n_dim)
+    distance = compute_distances(winner_pos, center, metric)
+    return float(distance[0, 0])
+
+
+def compute_worst_off_distance(
+    voter_positions: np.ndarray,
+    candidate_positions: np.ndarray,
+    winner_index: int,
+    metric: str = 'l2'
+) -> float:
+    """
+    Compute worst-off distance (maximum distance from any voter to winner).
+    
+    Args:
+        voter_positions: Voter positions (n_voters, n_dim)
+        candidate_positions: Candidate positions (n_candidates, n_dim)
+        winner_index: Index of winning candidate
+        metric: Distance metric to use
+        
+    Returns:
+        Maximum distance from any voter to winner
+    """
+    from .utility import compute_distances
+    
+    winner_pos = candidate_positions[winner_index:winner_index+1]  # (1, n_dim)
+    distances = compute_distances(voter_positions, winner_pos, metric)
+    return float(np.max(distances))
+
+
+def compute_rule_disagreement(
+    winners: Dict[str, int]
+) -> bool:
+    """
+    Check if different voting rules disagree (pick different winners).
+    
+    Args:
+        winners: Dictionary mapping rule names to winner indices
+        
+    Returns:
+        True if rules disagree, False if all agree
+    """
+    if len(winners) == 0:
+        return False
+    
+    winner_values = list(winners.values())
+    return len(set(winner_values)) > 1
+
+
+

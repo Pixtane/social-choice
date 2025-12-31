@@ -310,3 +310,4 @@ The GUI is built with modularity in mind. To add features:
 Same as the parent Spatial Voting Simulator project.
 
 
+
