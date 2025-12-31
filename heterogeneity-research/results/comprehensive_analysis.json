@@ -1,0 +1,309 @@
+{
+  "threshold_nonlinearity": {
+    "plurality": {
+      "max_disagreement": 84.0,
+      "max_disagreement_threshold": 0.6,
+      "min_disagreement": 70.5,
+      "min_disagreement_threshold": 0.6,
+      "inflection_points": [
+        0.15,
+        0.25,
+        0.3,
+        0.35,
+        0.39999999999999997,
+        0.44999999999999996,
+        0.49999999999999994,
+        0.5499999999999999,
+        0.6,
+        0.7,
+        0.75,
+        0.7999999999999999,
+        0.9
+      ],
+      "max_curvature_threshold": 0.75,
+      "max_jump": 12.0,
+      "jump_threshold": 0.7,
+      "sigmoid_fit": true,
+      "sigmoid_center": 0.8,
+      "sigmoid_slope": 5.0,
+      "variance": 9.752077562326868,
+      "range": 13.5
+    },
+    "borda": {
+      "max_disagreement": 83.5,
+      "max_disagreement_threshold": 0.7,
+      "min_disagreement": 76.0,
+      "min_disagreement_threshold": 0.7,
+      "inflection_points": [
+        0.2,
+        0.25,
+        0.3,
+        0.49999999999999994,
+        0.5499999999999999,
+        0.65,
+        0.7,
+        0.75,
+        0.85,
+        0.9
+      ],
+      "max_curvature_threshold": 0.7,
+      "max_jump": 7.5,
+      "jump_threshold": 0.65,
+      "sigmoid_fit": true,
+      "sigmoid_center": 0.8,
+      "sigmoid_slope": 5.0,
+      "variance": 4.0083102493074785,
+      "range": 7.5
+    },
+    "irv": {
+      "max_disagreement": 85.0,
+      "max_disagreement_threshold": 0.15,
+      "min_disagreement": 76.5,
+      "min_disagreement_threshold": 0.15,
+      "inflection_points": [
+        0.2,
+        0.25,
+        0.35,
+        0.39999999999999997,
+        0.5499999999999999,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        0.7999999999999999,
+        0.85,
+        0.9
+      ],
+      "max_curvature_threshold": 0.85,
+      "max_jump": 7.5,
+      "jump_threshold": 0.05,
+      "sigmoid_fit": true,
+      "sigmoid_center": 0.8,
+      "sigmoid_slope": 5.0,
+      "variance": 6.1024930747922435,
+      "range": 8.5
+    }
+  },
+  "metric_asymmetry": {
+    "plurality": {
+      "max_asymmetry": {
+        "pair1": "l1_cosine",
+        "pair2": "cosine_l1",
+        "disagreement1": 81.33333333333333,
+        "disagreement2": 87.33333333333333,
+        "absolute_asymmetry": 6.0,
+        "relative_asymmetry": 0.06870229007633588
+      },
+      "mean_asymmetry": 3.777777777777781,
+      "std_asymmetry": 1.196703290474333,
+      "top_asymmetries": [
+        {
+          "pair1": "l1_cosine",
+          "pair2": "cosine_l1",
+          "disagreement1": 81.33333333333333,
+          "disagreement2": 87.33333333333333,
+          "absolute_asymmetry": 6.0,
+          "relative_asymmetry": 0.06870229007633588
+        },
+        {
+          "pair1": "cosine_l1",
+          "pair2": "l1_cosine",
+          "disagreement1": 87.33333333333333,
+          "disagreement2": 81.33333333333333,
+          "absolute_asymmetry": 6.0,
+          "relative_asymmetry": 0.06870229007633588
+        },
+        {
+          "pair1": "l2_chebyshev",
+          "pair2": "chebyshev_l2",
+          "disagreement1": 86.0,
+          "disagreement2": 81.33333333333333,
+          "absolute_asymmetry": 4.666666666666671,
+          "relative_asymmetry": 0.05426356589147292
+        },
+        {
+          "pair1": "chebyshev_l2",
+          "pair2": "l2_chebyshev",
+          "disagreement1": 81.33333333333333,
+          "disagreement2": 86.0,
+          "absolute_asymmetry": 4.666666666666671,
+          "relative_asymmetry": 0.05426356589147292
+        },
+        {
+          "pair1": "l1_l2",
+          "pair2": "l2_l1",
+          "disagreement1": 84.0,
+          "disagreement2": 80.66666666666666,
+          "absolute_asymmetry": 3.333333333333343,
+          "relative_asymmetry": 0.0396825396825398
+        }
+      ]
+    },
+    "borda": {
+      "max_asymmetry": {
+        "pair1": "l1_chebyshev",
+        "pair2": "chebyshev_l1",
+        "disagreement1": 76.66666666666667,
+        "disagreement2": 84.0,
+        "absolute_asymmetry": 7.333333333333329,
+        "relative_asymmetry": 0.08730158730158724
+      },
+      "mean_asymmetry": 4.000000000000003,
+      "std_asymmetry": 1.7213259316477354,
+      "top_asymmetries": [
+        {
+          "pair1": "l1_chebyshev",
+          "pair2": "chebyshev_l1",
+          "disagreement1": 76.66666666666667,
+          "disagreement2": 84.0,
+          "absolute_asymmetry": 7.333333333333329,
+          "relative_asymmetry": 0.08730158730158724
+        },
+        {
+          "pair1": "chebyshev_l1",
+          "pair2": "l1_chebyshev",
+          "disagreement1": 84.0,
+          "disagreement2": 76.66666666666667,
+          "absolute_asymmetry": 7.333333333333329,
+          "relative_asymmetry": 0.08730158730158724
+        },
+        {
+          "pair1": "l1_l2",
+          "pair2": "l2_l1",
+          "disagreement1": 88.0,
+          "disagreement2": 83.33333333333334,
+          "absolute_asymmetry": 4.666666666666657,
+          "relative_asymmetry": 0.05303030303030292
+        },
+        {
+          "pair1": "l2_l1",
+          "pair2": "l1_l2",
+          "disagreement1": 83.33333333333334,
+          "disagreement2": 88.0,
+          "absolute_asymmetry": 4.666666666666657,
+          "relative_asymmetry": 0.05303030303030292
+        },
+        {
+          "pair1": "l2_cosine",
+          "pair2": "cosine_l2",
+          "disagreement1": 81.33333333333333,
+          "disagreement2": 85.33333333333334,
+          "absolute_asymmetry": 4.000000000000014,
+          "relative_asymmetry": 0.04687500000000016
+        }
+      ]
+    },
+    "irv": {
+      "max_asymmetry": {
+        "pair1": "l1_l2",
+        "pair2": "l2_l1",
+        "disagreement1": 78.66666666666666,
+        "disagreement2": 86.66666666666667,
+        "absolute_asymmetry": 8.000000000000014,
+        "relative_asymmetry": 0.09230769230769247
+      },
+      "mean_asymmetry": 4.4444444444444455,
+      "std_asymmetry": 1.749779527558186,
+      "top_asymmetries": [
+        {
+          "pair1": "l1_l2",
+          "pair2": "l2_l1",
+          "disagreement1": 78.66666666666666,
+          "disagreement2": 86.66666666666667,
+          "absolute_asymmetry": 8.000000000000014,
+          "relative_asymmetry": 0.09230769230769247
+        },
+        {
+          "pair1": "l2_l1",
+          "pair2": "l1_l2",
+          "disagreement1": 86.66666666666667,
+          "disagreement2": 78.66666666666666,
+          "absolute_asymmetry": 8.000000000000014,
+          "relative_asymmetry": 0.09230769230769247
+        },
+        {
+          "pair1": "l2_cosine",
+          "pair2": "cosine_l2",
+          "disagreement1": 80.0,
+          "disagreement2": 84.66666666666667,
+          "absolute_asymmetry": 4.666666666666671,
+          "relative_asymmetry": 0.05511811023622053
+        },
+        {
+          "pair1": "cosine_l2",
+          "pair2": "l2_cosine",
+          "disagreement1": 84.66666666666667,
+          "disagreement2": 80.0,
+          "absolute_asymmetry": 4.666666666666671,
+          "relative_asymmetry": 0.05511811023622053
+        },
+        {
+          "pair1": "l1_cosine",
+          "pair2": "cosine_l1",
+          "disagreement1": 80.66666666666666,
+          "disagreement2": 76.0,
+          "absolute_asymmetry": 4.666666666666657,
+          "relative_asymmetry": 0.05785123966942138
+        }
+      ]
+    }
+  },
+  "dimensional_scaling": {
+    "plurality": {
+      "peak_dimension": 2,
+      "peak_disagreement": 84.66666666666667,
+      "scaling_exponent": 0.26305191800862143,
+      "scaling_r_squared": 1.0,
+      "plateau_slope": -0.06666666666667258,
+      "initial_disagreement": 76.0,
+      "final_disagreement": 76.66666666666667,
+      "total_change": 0.6666666666666714
+    },
+    "borda": {
+      "peak_dimension": 2,
+      "peak_disagreement": 83.33333333333334,
+      "scaling_exponent": 0.09946119796876045,
+      "scaling_r_squared": 1.0,
+      "plateau_slope": -0.1333333333333449,
+      "initial_disagreement": 80.0,
+      "final_disagreement": 80.0,
+      "total_change": 0.0
+    },
+    "irv": {
+      "peak_dimension": 3,
+      "peak_disagreement": 82.0,
+      "scaling_exponent": 0.008228139043696032,
+      "scaling_r_squared": 0.05316645893328953,
+      "plateau_slope": -0.9333333333333371,
+      "initial_disagreement": 81.33333333333333,
+      "final_disagreement": 78.66666666666666,
+      "total_change": -2.6666666666666714
+    }
+  },
+  "preference_structure": {
+    "plurality": {
+      "mean_cycle_change": 1.8333333333333333,
+      "std_cycle_change": 1.699673171197595,
+      "mean_condorcet_change": 2.9666911118664125,
+      "std_condorcet_change": 5.819893711656721,
+      "max_cycle_increase": 3.5,
+      "max_condorcet_change": 7.176131322094051
+    },
+    "borda": {
+      "mean_cycle_change": 1.8333333333333333,
+      "std_cycle_change": 1.699673171197595,
+      "mean_condorcet_change": 0.11825117859065415,
+      "std_condorcet_change": 2.5119642582005697,
+      "max_cycle_increase": 3.5,
+      "max_condorcet_change": 3.349600709849156
+    },
+    "irv": {
+      "mean_cycle_change": 1.8333333333333333,
+      "std_cycle_change": 1.699673171197595,
+      "mean_condorcet_change": 1.408218132494298,
+      "std_condorcet_change": 0.4555826873466093,
+      "max_cycle_increase": 3.5,
+      "max_condorcet_change": 1.9092945128779348
+    }
+  }
+}

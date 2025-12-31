@@ -1,0 +1,134 @@
+{
+  "dimensions": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    10
+  ],
+  "data": {
+    "1": {
+      "plurality": {
+        "disagreement_rate": 76.0,
+        "vse_difference": -0.0330785517816885
+      },
+      "borda": {
+        "disagreement_rate": 80.0,
+        "vse_difference": 0.0015435603011928478
+      },
+      "irv": {
+        "disagreement_rate": 81.33333333333333,
+        "vse_difference": 0.011159217213564832
+      }
+    },
+    "2": {
+      "plurality": {
+        "disagreement_rate": 84.66666666666667,
+        "vse_difference": -0.012561160451631248
+      },
+      "borda": {
+        "disagreement_rate": 83.33333333333334,
+        "vse_difference": 0.0002970362218608358
+      },
+      "irv": {
+        "disagreement_rate": 80.0,
+        "vse_difference": -0.00019795527687227477
+      }
+    },
+    "3": {
+      "plurality": {
+        "disagreement_rate": 80.0,
+        "vse_difference": -0.002172012000575929
+      },
+      "borda": {
+        "disagreement_rate": 79.33333333333333,
+        "vse_difference": -0.0005994396748457698
+      },
+      "irv": {
+        "disagreement_rate": 82.0,
+        "vse_difference": -0.0023013505246016752
+      }
+    },
+    "4": {
+      "plurality": {
+        "disagreement_rate": 76.0,
+        "vse_difference": 0.02150841028979822
+      },
+      "borda": {
+        "disagreement_rate": 75.33333333333333,
+        "vse_difference": 0.002723055396790741
+      },
+      "irv": {
+        "disagreement_rate": 80.0,
+        "vse_difference": 0.004513842337114271
+      }
+    },
+    "5": {
+      "plurality": {
+        "disagreement_rate": 78.0,
+        "vse_difference": 0.007518500870759115
+      },
+      "borda": {
+        "disagreement_rate": 79.33333333333333,
+        "vse_difference": -0.0005094237797977907
+      },
+      "irv": {
+        "disagreement_rate": 77.33333333333333,
+        "vse_difference": -0.0009063003319061957
+      }
+    },
+    "7": {
+      "plurality": {
+        "disagreement_rate": 82.0,
+        "vse_difference": 0.02816340482100954
+      },
+      "borda": {
+        "disagreement_rate": 72.66666666666667,
+        "vse_difference": 0.0026805167786547734
+      },
+      "irv": {
+        "disagreement_rate": 72.0,
+        "vse_difference": 0.005529200340889218
+      }
+    },
+    "10": {
+      "plurality": {
+        "disagreement_rate": 76.66666666666667,
+        "vse_difference": -0.011253500804614291
+      },
+      "borda": {
+        "disagreement_rate": 80.0,
+        "vse_difference": 0.003576776499609191
+      },
+      "irv": {
+        "disagreement_rate": 78.66666666666666,
+        "vse_difference": -0.01097751895812249
+      }
+    }
+  },
+  "analysis": {
+    "plurality": {
+      "peak_dimension": 2,
+      "peak_disagreement": 84.66666666666667,
+      "scaling_exponent": 0.26305191800862143,
+      "final_disagreement": 76.66666666666667,
+      "scaling_ratio": 1.0087719298245614
+    },
+    "borda": {
+      "peak_dimension": 2,
+      "peak_disagreement": 83.33333333333334,
+      "scaling_exponent": 0.09946119796876045,
+      "final_disagreement": 80.0,
+      "scaling_ratio": 1.0
+    },
+    "irv": {
+      "peak_dimension": 3,
+      "peak_disagreement": 82.0,
+      "scaling_exponent": 0.008228139043696032,
+      "final_disagreement": 78.66666666666666,
+      "scaling_ratio": 0.9672131147540983
+    }
+  }
+}

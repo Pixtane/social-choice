@@ -1,0 +1,375 @@
+{
+  "interaction_matrix": {
+    "l1_l2": {
+      "plurality": {
+        "disagreement_rate": 84.0,
+        "vse_difference": 0.005297804521203431
+      },
+      "borda": {
+        "disagreement_rate": 88.0,
+        "vse_difference": 0.013490501141159683
+      },
+      "irv": {
+        "disagreement_rate": 78.66666666666666,
+        "vse_difference": 0.004787480452352
+      }
+    },
+    "l1_cosine": {
+      "plurality": {
+        "disagreement_rate": 81.33333333333333,
+        "vse_difference": 0.03677143776117331
+      },
+      "borda": {
+        "disagreement_rate": 80.66666666666666,
+        "vse_difference": 0.0028773283360002955
+      },
+      "irv": {
+        "disagreement_rate": 80.66666666666666,
+        "vse_difference": 0.007532727137350648
+      }
+    },
+    "l1_chebyshev": {
+      "plurality": {
+        "disagreement_rate": 78.66666666666666,
+        "vse_difference": 0.056326509016931814
+      },
+      "borda": {
+        "disagreement_rate": 76.66666666666667,
+        "vse_difference": 0.0029679392493585643
+      },
+      "irv": {
+        "disagreement_rate": 83.33333333333334,
+        "vse_difference": 0.015729450734220274
+      }
+    },
+    "l2_l1": {
+      "plurality": {
+        "disagreement_rate": 80.66666666666666,
+        "vse_difference": 0.02102252930377213
+      },
+      "borda": {
+        "disagreement_rate": 83.33333333333334,
+        "vse_difference": 0.0024184640538341684
+      },
+      "irv": {
+        "disagreement_rate": 86.66666666666667,
+        "vse_difference": 0.02417662077386007
+      }
+    },
+    "l2_cosine": {
+      "plurality": {
+        "disagreement_rate": 82.66666666666667,
+        "vse_difference": -0.011954114152610718
+      },
+      "borda": {
+        "disagreement_rate": 81.33333333333333,
+        "vse_difference": 0.005973493360144966
+      },
+      "irv": {
+        "disagreement_rate": 80.0,
+        "vse_difference": 0.0010222172390365047
+      }
+    },
+    "l2_chebyshev": {
+      "plurality": {
+        "disagreement_rate": 86.0,
+        "vse_difference": -0.05506481485393033
+      },
+      "borda": {
+        "disagreement_rate": 77.33333333333333,
+        "vse_difference": 0.00699915573126364
+      },
+      "irv": {
+        "disagreement_rate": 81.33333333333333,
+        "vse_difference": -0.0031306281013366855
+      }
+    },
+    "cosine_l1": {
+      "plurality": {
+        "disagreement_rate": 87.33333333333333,
+        "vse_difference": -0.005735573110893677
+      },
+      "borda": {
+        "disagreement_rate": 82.66666666666667,
+        "vse_difference": 0.01967013357452252
+      },
+      "irv": {
+        "disagreement_rate": 76.0,
+        "vse_difference": 0.03863932461828923
+      }
+    },
+    "cosine_l2": {
+      "plurality": {
+        "disagreement_rate": 80.0,
+        "vse_difference": 0.026174906735842884
+      },
+      "borda": {
+        "disagreement_rate": 85.33333333333334,
+        "vse_difference": 0.005966285398098514
+      },
+      "irv": {
+        "disagreement_rate": 84.66666666666667,
+        "vse_difference": 0.027422077144301893
+      }
+    },
+    "cosine_chebyshev": {
+      "plurality": {
+        "disagreement_rate": 79.33333333333333,
+        "vse_difference": 0.009082380928776224
+      },
+      "borda": {
+        "disagreement_rate": 78.66666666666666,
+        "vse_difference": 0.00566299553008931
+      },
+      "irv": {
+        "disagreement_rate": 80.0,
+        "vse_difference": 0.020064392226890382
+      }
+    },
+    "chebyshev_l1": {
+      "plurality": {
+        "disagreement_rate": 75.33333333333333,
+        "vse_difference": -0.052985727072351496
+      },
+      "borda": {
+        "disagreement_rate": 84.0,
+        "vse_difference": 0.006330386583847436
+      },
+      "irv": {
+        "disagreement_rate": 86.0,
+        "vse_difference": -0.030179013936433963
+      }
+    },
+    "chebyshev_l2": {
+      "plurality": {
+        "disagreement_rate": 81.33333333333333,
+        "vse_difference": -0.0376611848373245
+      },
+      "borda": {
+        "disagreement_rate": 80.66666666666666,
+        "vse_difference": 0.018296501837619106
+      },
+      "irv": {
+        "disagreement_rate": 78.0,
+        "vse_difference": -0.005222909898608741
+      }
+    },
+    "chebyshev_cosine": {
+      "plurality": {
+        "disagreement_rate": 82.0,
+        "vse_difference": 0.0026986247137725794
+      },
+      "borda": {
+        "disagreement_rate": 81.33333333333333,
+        "vse_difference": 0.016645542566251947
+      },
+      "irv": {
+        "disagreement_rate": 83.33333333333334,
+        "vse_difference": 0.025007372474498024
+      }
+    }
+  },
+  "analysis": {
+    "strongest_pairs": {
+      "plurality": [
+        [
+          "cosine_l1",
+          87.33333333333333
+        ],
+        [
+          "l2_chebyshev",
+          86.0
+        ],
+        [
+          "l1_l2",
+          84.0
+        ]
+      ],
+      "borda": [
+        [
+          "l1_l2",
+          88.0
+        ],
+        [
+          "cosine_l2",
+          85.33333333333334
+        ],
+        [
+          "chebyshev_l1",
+          84.0
+        ]
+      ],
+      "irv": [
+        [
+          "l2_l1",
+          86.66666666666667
+        ],
+        [
+          "chebyshev_l1",
+          86.0
+        ],
+        [
+          "cosine_l2",
+          84.66666666666667
+        ]
+      ]
+    },
+    "weakest_pairs": {
+      "plurality": [
+        [
+          "cosine_chebyshev",
+          79.33333333333333
+        ],
+        [
+          "l1_chebyshev",
+          78.66666666666666
+        ],
+        [
+          "chebyshev_l1",
+          75.33333333333333
+        ]
+      ],
+      "borda": [
+        [
+          "cosine_chebyshev",
+          78.66666666666666
+        ],
+        [
+          "l2_chebyshev",
+          77.33333333333333
+        ],
+        [
+          "l1_chebyshev",
+          76.66666666666667
+        ]
+      ],
+      "irv": [
+        [
+          "l1_l2",
+          78.66666666666666
+        ],
+        [
+          "chebyshev_l2",
+          78.0
+        ],
+        [
+          "cosine_l1",
+          76.0
+        ]
+      ]
+    },
+    "asymmetry_analysis": {
+      "plurality": [
+        {
+          "pair1": "l1_cosine",
+          "pair2": "cosine_l1",
+          "asymmetry": 6.0,
+          "d1": 81.33333333333333,
+          "d2": 87.33333333333333
+        },
+        {
+          "pair1": "cosine_l1",
+          "pair2": "l1_cosine",
+          "asymmetry": 6.0,
+          "d1": 87.33333333333333,
+          "d2": 81.33333333333333
+        },
+        {
+          "pair1": "l2_chebyshev",
+          "pair2": "chebyshev_l2",
+          "asymmetry": 4.666666666666671,
+          "d1": 86.0,
+          "d2": 81.33333333333333
+        },
+        {
+          "pair1": "chebyshev_l2",
+          "pair2": "l2_chebyshev",
+          "asymmetry": 4.666666666666671,
+          "d1": 81.33333333333333,
+          "d2": 86.0
+        },
+        {
+          "pair1": "l1_l2",
+          "pair2": "l2_l1",
+          "asymmetry": 3.333333333333343,
+          "d1": 84.0,
+          "d2": 80.66666666666666
+        }
+      ],
+      "borda": [
+        {
+          "pair1": "l1_chebyshev",
+          "pair2": "chebyshev_l1",
+          "asymmetry": 7.333333333333329,
+          "d1": 76.66666666666667,
+          "d2": 84.0
+        },
+        {
+          "pair1": "chebyshev_l1",
+          "pair2": "l1_chebyshev",
+          "asymmetry": 7.333333333333329,
+          "d1": 84.0,
+          "d2": 76.66666666666667
+        },
+        {
+          "pair1": "l1_l2",
+          "pair2": "l2_l1",
+          "asymmetry": 4.666666666666657,
+          "d1": 88.0,
+          "d2": 83.33333333333334
+        },
+        {
+          "pair1": "l2_l1",
+          "pair2": "l1_l2",
+          "asymmetry": 4.666666666666657,
+          "d1": 83.33333333333334,
+          "d2": 88.0
+        },
+        {
+          "pair1": "l2_cosine",
+          "pair2": "cosine_l2",
+          "asymmetry": 4.000000000000014,
+          "d1": 81.33333333333333,
+          "d2": 85.33333333333334
+        }
+      ],
+      "irv": [
+        {
+          "pair1": "l1_l2",
+          "pair2": "l2_l1",
+          "asymmetry": 8.000000000000014,
+          "d1": 78.66666666666666,
+          "d2": 86.66666666666667
+        },
+        {
+          "pair1": "l2_l1",
+          "pair2": "l1_l2",
+          "asymmetry": 8.000000000000014,
+          "d1": 86.66666666666667,
+          "d2": 78.66666666666666
+        },
+        {
+          "pair1": "l2_cosine",
+          "pair2": "cosine_l2",
+          "asymmetry": 4.666666666666671,
+          "d1": 80.0,
+          "d2": 84.66666666666667
+        },
+        {
+          "pair1": "cosine_l2",
+          "pair2": "l2_cosine",
+          "asymmetry": 4.666666666666671,
+          "d1": 84.66666666666667,
+          "d2": 80.0
+        },
+        {
+          "pair1": "l1_cosine",
+          "pair2": "cosine_l1",
+          "asymmetry": 4.666666666666657,
+          "d1": 80.66666666666666,
+          "d2": 76.0
+        }
+      ]
+    }
+  }
+}

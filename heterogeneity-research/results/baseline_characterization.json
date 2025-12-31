@@ -1,0 +1,154 @@
+{
+  "l1": {
+    "plurality": {
+      "vse_mean": 0.761774434615939,
+      "vse_std": 0.3242562081426823,
+      "condorcet_efficiency": 44.44444444444444,
+      "cycle_percentage": 94.0
+    },
+    "borda": {
+      "vse_mean": 0.9630008178089372,
+      "vse_std": 0.1152354462885738,
+      "condorcet_efficiency": 82.22222222222223,
+      "cycle_percentage": 94.0
+    },
+    "irv": {
+      "vse_mean": 0.9468443819218824,
+      "vse_std": 0.1419532410964942,
+      "condorcet_efficiency": 77.77777777777777,
+      "cycle_percentage": 94.0
+    },
+    "approval": {
+      "vse_mean": 0.9537256147895431,
+      "vse_std": 0.12196897343674788,
+      "condorcet_efficiency": 78.88888888888889,
+      "cycle_percentage": 94.0
+    },
+    "star": {
+      "vse_mean": 0.9744673362122376,
+      "vse_std": 0.076749899096883,
+      "condorcet_efficiency": 97.77777777777777,
+      "cycle_percentage": 94.0
+    },
+    "schulze": {
+      "vse_mean": 0.9753016338959685,
+      "vse_std": 0.08668151602657898,
+      "condorcet_efficiency": 100.0,
+      "cycle_percentage": 94.0
+    }
+  },
+  "l2": {
+    "plurality": {
+      "vse_mean": 0.8534728277748834,
+      "vse_std": 0.2702757417945809,
+      "condorcet_efficiency": 61.224489795918366,
+      "cycle_percentage": 93.0
+    },
+    "borda": {
+      "vse_mean": 0.9891869425299891,
+      "vse_std": 0.05466871913388201,
+      "condorcet_efficiency": 89.79591836734694,
+      "cycle_percentage": 93.0
+    },
+    "irv": {
+      "vse_mean": 0.9457858141743049,
+      "vse_std": 0.1612403377808904,
+      "condorcet_efficiency": 81.63265306122449,
+      "cycle_percentage": 93.0
+    },
+    "approval": {
+      "vse_mean": 0.9648432764510868,
+      "vse_std": 0.10907977944919109,
+      "condorcet_efficiency": 81.63265306122449,
+      "cycle_percentage": 93.0
+    },
+    "star": {
+      "vse_mean": 0.998935848793588,
+      "vse_std": 0.00970594701857309,
+      "condorcet_efficiency": 98.9795918367347,
+      "cycle_percentage": 93.0
+    },
+    "schulze": {
+      "vse_mean": 0.9914192255984514,
+      "vse_std": 0.07075934348276461,
+      "condorcet_efficiency": 100.0,
+      "cycle_percentage": 93.0
+    }
+  },
+  "cosine": {
+    "plurality": {
+      "vse_mean": 0.8628678580162533,
+      "vse_std": 0.2422654053249384,
+      "condorcet_efficiency": 56.8421052631579,
+      "cycle_percentage": 96.0
+    },
+    "borda": {
+      "vse_mean": 0.9906376927537777,
+      "vse_std": 0.048040297106331675,
+      "condorcet_efficiency": 88.42105263157895,
+      "cycle_percentage": 96.0
+    },
+    "irv": {
+      "vse_mean": 0.9550186239640384,
+      "vse_std": 0.11330761496097962,
+      "condorcet_efficiency": 76.84210526315789,
+      "cycle_percentage": 96.0
+    },
+    "approval": {
+      "vse_mean": 0.9477743386170796,
+      "vse_std": 0.11523657426806513,
+      "condorcet_efficiency": 54.73684210526316,
+      "cycle_percentage": 96.0
+    },
+    "star": {
+      "vse_mean": 0.9950625664337466,
+      "vse_std": 0.021378577180348798,
+      "condorcet_efficiency": 88.42105263157895,
+      "cycle_percentage": 96.0
+    },
+    "schulze": {
+      "vse_mean": 0.9968047733909868,
+      "vse_std": 0.02066647198016124,
+      "condorcet_efficiency": 100.0,
+      "cycle_percentage": 96.0
+    }
+  },
+  "chebyshev": {
+    "plurality": {
+      "vse_mean": 0.8339335351856512,
+      "vse_std": 0.2747103183279461,
+      "condorcet_efficiency": 58.064516129032256,
+      "cycle_percentage": 93.0
+    },
+    "borda": {
+      "vse_mean": 0.9847214966191149,
+      "vse_std": 0.04809677217912692,
+      "condorcet_efficiency": 91.39784946236558,
+      "cycle_percentage": 93.0
+    },
+    "irv": {
+      "vse_mean": 0.9488628259983551,
+      "vse_std": 0.1289481839088727,
+      "condorcet_efficiency": 78.49462365591398,
+      "cycle_percentage": 93.0
+    },
+    "approval": {
+      "vse_mean": 0.9595002392531435,
+      "vse_std": 0.10690578170303401,
+      "condorcet_efficiency": 83.87096774193549,
+      "cycle_percentage": 93.0
+    },
+    "star": {
+      "vse_mean": 0.9928582608830996,
+      "vse_std": 0.03206455765059521,
+      "condorcet_efficiency": 100.0,
+      "cycle_percentage": 93.0
+    },
+    "schulze": {
+      "vse_mean": 0.9908262633719624,
+      "vse_std": 0.039322117801048294,
+      "condorcet_efficiency": 100.0,
+      "cycle_percentage": 93.0
+    }
+  }
+}

@@ -57,7 +57,7 @@ def compute_distances(
                 distances[v, c] = np.linalg.norm(diff, ord=2)
             elif metric == 'l1':
                 distances[v, c] = np.linalg.norm(diff, ord=1)
-            elif metric == 'linf':
+            elif metric == 'linf' or metric == 'chebyshev':
                 distances[v, c] = np.linalg.norm(diff, ord=np.inf)
             elif metric == 'cosine':
                 # Cosine distance = 1 - cosine similarity

@@ -1,0 +1,395 @@
+{
+  "center_metric": "l2",
+  "extreme_metric": "cosine",
+  "thresholds": [
+    0.1,
+    0.2,
+    0.30000000000000004,
+    0.4,
+    0.5,
+    0.6,
+    0.7000000000000001,
+    0.8,
+    0.9
+  ],
+  "results": {
+    "0.1": {
+      "plurality": {
+        "vse_heterogeneous": 0.8407924854536728,
+        "vse_homogeneous": 0.814895687713221,
+        "vse_difference": 0.025896797740451838,
+        "disagreement_rate": 78.0,
+        "condorcet_efficiency_het": 53.68421052631579,
+        "condorcet_efficiency_homo": 54.255319148936174
+      },
+      "borda": {
+        "vse_heterogeneous": 0.987430526812953,
+        "vse_homogeneous": 0.983898812236866,
+        "vse_difference": 0.0035317145760869195,
+        "disagreement_rate": 87.0,
+        "condorcet_efficiency_het": 89.47368421052632,
+        "condorcet_efficiency_homo": 92.55319148936171
+      },
+      "irv": {
+        "vse_heterogeneous": 0.9642897164615419,
+        "vse_homogeneous": 0.9420862872729008,
+        "vse_difference": 0.022203429188641155,
+        "disagreement_rate": 81.0,
+        "condorcet_efficiency_het": 83.15789473684211,
+        "condorcet_efficiency_homo": 79.7872340425532
+      },
+      "approval": {
+        "vse_heterogeneous": 0.9811241329335886,
+        "vse_homogeneous": 0.9648816659703716,
+        "vse_difference": 0.01624246696321696,
+        "disagreement_rate": 84.0,
+        "condorcet_efficiency_het": 86.3157894736842,
+        "condorcet_efficiency_homo": 81.91489361702128
+      },
+      "star": {
+        "vse_heterogeneous": 0.9910841637457258,
+        "vse_homogeneous": 0.9943902440408883,
+        "vse_difference": -0.003306080295162439,
+        "disagreement_rate": 85.0,
+        "condorcet_efficiency_het": 100.0,
+        "condorcet_efficiency_homo": 100.0
+      }
+    },
+    "0.2": {
+      "plurality": {
+        "vse_heterogeneous": 0.8155459765787764,
+        "vse_homogeneous": 0.8550157000481693,
+        "vse_difference": -0.039469723469392926,
+        "disagreement_rate": 86.0,
+        "condorcet_efficiency_het": 56.38297872340426,
+        "condorcet_efficiency_homo": 62.765957446808514
+      },
+      "borda": {
+        "vse_heterogeneous": 0.9835821562529319,
+        "vse_homogeneous": 0.9900620109514651,
+        "vse_difference": -0.006479854698533183,
+        "disagreement_rate": 80.0,
+        "condorcet_efficiency_het": 87.23404255319149,
+        "condorcet_efficiency_homo": 93.61702127659575
+      },
+      "irv": {
+        "vse_heterogeneous": 0.9239033173856884,
+        "vse_homogeneous": 0.9689459696223293,
+        "vse_difference": -0.045042652236640834,
+        "disagreement_rate": 82.0,
+        "condorcet_efficiency_het": 75.53191489361703,
+        "condorcet_efficiency_homo": 80.85106382978724
+      },
+      "approval": {
+        "vse_heterogeneous": 0.9718624326263955,
+        "vse_homogeneous": 0.9628254750685643,
+        "vse_difference": 0.009036957557831182,
+        "disagreement_rate": 81.0,
+        "condorcet_efficiency_het": 75.53191489361703,
+        "condorcet_efficiency_homo": 75.53191489361703
+      },
+      "star": {
+        "vse_heterogeneous": 0.9986352978384158,
+        "vse_homogeneous": 0.9992663963146245,
+        "vse_difference": -0.0006310984762087912,
+        "disagreement_rate": 81.0,
+        "condorcet_efficiency_het": 98.93617021276596,
+        "condorcet_efficiency_homo": 100.0
+      }
+    },
+    "0.3": {
+      "plurality": {
+        "vse_heterogeneous": 0.8455433372348731,
+        "vse_homogeneous": 0.7893056053570578,
+        "vse_difference": 0.05623773187781522,
+        "disagreement_rate": 86.0,
+        "condorcet_efficiency_het": 58.333333333333336,
+        "condorcet_efficiency_homo": 47.87234042553192
+      },
+      "borda": {
+        "vse_heterogeneous": 0.9808105918689168,
+        "vse_homogeneous": 0.9752117745032229,
+        "vse_difference": 0.005598817365693898,
+        "disagreement_rate": 76.0,
+        "condorcet_efficiency_het": 87.5,
+        "condorcet_efficiency_homo": 84.04255319148936
+      },
+      "irv": {
+        "vse_heterogeneous": 0.9721712127414489,
+        "vse_homogeneous": 0.9653324964116582,
+        "vse_difference": 0.006838716329790717,
+        "disagreement_rate": 78.0,
+        "condorcet_efficiency_het": 86.45833333333333,
+        "condorcet_efficiency_homo": 78.72340425531915
+      },
+      "approval": {
+        "vse_heterogeneous": 0.9357298661280433,
+        "vse_homogeneous": 0.9622278665749122,
+        "vse_difference": -0.026498000446868897,
+        "disagreement_rate": 79.0,
+        "condorcet_efficiency_het": 72.91666666666667,
+        "condorcet_efficiency_homo": 76.59574468085107
+      },
+      "star": {
+        "vse_heterogeneous": 0.9984393967746961,
+        "vse_homogeneous": 0.9956914145014162,
+        "vse_difference": 0.002747982273279881,
+        "disagreement_rate": 76.0,
+        "condorcet_efficiency_het": 100.0,
+        "condorcet_efficiency_homo": 100.0
+      }
+    },
+    "0.4": {
+      "plurality": {
+        "vse_heterogeneous": 0.825050485930442,
+        "vse_homogeneous": 0.8219855643450781,
+        "vse_difference": 0.0030649215853638667,
+        "disagreement_rate": 87.0,
+        "condorcet_efficiency_het": 52.083333333333336,
+        "condorcet_efficiency_homo": 51.02040816326531
+      },
+      "borda": {
+        "vse_heterogeneous": 0.9851532281378277,
+        "vse_homogeneous": 0.9935214290784333,
+        "vse_difference": -0.008368200940605641,
+        "disagreement_rate": 85.0,
+        "condorcet_efficiency_het": 89.58333333333333,
+        "condorcet_efficiency_homo": 85.71428571428571
+      },
+      "irv": {
+        "vse_heterogeneous": 0.9541596746484289,
+        "vse_homogeneous": 0.9486989983161507,
+        "vse_difference": 0.005460676332278203,
+        "disagreement_rate": 75.0,
+        "condorcet_efficiency_het": 81.25,
+        "condorcet_efficiency_homo": 76.53061224489795
+      },
+      "approval": {
+        "vse_heterogeneous": 0.9592155854527892,
+        "vse_homogeneous": 0.9715355054461456,
+        "vse_difference": -0.012319919993356465,
+        "disagreement_rate": 84.0,
+        "condorcet_efficiency_het": 79.16666666666667,
+        "condorcet_efficiency_homo": 83.6734693877551
+      },
+      "star": {
+        "vse_heterogeneous": 0.9960020819732103,
+        "vse_homogeneous": 0.98525731432366,
+        "vse_difference": 0.010744767649550235,
+        "disagreement_rate": 81.0,
+        "condorcet_efficiency_het": 100.0,
+        "condorcet_efficiency_homo": 97.95918367346938
+      }
+    },
+    "0.5": {
+      "plurality": {
+        "vse_heterogeneous": 0.88850738622008,
+        "vse_homogeneous": 0.846662089073238,
+        "vse_difference": 0.04184529714684193,
+        "disagreement_rate": 78.0,
+        "condorcet_efficiency_het": 57.291666666666664,
+        "condorcet_efficiency_homo": 56.98924731182796
+      },
+      "borda": {
+        "vse_heterogeneous": 0.9881175379500476,
+        "vse_homogeneous": 0.9913749356343206,
+        "vse_difference": -0.0032573976842729113,
+        "disagreement_rate": 81.0,
+        "condorcet_efficiency_het": 88.54166666666667,
+        "condorcet_efficiency_homo": 89.24731182795699
+      },
+      "irv": {
+        "vse_heterogeneous": 0.9682577309750101,
+        "vse_homogeneous": 0.9544585885542218,
+        "vse_difference": 0.01379914242078828,
+        "disagreement_rate": 82.0,
+        "condorcet_efficiency_het": 80.20833333333333,
+        "condorcet_efficiency_homo": 81.72043010752688
+      },
+      "approval": {
+        "vse_heterogeneous": 0.9554205745192742,
+        "vse_homogeneous": 0.9548977757292921,
+        "vse_difference": 0.0005227987899820707,
+        "disagreement_rate": 73.0,
+        "condorcet_efficiency_het": 76.04166666666667,
+        "condorcet_efficiency_homo": 80.64516129032258
+      },
+      "star": {
+        "vse_heterogeneous": 0.9964573753507324,
+        "vse_homogeneous": 0.9961468637780828,
+        "vse_difference": 0.0003105115726496077,
+        "disagreement_rate": 80.0,
+        "condorcet_efficiency_het": 100.0,
+        "condorcet_efficiency_homo": 100.0
+      }
+    },
+    "0.6": {
+      "plurality": {
+        "vse_heterogeneous": 0.8175956998045081,
+        "vse_homogeneous": 0.8752806847551432,
+        "vse_difference": -0.05768498495063512,
+        "disagreement_rate": 76.0,
+        "condorcet_efficiency_het": 51.54639175257732,
+        "condorcet_efficiency_homo": 57.89473684210526
+      },
+      "borda": {
+        "vse_heterogeneous": 0.9912301768228836,
+        "vse_homogeneous": 0.9884013605211379,
+        "vse_difference": 0.0028288163017456958,
+        "disagreement_rate": 84.0,
+        "condorcet_efficiency_het": 92.78350515463917,
+        "condorcet_efficiency_homo": 86.3157894736842
+      },
+      "irv": {
+        "vse_heterogeneous": 0.9562914449792512,
+        "vse_homogeneous": 0.9513964831653849,
+        "vse_difference": 0.004894961813866283,
+        "disagreement_rate": 76.0,
+        "condorcet_efficiency_het": 79.38144329896907,
+        "condorcet_efficiency_homo": 83.15789473684211
+      },
+      "approval": {
+        "vse_heterogeneous": 0.9541360637810472,
+        "vse_homogeneous": 0.9402167934150638,
+        "vse_difference": 0.013919270365983394,
+        "disagreement_rate": 86.0,
+        "condorcet_efficiency_het": 83.50515463917526,
+        "condorcet_efficiency_homo": 76.84210526315789
+      },
+      "star": {
+        "vse_heterogeneous": 0.9984433275087963,
+        "vse_homogeneous": 0.9973269541631657,
+        "vse_difference": 0.001116373345630528,
+        "disagreement_rate": 83.0,
+        "condorcet_efficiency_het": 100.0,
+        "condorcet_efficiency_homo": 100.0
+      }
+    },
+    "0.7": {
+      "plurality": {
+        "vse_heterogeneous": 0.8240962791144227,
+        "vse_homogeneous": 0.8572891851772678,
+        "vse_difference": -0.033192906062845084,
+        "disagreement_rate": 80.0,
+        "condorcet_efficiency_het": 47.422680412371136,
+        "condorcet_efficiency_homo": 54.63917525773196
+      },
+      "borda": {
+        "vse_heterogeneous": 0.9860135386319686,
+        "vse_homogeneous": 0.9769497040539277,
+        "vse_difference": 0.009063834578040941,
+        "disagreement_rate": 76.0,
+        "condorcet_efficiency_het": 83.50515463917526,
+        "condorcet_efficiency_homo": 82.47422680412372
+      },
+      "irv": {
+        "vse_heterogeneous": 0.9330472785554871,
+        "vse_homogeneous": 0.9609593989137021,
+        "vse_difference": -0.027912120358214998,
+        "disagreement_rate": 80.0,
+        "condorcet_efficiency_het": 74.22680412371135,
+        "condorcet_efficiency_homo": 78.35051546391753
+      },
+      "approval": {
+        "vse_heterogeneous": 0.9622771852354005,
+        "vse_homogeneous": 0.9505610164534795,
+        "vse_difference": 0.011716168781921055,
+        "disagreement_rate": 76.0,
+        "condorcet_efficiency_het": 77.31958762886597,
+        "condorcet_efficiency_homo": 74.22680412371135
+      },
+      "star": {
+        "vse_heterogeneous": 0.9963477362736411,
+        "vse_homogeneous": 0.9969400282873044,
+        "vse_difference": -0.000592292013663287,
+        "disagreement_rate": 85.0,
+        "condorcet_efficiency_het": 95.87628865979381,
+        "condorcet_efficiency_homo": 96.90721649484536
+      }
+    },
+    "0.8": {
+      "plurality": {
+        "vse_heterogeneous": 0.8241220650129519,
+        "vse_homogeneous": 0.8395065970359684,
+        "vse_difference": -0.015384532023016484,
+        "disagreement_rate": 82.0,
+        "condorcet_efficiency_het": 51.515151515151516,
+        "condorcet_efficiency_homo": 54.166666666666664
+      },
+      "borda": {
+        "vse_heterogeneous": 0.9896554226250542,
+        "vse_homogeneous": 0.9732243291197318,
+        "vse_difference": 0.01643109350532246,
+        "disagreement_rate": 76.0,
+        "condorcet_efficiency_het": 89.8989898989899,
+        "condorcet_efficiency_homo": 81.25
+      },
+      "irv": {
+        "vse_heterogeneous": 0.9534563875423961,
+        "vse_homogeneous": 0.938888423997826,
+        "vse_difference": 0.014567963544570128,
+        "disagreement_rate": 74.0,
+        "condorcet_efficiency_het": 79.79797979797979,
+        "condorcet_efficiency_homo": 71.875
+      },
+      "approval": {
+        "vse_heterogeneous": 0.9548456472565156,
+        "vse_homogeneous": 0.9589291489173616,
+        "vse_difference": -0.004083501660846034,
+        "disagreement_rate": 78.0,
+        "condorcet_efficiency_het": 73.73737373737374,
+        "condorcet_efficiency_homo": 72.91666666666667
+      },
+      "star": {
+        "vse_heterogeneous": 0.9990298662629412,
+        "vse_homogeneous": 0.9939997364109029,
+        "vse_difference": 0.005030129852038323,
+        "disagreement_rate": 78.0,
+        "condorcet_efficiency_het": 100.0,
+        "condorcet_efficiency_homo": 97.91666666666667
+      }
+    },
+    "0.9": {
+      "plurality": {
+        "vse_heterogeneous": 0.8116047208457777,
+        "vse_homogeneous": 0.7923631872975414,
+        "vse_difference": 0.019241533548236323,
+        "disagreement_rate": 81.0,
+        "condorcet_efficiency_het": 52.0,
+        "condorcet_efficiency_homo": 48.35164835164835
+      },
+      "borda": {
+        "vse_heterogeneous": 0.9797603577402663,
+        "vse_homogeneous": 0.9842078030003251,
+        "vse_difference": -0.004447445260058802,
+        "disagreement_rate": 74.0,
+        "condorcet_efficiency_het": 81.0,
+        "condorcet_efficiency_homo": 86.81318681318682
+      },
+      "irv": {
+        "vse_heterogeneous": 0.9499580237466696,
+        "vse_homogeneous": 0.968100984232969,
+        "vse_difference": -0.018142960486299375,
+        "disagreement_rate": 76.0,
+        "condorcet_efficiency_het": 76.0,
+        "condorcet_efficiency_homo": 80.21978021978022
+      },
+      "approval": {
+        "vse_heterogeneous": 0.9405013269832917,
+        "vse_homogeneous": 0.9667776546623804,
+        "vse_difference": -0.026276327679088718,
+        "disagreement_rate": 69.0,
+        "condorcet_efficiency_het": 68.0,
+        "condorcet_efficiency_homo": 76.92307692307692
+      },
+      "star": {
+        "vse_heterogeneous": 0.9916458055651064,
+        "vse_homogeneous": 0.9962947739204452,
+        "vse_difference": -0.0046489683553387895,
+        "disagreement_rate": 77.0,
+        "condorcet_efficiency_het": 99.0,
+        "condorcet_efficiency_homo": 96.7032967032967
+      }
+    }
+  }
+}
