@@ -78,3 +78,4 @@ python test_plur_vs_random.py
 
 Expected runtime: ~6-7 minutes for all 50 configurations (1000 runs each)
 
+

@@ -286,3 +286,4 @@ When adding new tests or visualizations:
 - See `DISTANCE_PATTERNS.md` for previous findings
 - See `HETEROGENITY_ANALYSIS.md` for analysis of past experiments
 - See `HETEROGENEOUS_DISTANCE.md` for implementation details
+

@@ -229,3 +229,4 @@ print(report)
 - Check `RESEARCH_FRAMEWORK.md` for research questions
 - See `README.md` for full documentation
 - Look at existing results in `heterogenity-testing/` for examples
+
