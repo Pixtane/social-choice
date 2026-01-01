@@ -1,0 +1,43 @@
+================================================================================
+VOTER SCALING VERIFICATION SUMMARY
+================================================================================
+
+Timestamp: 20251231_173328
+Profiles per config: 150
+Candidates: 5
+Voter counts tested: [5, 20]
+
+
+Asymmetric Metric Interaction
+--------------------------------------------------------------------------------
+Verified: YES
+
+  5 voters:
+    asymmetric_l1_cosine_plurality: asymmetry = 0.0%
+    asymmetric_l1_chebyshev_borda: asymmetry = 0.0%
+    asymmetric_l1_l2_irv: asymmetry = 0.0%
+  20 voters:
+    asymmetric_l1_cosine_plurality: asymmetry = 0.0%
+    asymmetric_l1_chebyshev_borda: asymmetry = 0.0%
+    asymmetric_l1_l2_irv: asymmetry = 0.0%
+
+
+Dimensional Scaling Laws
+--------------------------------------------------------------------------------
+Verified: YES
+
+  5 voters:
+    plurality: peak at 1D
+    borda: peak at 1D
+    irv: peak at 1D
+  20 voters:
+    plurality: peak at 1D
+    borda: peak at 1D
+    irv: peak at 1D
+
+
+Threshold Phase Transitions
+--------------------------------------------------------------------------------
+Verified: YES
+
+  5 voters:

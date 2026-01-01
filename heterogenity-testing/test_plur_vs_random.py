@@ -73,9 +73,9 @@ class PluralityVsRandomTest:
             distance_metric: Distance metric to use ('l1' or 'l2')
         """
         self.n_runs = n_runs
-        self.n_voters = 100
-        self.dimensions = [1, 2, 3, 5, 10]
-        self.candidate_counts = [2, 3, 5, 10]
+        self.n_voters = 5000
+        self.dimensions = [1, 2, 5, 10]
+        self.candidate_counts = [25] #[2, 3, 5, 10, 25]
         self.distance_metric = distance_metric.lower()
         if self.distance_metric not in ['l1', 'l2']:
             raise ValueError(f"distance_metric must be 'l1' or 'l2', got '{distance_metric}'")
@@ -502,7 +502,7 @@ class PluralityVsRandomTest:
 
 def main():
     """Main entry point."""
-    test = PluralityVsRandomTest(n_runs=100, distance_metric='l1')
+    test = PluralityVsRandomTest(n_runs=50, distance_metric='l2')
     
     # Run all configurations
     test.run_all_configurations()

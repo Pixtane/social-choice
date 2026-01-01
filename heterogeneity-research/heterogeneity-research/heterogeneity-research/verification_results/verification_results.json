@@ -1,0 +1,446 @@
+{
+  "finding_1": {
+    "finding_name": "Asymmetric Metric Interaction",
+    "verified": false,
+    "expected_values": {
+      "mean_asymmetry": 4.0,
+      "std_asymmetry": 1.7,
+      "test_pairs": [
+        [
+          "l1",
+          "cosine",
+          "plurality",
+          6.0,
+          81.3,
+          87.3
+        ],
+        [
+          "l1",
+          "chebyshev",
+          "borda",
+          7.3,
+          76.7,
+          84.0
+        ],
+        [
+          "l1",
+          "l2",
+          "irv",
+          8.0,
+          78.7,
+          86.7
+        ]
+      ]
+    },
+    "observed_values": {
+      "l1_cosine": {
+        "disagreement_ab": 86.0,
+        "disagreement_ba": 79.0,
+        "asymmetry": 7.0,
+        "expected_delta": 6.0,
+        "expected_d1": 81.3,
+        "expected_d2": 87.3
+      },
+      "l1_chebyshev": {
+        "disagreement_ab": 85.0,
+        "disagreement_ba": 82.5,
+        "asymmetry": 2.5,
+        "expected_delta": 7.3,
+        "expected_d1": 76.7,
+        "expected_d2": 84.0
+      },
+      "l1_l2": {
+        "disagreement_ab": 78.5,
+        "disagreement_ba": 76.5,
+        "asymmetry": 2.0,
+        "expected_delta": 8.0,
+        "expected_d1": 78.7,
+        "expected_d2": 86.7
+      }
+    },
+    "notes": [
+      "Verified pairs: 1/3",
+      "Failed pairs: 2",
+      "  - l1<->chebyshev (borda): Delta = 2.5% (expected 7.3%)",
+      "  - l1<->l2 (irv): Delta = 2.0% (expected 8.0%)"
+    ]
+  },
+  "finding_2": {
+    "finding_name": "Dimensional Scaling Laws",
+    "verified": true,
+    "expected_values": {
+      "plurality": {
+        "peak_dim": 2,
+        "peak_d": 84.7,
+        "alpha": 0.263
+      },
+      "borda": {
+        "peak_dim": 2,
+        "peak_d": 83.3,
+        "alpha": 0.099
+      },
+      "irv": {
+        "peak_dim": 3,
+        "peak_d": 82.0,
+        "alpha": 0.008
+      }
+    },
+    "observed_values": {
+      "plurality": {
+        "peak_dimension": 2,
+        "peak_disagreement": 81.0,
+        "scaling_exponent": 0.07636224420994223,
+        "r_squared": 1.0,
+        "disagreements_by_dim": {
+          "1": 78.5,
+          "2": 81.0,
+          "3": 78.0,
+          "4": 80.0,
+          "5": 79.5,
+          "7": 77.0,
+          "10": 80.0
+        },
+        "expected_peak_dim": 2,
+        "expected_peak_d": 84.7,
+        "expected_alpha": 0.263
+      },
+      "borda": {
+        "peak_dimension": 7,
+        "peak_disagreement": 85.0,
+        "scaling_exponent": 0.03094050530431495,
+        "r_squared": 0.28286777323976314,
+        "disagreements_by_dim": {
+          "1": 78.5,
+          "2": 83.5,
+          "3": 82.0,
+          "4": 80.0,
+          "5": 80.5,
+          "7": 85.0,
+          "10": 76.0
+        },
+        "expected_peak_dim": 2,
+        "expected_peak_d": 83.3,
+        "expected_alpha": 0.099
+      },
+      "irv": {
+        "peak_dimension": 3,
+        "peak_disagreement": 82.0,
+        "scaling_exponent": 0.16116745490821585,
+        "r_squared": 0.8991096087208307,
+        "disagreements_by_dim": {
+          "1": 73.5,
+          "2": 81.0,
+          "3": 82.0,
+          "4": 81.0,
+          "5": 79.5,
+          "7": 81.5,
+          "10": 76.0
+        },
+        "expected_peak_dim": 3,
+        "expected_peak_d": 82.0,
+        "expected_alpha": 0.008
+      }
+    },
+    "notes": [
+      "Verified rules: 2/3",
+      "  - borda: peak at d=7 (expected 2), D=85.0% (expected 83.3%)"
+    ]
+  },
+  "finding_3": {
+    "finding_name": "Threshold Phase Transitions",
+    "verified": true,
+    "expected_values": {
+      "plurality": {
+        "max_d": 84.0,
+        "max_theta": 0.6,
+        "range": 13.5
+      },
+      "borda": {
+        "max_d": 83.5,
+        "max_theta": 0.7,
+        "range": 7.5
+      },
+      "irv": {
+        "max_d": 85.0,
+        "max_theta": 0.15,
+        "range": 8.5
+      }
+    },
+    "observed_values": {
+      "plurality": {
+        "max_disagreement": 84.0,
+        "max_threshold": 0.7999999999999999,
+        "min_disagreement": 74.0,
+        "range": 10.0,
+        "max_curvature_threshold": 0.5499999999999999,
+        "disagreements": [
+          81.5,
+          77.5,
+          80.0,
+          80.5,
+          76.0,
+          78.5,
+          79.0,
+          82.5,
+          75.5,
+          83.0,
+          74.0,
+          80.0,
+          83.0,
+          80.0,
+          83.0,
+          84.0,
+          75.5,
+          82.5,
+          80.0
+        ],
+        "thresholds": [
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.39999999999999997,
+          0.44999999999999996,
+          0.49999999999999994,
+          0.5499999999999999,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.7999999999999999,
+          0.85,
+          0.9,
+          0.95
+        ],
+        "expected_max_d": 84.0,
+        "expected_max_theta": 0.6,
+        "expected_range": 13.5
+      },
+      "borda": {
+        "max_disagreement": 83.5,
+        "max_threshold": 0.7999999999999999,
+        "min_disagreement": 77.0,
+        "range": 6.5,
+        "max_curvature_threshold": 0.7999999999999999,
+        "disagreements": [
+          81.5,
+          80.0,
+          81.0,
+          77.0,
+          80.0,
+          79.0,
+          80.0,
+          79.0,
+          82.0,
+          79.0,
+          78.5,
+          79.5,
+          79.5,
+          81.0,
+          77.0,
+          83.5,
+          81.0,
+          81.5,
+          79.0
+        ],
+        "thresholds": [
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.39999999999999997,
+          0.44999999999999996,
+          0.49999999999999994,
+          0.5499999999999999,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.7999999999999999,
+          0.85,
+          0.9,
+          0.95
+        ],
+        "expected_max_d": 83.5,
+        "expected_max_theta": 0.7,
+        "expected_range": 7.5
+      },
+      "irv": {
+        "max_disagreement": 84.5,
+        "max_threshold": 0.15,
+        "min_disagreement": 74.0,
+        "range": 10.5,
+        "max_curvature_threshold": 0.25,
+        "disagreements": [
+          80.5,
+          79.5,
+          84.5,
+          74.0,
+          83.0,
+          76.5,
+          78.5,
+          77.5,
+          79.5,
+          77.0,
+          77.0,
+          78.5,
+          80.5,
+          80.5,
+          81.5,
+          80.0,
+          76.0,
+          79.0,
+          77.5
+        ],
+        "thresholds": [
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.39999999999999997,
+          0.44999999999999996,
+          0.49999999999999994,
+          0.5499999999999999,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.7999999999999999,
+          0.85,
+          0.9,
+          0.95
+        ],
+        "expected_max_d": 85.0,
+        "expected_max_theta": 0.15,
+        "expected_range": 8.5
+      }
+    },
+    "notes": [
+      "Verified rules: 2/3",
+      "  - plurality: D_max=84.0% at theta=0.80 (expected 84.0% at theta=0.60)"
+    ]
+  },
+  "finding_4": {
+    "finding_name": "Preference Destabilization Paradox",
+    "verified": false,
+    "expected_values": {
+      "plurality": {
+        "cycle_change": 3.5,
+        "condorcet_change": 7.0
+      },
+      "borda": {
+        "cycle_change": 3.5,
+        "condorcet_change": 1.2
+      },
+      "irv": {
+        "cycle_change": 3.5,
+        "condorcet_change": 0.8
+      }
+    },
+    "observed_values": {
+      "plurality": {
+        "cycle_rate_het": 97.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_change": 2.0,
+        "condorcet_eff_het": 56.31578947368421,
+        "condorcet_eff_homo": 53.723404255319146,
+        "condorcet_change": 2.5923852183650666,
+        "expected_cycle_change": 3.5,
+        "expected_condorcet_change": 7.0
+      },
+      "borda": {
+        "cycle_rate_het": 95.0,
+        "cycle_rate_homo": 94.5,
+        "cycle_change": 0.5,
+        "condorcet_eff_het": 91.005291005291,
+        "condorcet_eff_homo": 87.16577540106952,
+        "condorcet_change": 3.839515604221475,
+        "expected_cycle_change": 3.5,
+        "expected_condorcet_change": 1.2
+      },
+      "irv": {
+        "cycle_rate_het": 94.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_change": -1.0,
+        "condorcet_eff_het": 82.19895287958116,
+        "condorcet_eff_homo": 80.41237113402062,
+        "condorcet_change": 1.7865817455605395,
+        "expected_cycle_change": 3.5,
+        "expected_condorcet_change": 0.8
+      }
+    },
+    "notes": [
+      "Verified rules: 0/3",
+      "  - plurality: efficiency change mismatch (2.6% vs 7.0%)",
+      "  - borda: cycle change mismatch (0.5% vs 3.5%)",
+      "  - irv: cycles don't increase, cycle change mismatch (-1.0% vs 3.5%)"
+    ]
+  },
+  "finding_5": {
+    "finding_name": "Metric Interaction Strength Hierarchy",
+    "verified": false,
+    "expected_values": {
+      "expected_order": [
+        "cosine_l1",
+        "l2_chebyshev",
+        "l1_l2",
+        "l2_cosine",
+        "cosine_chebyshev"
+      ],
+      "expected_values": {
+        "cosine_l1": 87.3,
+        "l2_chebyshev": 86.0,
+        "l1_l2": 84.0,
+        "l2_cosine": 82.7,
+        "cosine_chebyshev": 79.3
+      }
+    },
+    "observed_values": {
+      "observed_order": [
+        "cosine_chebyshev",
+        "l2_chebyshev",
+        "l2_cosine",
+        "cosine_l1",
+        "l1_l2"
+      ],
+      "values": {
+        "cosine_l1": {
+          "disagreement": 77.5,
+          "expected": 87.3
+        },
+        "l2_chebyshev": {
+          "disagreement": 84.5,
+          "expected": 86.0
+        },
+        "l1_l2": {
+          "disagreement": 77.5,
+          "expected": 84.0
+        },
+        "l2_cosine": {
+          "disagreement": 81.5,
+          "expected": 82.7
+        },
+        "cosine_chebyshev": {
+          "disagreement": 86.0,
+          "expected": 79.3
+        }
+      }
+    },
+    "notes": [
+      "Verified pairs: 2/5",
+      "Order correct: False",
+      "  - cosine<->l1: D = 77.5% (expected 87.3%)",
+      "  - l1<->l2: D = 77.5% (expected 84.0%)",
+      "  - cosine<->chebyshev: D = 86.0% (expected 79.3%)"
+    ]
+  }
+}

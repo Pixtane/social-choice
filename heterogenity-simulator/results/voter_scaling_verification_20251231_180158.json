@@ -1,0 +1,601 @@
+{
+  "timestamp": "20251231_180158",
+  "parameters": {
+    "n_profiles": 5,
+    "n_candidates": 5,
+    "voter_counts": [
+      50
+    ]
+  },
+  "results": {
+    "phenomenon_1": {
+      "phenomenon_name": "Asymmetric Metric Interaction",
+      "voter_counts": [
+        50
+      ],
+      "summary": {
+        "phenomenon": "Asymmetric Metric Interaction",
+        "tested_pairs": 3,
+        "voter_counts_tested": [
+          50
+        ],
+        "asymmetry_trend": {
+          "trend": "decreasing",
+          "slope": -9.999999999999993,
+          "mean": 13.333333333333334,
+          "std": 9.428090415820634,
+          "min": 0.0,
+          "max": 20.0
+        }
+      },
+      "verified": true,
+      "scaling_results": [
+        {
+          "n_voters": 50,
+          "results": {
+            "n_voters": 50,
+            "test_pairs": {
+              "asymmetric_l1_cosine_plurality": {
+                "disagreement_ab": 40.0,
+                "disagreement_ba": 60.0,
+                "asymmetry": 20.0,
+                "expected_delta": 6.0,
+                "difference_from_expected": 14.0,
+                "verified": true
+              },
+              "asymmetric_l1_chebyshev_borda": {
+                "disagreement_ab": 20.0,
+                "disagreement_ba": 40.0,
+                "asymmetry": 20.0,
+                "expected_delta": 7.3,
+                "difference_from_expected": 12.7,
+                "verified": true
+              },
+              "asymmetric_l1_l2_irv": {
+                "disagreement_ab": 0.0,
+                "disagreement_ba": 0.0,
+                "asymmetry": 0.0,
+                "expected_delta": 8.0,
+                "difference_from_expected": -8.0,
+                "verified": false
+              }
+            }
+          },
+          "verified": true,
+          "notes": []
+        }
+      ]
+    },
+    "phenomenon_2": {
+      "phenomenon_name": "Dimensional Scaling Laws",
+      "voter_counts": [
+        50
+      ],
+      "summary": {
+        "phenomenon": "Dimensional Scaling Laws",
+        "dimensions_tested": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          7,
+          10
+        ],
+        "voting_rules_tested": [
+          "plurality",
+          "borda",
+          "irv"
+        ],
+        "peak_stability": {
+          "plurality": {
+            "peaks": [
+              1
+            ],
+            "unique_peaks": [
+              1
+            ],
+            "is_stable": true,
+            "most_common": 1
+          },
+          "borda": {
+            "peaks": [
+              2
+            ],
+            "unique_peaks": [
+              2
+            ],
+            "is_stable": true,
+            "most_common": 2
+          },
+          "irv": {
+            "peaks": [
+              1
+            ],
+            "unique_peaks": [
+              1
+            ],
+            "is_stable": true,
+            "most_common": 1
+          }
+        }
+      },
+      "verified": true,
+      "scaling_results": [
+        {
+          "n_voters": 50,
+          "results": {
+            "n_voters": 50,
+            "dimensional_data": {
+              "plurality": {
+                "dimensions": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  7,
+                  10
+                ],
+                "disagreements": [
+                  60.0,
+                  0.0,
+                  20.0,
+                  0.0,
+                  20.0,
+                  20.0,
+                  20.0
+                ],
+                "peak_dimension": 1,
+                "peak_disagreement": 60.0,
+                "expected_peak": 2,
+                "matches_expected": false
+              },
+              "borda": {
+                "dimensions": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  7,
+                  10
+                ],
+                "disagreements": [
+                  0.0,
+                  40.0,
+                  0.0,
+                  40.0,
+                  40.0,
+                  0.0,
+                  0.0
+                ],
+                "peak_dimension": 2,
+                "peak_disagreement": 40.0,
+                "expected_peak": 2,
+                "matches_expected": true
+              },
+              "irv": {
+                "dimensions": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  7,
+                  10
+                ],
+                "disagreements": [
+                  80.0,
+                  40.0,
+                  20.0,
+                  0.0,
+                  20.0,
+                  20.0,
+                  20.0
+                ],
+                "peak_dimension": 1,
+                "peak_disagreement": 80.0,
+                "expected_peak": 3,
+                "matches_expected": false
+              }
+            }
+          },
+          "verified": true,
+          "notes": []
+        }
+      ]
+    },
+    "phenomenon_3": {
+      "phenomenon_name": "Threshold Phase Transitions",
+      "voter_counts": [
+        50
+      ],
+      "summary": {
+        "phenomenon": "Threshold Phase Transitions",
+        "thresholds_tested": [
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.39999999999999997,
+          0.44999999999999996,
+          0.49999999999999994,
+          0.5499999999999999,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.7999999999999999,
+          0.85,
+          0.9,
+          0.95
+        ],
+        "voting_rules_tested": [
+          "plurality",
+          "borda",
+          "irv"
+        ],
+        "sigmoid_stability": {
+          "plurality": {
+            "max_threshold_mean": 0.05,
+            "max_threshold_std": 0.0,
+            "max_disagreement_mean": 20.0,
+            "max_disagreement_std": 0.0
+          },
+          "borda": {
+            "max_threshold_mean": 0.05,
+            "max_threshold_std": 0.0,
+            "max_disagreement_mean": 80.0,
+            "max_disagreement_std": 0.0
+          },
+          "irv": {
+            "max_threshold_mean": 0.1,
+            "max_threshold_std": 0.0,
+            "max_disagreement_mean": 80.0,
+            "max_disagreement_std": 0.0
+          }
+        }
+      },
+      "verified": true,
+      "scaling_results": [
+        {
+          "n_voters": 50,
+          "results": {
+            "n_voters": 50,
+            "threshold_data": {
+              "plurality": {
+                "thresholds": [
+                  0.05,
+                  0.1,
+                  0.15,
+                  0.2,
+                  0.25,
+                  0.3,
+                  0.35,
+                  0.39999999999999997,
+                  0.44999999999999996,
+                  0.49999999999999994,
+                  0.5499999999999999,
+                  0.6,
+                  0.65,
+                  0.7,
+                  0.75,
+                  0.7999999999999999,
+                  0.85,
+                  0.9,
+                  0.95
+                ],
+                "disagreements": [
+                  20.0,
+                  20.0,
+                  20.0,
+                  20.0,
+                  20.0,
+                  20.0,
+                  20.0,
+                  20.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "max_threshold": 0.05,
+                "max_disagreement": 20.0,
+                "min_disagreement": 0.0,
+                "range": 20.0,
+                "expected_max": 84.0,
+                "difference_from_expected": -64.0
+              },
+              "borda": {
+                "thresholds": [
+                  0.05,
+                  0.1,
+                  0.15,
+                  0.2,
+                  0.25,
+                  0.3,
+                  0.35,
+                  0.39999999999999997,
+                  0.44999999999999996,
+                  0.49999999999999994,
+                  0.5499999999999999,
+                  0.6,
+                  0.65,
+                  0.7,
+                  0.75,
+                  0.7999999999999999,
+                  0.85,
+                  0.9,
+                  0.95
+                ],
+                "disagreements": [
+                  80.0,
+                  80.0,
+                  60.0,
+                  60.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  20.0,
+                  20.0,
+                  20.0,
+                  20.0,
+                  20.0,
+                  20.0
+                ],
+                "max_threshold": 0.05,
+                "max_disagreement": 80.0,
+                "min_disagreement": 20.0,
+                "range": 60.0,
+                "expected_max": 83.5,
+                "difference_from_expected": -3.5
+              },
+              "irv": {
+                "thresholds": [
+                  0.05,
+                  0.1,
+                  0.15,
+                  0.2,
+                  0.25,
+                  0.3,
+                  0.35,
+                  0.39999999999999997,
+                  0.44999999999999996,
+                  0.49999999999999994,
+                  0.5499999999999999,
+                  0.6,
+                  0.65,
+                  0.7,
+                  0.75,
+                  0.7999999999999999,
+                  0.85,
+                  0.9,
+                  0.95
+                ],
+                "disagreements": [
+                  60.0,
+                  80.0,
+                  80.0,
+                  80.0,
+                  60.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  40.0,
+                  0.0
+                ],
+                "max_threshold": 0.1,
+                "max_disagreement": 80.0,
+                "min_disagreement": 0.0,
+                "range": 80.0,
+                "expected_max": 85.0,
+                "difference_from_expected": -5.0
+              }
+            }
+          },
+          "verified": true,
+          "notes": []
+        }
+      ]
+    },
+    "phenomenon_4": {
+      "phenomenon_name": "Preference Destabilization Paradox",
+      "voter_counts": [
+        50
+      ],
+      "summary": {
+        "phenomenon": "Preference Destabilization Paradox",
+        "voting_rules_tested": [
+          "plurality",
+          "borda",
+          "irv"
+        ],
+        "paradox_stability": {
+          "plurality": {
+            "cycle_increase_mean": 0.0,
+            "cycle_increase_std": 0.0,
+            "efficiency_increase_mean": 20.0,
+            "efficiency_increase_std": 0.0,
+            "paradox_always_present": false
+          },
+          "borda": {
+            "cycle_increase_mean": 0.0,
+            "cycle_increase_std": 0.0,
+            "efficiency_increase_mean": 0.0,
+            "efficiency_increase_std": 0.0,
+            "paradox_always_present": false
+          },
+          "irv": {
+            "cycle_increase_mean": 0.0,
+            "cycle_increase_std": 0.0,
+            "efficiency_increase_mean": 0.0,
+            "efficiency_increase_std": 0.0,
+            "paradox_always_present": false
+          }
+        }
+      },
+      "verified": true,
+      "scaling_results": [
+        {
+          "n_voters": 50,
+          "results": {
+            "n_voters": 50,
+            "paradox_data": {
+              "plurality": {
+                "cycle_rate_het": 0.0,
+                "cycle_rate_homo": 0.0,
+                "cycle_increase": 0.0,
+                "expected_cycle_increase": 3.5,
+                "condorcet_efficiency_het": 80.0,
+                "condorcet_efficiency_homo": 60.0,
+                "efficiency_increase": 20.0,
+                "expected_efficiency_increase": 7.0,
+                "paradox_verified": false
+              },
+              "borda": {
+                "cycle_rate_het": 0.0,
+                "cycle_rate_homo": 0.0,
+                "cycle_increase": 0.0,
+                "expected_cycle_increase": 3.5,
+                "condorcet_efficiency_het": 80.0,
+                "condorcet_efficiency_homo": 80.0,
+                "efficiency_increase": 0.0,
+                "expected_efficiency_increase": 1.2,
+                "paradox_verified": false
+              },
+              "irv": {
+                "cycle_rate_het": 0.0,
+                "cycle_rate_homo": 0.0,
+                "cycle_increase": 0.0,
+                "expected_cycle_increase": 3.5,
+                "condorcet_efficiency_het": 100.0,
+                "condorcet_efficiency_homo": 100.0,
+                "efficiency_increase": 0.0,
+                "expected_efficiency_increase": 0.8,
+                "paradox_verified": false
+              }
+            }
+          },
+          "verified": true,
+          "notes": []
+        }
+      ]
+    },
+    "phenomenon_5": {
+      "phenomenon_name": "Metric Interaction Strength Hierarchy",
+      "voter_counts": [
+        50
+      ],
+      "summary": {
+        "phenomenon": "Metric Interaction Strength Hierarchy",
+        "metric_pairs_tested": 5,
+        "voting_rule": "plurality",
+        "hierarchy_stability": {
+          "stable": true,
+          "hierarchies": [
+            [
+              "cosine<->chebyshev",
+              "cosine<->l1",
+              "l1<->l2",
+              "l2<->chebyshev",
+              "l2<->cosine"
+            ]
+          ],
+          "consistent_order": [
+            "cosine<->chebyshev",
+            "cosine<->l1",
+            "l1<->l2",
+            "l2<->chebyshev",
+            "l2<->cosine"
+          ]
+        }
+      },
+      "verified": true,
+      "scaling_results": [
+        {
+          "n_voters": 50,
+          "results": {
+            "n_voters": 50,
+            "interaction_strengths": {
+              "l2<->chebyshev": {
+                "disagreement": 0.0,
+                "center_metric": "l2",
+                "extreme_metric": "chebyshev"
+              },
+              "cosine<->l1": {
+                "disagreement": 20.0,
+                "center_metric": "cosine",
+                "extreme_metric": "l1"
+              },
+              "l1<->l2": {
+                "disagreement": 20.0,
+                "center_metric": "l1",
+                "extreme_metric": "l2"
+              },
+              "l2<->cosine": {
+                "disagreement": 0.0,
+                "center_metric": "l2",
+                "extreme_metric": "cosine"
+              },
+              "cosine<->chebyshev": {
+                "disagreement": 40.0,
+                "center_metric": "cosine",
+                "extreme_metric": "chebyshev"
+              }
+            },
+            "hierarchy": [
+              {
+                "pair": "cosine<->chebyshev",
+                "strength": 40.0
+              },
+              {
+                "pair": "cosine<->l1",
+                "strength": 20.0
+              },
+              {
+                "pair": "l1<->l2",
+                "strength": 20.0
+              },
+              {
+                "pair": "l2<->chebyshev",
+                "strength": 0.0
+              },
+              {
+                "pair": "l2<->cosine",
+                "strength": 0.0
+              }
+            ]
+          },
+          "verified": true,
+          "notes": []
+        }
+      ]
+    }
+  }
+}

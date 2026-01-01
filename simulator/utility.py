@@ -118,7 +118,7 @@ class UtilityComputer:
         Args:
             distances: (n_voters, n_candidates) distance matrix
             n_dim: Number of spatial dimensions
-            
+        
         Returns:
             (n_voters, n_candidates) utility matrix
         """
@@ -126,36 +126,23 @@ class UtilityComputer:
         
         if utility_func == 'gaussian':
             # Gaussian: u = exp(-d² / (2 * sigma²))
-            # Use fixed sigma based on 2D baseline for consistent scaling
-            sigma = self.config.sigma_factor * np.sqrt(2.0)
+            sigma = self.config.sigma_factor * np.sqrt(n_dim)
             utilities = np.exp(-distances**2 / (2 * sigma**2))
         
         elif utility_func == 'quadratic':
             # Quadratic: u = max(0, 1 - (d / d_max)²)
             d_max = self.config.d_max
             if d_max is None:
-                # Use mean distance scaled by dimension factor for consistent utility interpretation
-                # This accounts for how distances scale with dimensionality while maintaining
-                # comparable utility ranges (Dawson model expectation: VSE should decrease with dim)
-                mean_dist = np.mean(distances)
-                # Scale by sqrt(2) / sqrt(n_dim) to normalize relative to 2D baseline
-                d_max = mean_dist * (np.sqrt(2.0) / np.sqrt(max(n_dim, 1)))
-                if d_max < 1e-9:  # Fallback if all distances are near zero
-                    d_max = np.sqrt(2.0)
+                # Use diagonal of unit hypercube as max distance
+                d_max = np.sqrt(n_dim)
             utilities = np.maximum(0.0, 1.0 - (distances / d_max)**2)
         
         elif utility_func == 'linear':
             # Linear: u = max(0, 1 - d / d_max)
             d_max = self.config.d_max
             if d_max is None:
-                # Use mean distance scaled by dimension factor for consistent utility interpretation
-                # This accounts for how distances scale with dimensionality while maintaining
-                # comparable utility ranges (Dawson model expectation: VSE should decrease with dim)
-                mean_dist = np.mean(distances)
-                # Scale by sqrt(2) / sqrt(n_dim) to normalize relative to 2D baseline
-                d_max = mean_dist * (np.sqrt(2.0) / np.sqrt(max(n_dim, 1)))
-                if d_max < 1e-9:  # Fallback if all distances are near zero
-                    d_max = np.sqrt(2.0)
+                # Use diagonal of unit hypercube as max distance
+                d_max = np.sqrt(n_dim)
             utilities = np.maximum(0.0, 1.0 - distances / d_max)
         
         else:

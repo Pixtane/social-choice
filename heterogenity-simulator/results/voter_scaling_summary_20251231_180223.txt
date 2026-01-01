@@ -1,0 +1,75 @@
+================================================================================
+VOTER SCALING VERIFICATION SUMMARY
+================================================================================
+
+Timestamp: 20251231_180223
+Profiles per config: 10
+Candidates: 5
+Voter counts tested: [50, 100]
+
+
+Asymmetric Metric Interaction
+--------------------------------------------------------------------------------
+Verified: YES
+
+  50 voters:
+    asymmetric_l1_cosine_plurality: asymmetry = 40.0%
+    asymmetric_l1_chebyshev_borda: asymmetry = 0.0%
+    asymmetric_l1_l2_irv: asymmetry = 0.0%
+  100 voters:
+    asymmetric_l1_cosine_plurality: asymmetry = 0.0%
+    asymmetric_l1_chebyshev_borda: asymmetry = 0.0%
+    asymmetric_l1_l2_irv: asymmetry = 10.0%
+
+
+Dimensional Scaling Laws
+--------------------------------------------------------------------------------
+Verified: YES
+
+  50 voters:
+    plurality: peak at 1D
+    borda: peak at 4D
+    irv: peak at 1D
+  100 voters:
+    plurality: peak at 1D
+    borda: peak at 2D
+    irv: peak at 2D
+
+
+Threshold Phase Transitions
+--------------------------------------------------------------------------------
+Verified: YES
+
+  50 voters:
+    plurality: max at threshold=0.05
+    borda: max at threshold=0.05
+    irv: max at threshold=0.10
+  100 voters:
+    plurality: max at threshold=0.05
+    borda: max at threshold=0.05
+    irv: max at threshold=0.10
+
+
+Preference Destabilization Paradox
+--------------------------------------------------------------------------------
+Verified: YES
+
+  50 voters:
+    plurality: dC=0.0%, dE=20.0%
+    borda: dC=0.0%, dE=0.0%
+    irv: dC=0.0%, dE=-10.0%
+  100 voters:
+    plurality: dC=0.0%, dE=26.4%
+    borda: dC=0.0%, dE=-9.7%
+    irv: dC=10.0%, dE=-12.5%
+
+
+Metric Interaction Strength Hierarchy
+--------------------------------------------------------------------------------
+Verified: YES
+
+  50 voters:
+    Hierarchy: cosine<->chebyshev, cosine<->l1, l2<->cosine, l1<->l2, l2<->chebyshev
+  100 voters:
+    Hierarchy: l2<->cosine, cosine<->chebyshev, cosine<->l1, l2<->chebyshev, l1<->l2
+
