@@ -107,6 +107,34 @@ class HeterogeneityResearcher:
         homo_winners = homo_result.rule_results[rule].winners
         disagreement = np.mean(het_winners != homo_winners) * 100
         return disagreement
+
+    def _run_homogeneous_baseline(
+        self,
+        *,
+        n_profiles: int,
+        n_voters: int,
+        n_candidates: int,
+        voting_rules: List[str],
+        dimension: int,
+        baseline_metric: str,
+        d_max: float,
+    ) -> ExperimentResult:
+        """Run a homogeneous simulation using a single baseline distance metric."""
+        config_homo = SimulationConfig(
+            n_profiles=n_profiles,
+            n_voters=n_voters,
+            n_candidates=n_candidates,
+            voting_rules=voting_rules,
+            geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
+            utility=UtilityConfig(
+                function='linear',
+                distance_metric=baseline_metric,
+                d_max=d_max,
+                heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
+            ),
+            rng_seed=self.config.rng_seed
+        )
+        return run_experiment(config_homo, save_results=False, verbose=False)
     
     def compute_condorcet_metrics(
         self,
@@ -187,35 +215,48 @@ class HeterogeneityResearcher:
             result_het = run_experiment(config_het, save_results=False, verbose=False)
             
             # Homogeneous baseline (center metric)
-            config_homo = SimulationConfig(
+            d_max = 2.0 * np.sqrt(dimension)
+            result_homo_center = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
                 n_voters=n_voters,
                 n_candidates=self.config.base_n_candidates,
                 voting_rules=self.config.voting_rules,
-                geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
-                utility=UtilityConfig(
-                    function='linear',
-                    distance_metric=center_metric,
-                    d_max=2.0 * np.sqrt(dimension),
-                    heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
-                ),
-                rng_seed=self.config.rng_seed
+                dimension=dimension,
+                baseline_metric=center_metric,
+                d_max=d_max,
             )
-            result_homo = run_experiment(config_homo, save_results=False, verbose=False)
+            result_homo_extreme = self._run_homogeneous_baseline(
+                n_profiles=self.config.base_n_profiles,
+                n_voters=n_voters,
+                n_candidates=self.config.base_n_candidates,
+                voting_rules=self.config.voting_rules,
+                dimension=dimension,
+                baseline_metric=extreme_metric,
+                d_max=d_max,
+            )
             
             voter_data = {}
             for rule in self.config.voting_rules:
-                disagreement = self.compute_disagreement(result_het, result_homo, rule)
-                condorcet_metrics = self.compute_condorcet_metrics(result_het, result_homo, rule)
+                disagreement = self.compute_disagreement(result_het, result_homo_center, rule)
+                condorcet_metrics = self.compute_condorcet_metrics(result_het, result_homo_center, rule)
+                disagreement_extreme_baseline = self.compute_disagreement(result_het, result_homo_extreme, rule)
+                condorcet_metrics_extreme_baseline = self.compute_condorcet_metrics(
+                    result_het, result_homo_extreme, rule
+                )
                 
                 het_metrics = result_het.rule_results[rule].aggregate_metrics
-                homo_metrics = result_homo.rule_results[rule].aggregate_metrics
+                homo_metrics = result_homo_center.rule_results[rule].aggregate_metrics
+                homo_metrics_extreme = result_homo_extreme.rule_results[rule].aggregate_metrics
                 
                 voter_data[rule] = {
                     'disagreement_rate': disagreement,
                     'vse_het': het_metrics.vse_mean,
                     'vse_homo': homo_metrics.vse_mean,
                     'vse_difference': het_metrics.vse_mean - homo_metrics.vse_mean,
+                    'disagreement_rate_extreme_baseline': disagreement_extreme_baseline,
+                    'vse_homo_extreme_baseline': homo_metrics_extreme.vse_mean,
+                    'vse_difference_extreme_baseline': het_metrics.vse_mean - homo_metrics_extreme.vse_mean,
+                    **{f'{k}_extreme_baseline': v for k, v in condorcet_metrics_extreme_baseline.items()},
                     **condorcet_metrics
                 }
             
@@ -286,35 +327,48 @@ class HeterogeneityResearcher:
             result_het = run_experiment(config_het, save_results=False, verbose=False)
             
             # Homogeneous baseline
-            config_homo = SimulationConfig(
+            d_max = 2.0 * np.sqrt(dimension)
+            result_homo_center = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
                 n_voters=n_voters,
                 n_candidates=self.config.base_n_candidates,
                 voting_rules=self.config.voting_rules,
-                geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
-                utility=UtilityConfig(
-                    function='linear',
-                    distance_metric=center_metric,
-                    d_max=2.0 * np.sqrt(dimension),
-                    heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
-                ),
-                rng_seed=self.config.rng_seed
+                dimension=dimension,
+                baseline_metric=center_metric,
+                d_max=d_max,
             )
-            result_homo = run_experiment(config_homo, save_results=False, verbose=False)
+            result_homo_extreme = self._run_homogeneous_baseline(
+                n_profiles=self.config.base_n_profiles,
+                n_voters=n_voters,
+                n_candidates=self.config.base_n_candidates,
+                voting_rules=self.config.voting_rules,
+                dimension=dimension,
+                baseline_metric=extreme_metric,
+                d_max=d_max,
+            )
             
             threshold_data = {}
             for rule in self.config.voting_rules:
-                disagreement = self.compute_disagreement(result_het, result_homo, rule)
-                condorcet_metrics = self.compute_condorcet_metrics(result_het, result_homo, rule)
+                disagreement = self.compute_disagreement(result_het, result_homo_center, rule)
+                condorcet_metrics = self.compute_condorcet_metrics(result_het, result_homo_center, rule)
+                disagreement_extreme_baseline = self.compute_disagreement(result_het, result_homo_extreme, rule)
+                condorcet_metrics_extreme_baseline = self.compute_condorcet_metrics(
+                    result_het, result_homo_extreme, rule
+                )
                 
                 het_metrics = result_het.rule_results[rule].aggregate_metrics
-                homo_metrics = result_homo.rule_results[rule].aggregate_metrics
+                homo_metrics = result_homo_center.rule_results[rule].aggregate_metrics
+                homo_metrics_extreme = result_homo_extreme.rule_results[rule].aggregate_metrics
                 
                 threshold_data[rule] = {
                     'disagreement_rate': disagreement,
                     'vse_het': het_metrics.vse_mean,
                     'vse_homo': homo_metrics.vse_mean,
                     'vse_difference': het_metrics.vse_mean - homo_metrics.vse_mean,
+                    'disagreement_rate_extreme_baseline': disagreement_extreme_baseline,
+                    'vse_homo_extreme_baseline': homo_metrics_extreme.vse_mean,
+                    'vse_difference_extreme_baseline': het_metrics.vse_mean - homo_metrics_extreme.vse_mean,
+                    **{f'{k}_extreme_baseline': v for k, v in condorcet_metrics_extreme_baseline.items()},
                     **condorcet_metrics
                 }
             
@@ -384,35 +438,48 @@ class HeterogeneityResearcher:
             result_het = run_experiment(config_het, save_results=False, verbose=False)
             
             # Homogeneous baseline
-            config_homo = SimulationConfig(
+            d_max = 2.0 * np.sqrt(dimension)
+            result_homo_center = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
                 n_voters=n_voters,
                 n_candidates=self.config.base_n_candidates,
                 voting_rules=self.config.voting_rules,
-                geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
-                utility=UtilityConfig(
-                    function='linear',
-                    distance_metric=center_metric,
-                    d_max=2.0 * np.sqrt(dimension),
-                    heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
-                ),
-                rng_seed=self.config.rng_seed
+                dimension=dimension,
+                baseline_metric=center_metric,
+                d_max=d_max,
             )
-            result_homo = run_experiment(config_homo, save_results=False, verbose=False)
+            result_homo_extreme = self._run_homogeneous_baseline(
+                n_profiles=self.config.base_n_profiles,
+                n_voters=n_voters,
+                n_candidates=self.config.base_n_candidates,
+                voting_rules=self.config.voting_rules,
+                dimension=dimension,
+                baseline_metric=extreme_metric,
+                d_max=d_max,
+            )
             
             dim_data = {}
             for rule in self.config.voting_rules:
-                disagreement = self.compute_disagreement(result_het, result_homo, rule)
-                condorcet_metrics = self.compute_condorcet_metrics(result_het, result_homo, rule)
+                disagreement = self.compute_disagreement(result_het, result_homo_center, rule)
+                condorcet_metrics = self.compute_condorcet_metrics(result_het, result_homo_center, rule)
+                disagreement_extreme_baseline = self.compute_disagreement(result_het, result_homo_extreme, rule)
+                condorcet_metrics_extreme_baseline = self.compute_condorcet_metrics(
+                    result_het, result_homo_extreme, rule
+                )
                 
                 het_metrics = result_het.rule_results[rule].aggregate_metrics
-                homo_metrics = result_homo.rule_results[rule].aggregate_metrics
+                homo_metrics = result_homo_center.rule_results[rule].aggregate_metrics
+                homo_metrics_extreme = result_homo_extreme.rule_results[rule].aggregate_metrics
                 
                 dim_data[rule] = {
                     'disagreement_rate': disagreement,
                     'vse_het': het_metrics.vse_mean,
                     'vse_homo': homo_metrics.vse_mean,
                     'vse_difference': het_metrics.vse_mean - homo_metrics.vse_mean,
+                    'disagreement_rate_extreme_baseline': disagreement_extreme_baseline,
+                    'vse_homo_extreme_baseline': homo_metrics_extreme.vse_mean,
+                    'vse_difference_extreme_baseline': het_metrics.vse_mean - homo_metrics_extreme.vse_mean,
+                    **{f'{k}_extreme_baseline': v for k, v in condorcet_metrics_extreme_baseline.items()},
                     **condorcet_metrics
                 }
             
@@ -506,39 +573,69 @@ class HeterogeneityResearcher:
                     rng_seed=self.config.rng_seed
                 )
                 result_het_ba = run_experiment(config_het_rev, save_results=False, verbose=False)
-                
-                # Homogeneous baseline (center metric)
-                config_homo = SimulationConfig(
+
+                # Homogeneous baselines
+                d_max = 2.0 * np.sqrt(dimension)
+                # Baseline aligned with each heterogeneous run's center metric (default comparison)
+                result_homo_center_ab = self._run_homogeneous_baseline(
                     n_profiles=self.config.base_n_profiles,
                     n_voters=n_voters,
                     n_candidates=self.config.base_n_candidates,
                     voting_rules=self.config.voting_rules,
-                    geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
-                    utility=UtilityConfig(
-                        function='linear',
-                        distance_metric=center_metric,
-                        d_max=2.0 * np.sqrt(dimension),
-                        heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
-                    ),
-                    rng_seed=self.config.rng_seed
+                    dimension=dimension,
+                    baseline_metric=center_metric,
+                    d_max=d_max,
                 )
-                result_homo = run_experiment(config_homo, save_results=False, verbose=False)
+                result_homo_center_ba = self._run_homogeneous_baseline(
+                    n_profiles=self.config.base_n_profiles,
+                    n_voters=n_voters,
+                    n_candidates=self.config.base_n_candidates,
+                    voting_rules=self.config.voting_rules,
+                    dimension=dimension,
+                    baseline_metric=extreme_metric,
+                    d_max=d_max,
+                )
+                # Secondary comparison baseline aligned with each heterogeneous run's extreme metric.
+                # These are the same two homogeneous runs as above, just swapped.
+                result_homo_extreme_ab = result_homo_center_ba
+                result_homo_extreme_ba = result_homo_center_ab
                 
                 pair_data = {}
                 for rule in self.config.voting_rules:
-                    disagreement_ab = self.compute_disagreement(result_het_ab, result_homo, rule)
-                    disagreement_ba = self.compute_disagreement(result_het_ba, result_homo, rule)
+                    # Default: compare each heterogeneous run to the homogeneous run using its center metric
+                    disagreement_ab = self.compute_disagreement(result_het_ab, result_homo_center_ab, rule)
+                    disagreement_ba = self.compute_disagreement(result_het_ba, result_homo_center_ba, rule)
                     asymmetry = abs(disagreement_ab - disagreement_ba)
+
+                    # Secondary: compare to homogeneous run using the extreme metric
+                    disagreement_ab_extreme_baseline = self.compute_disagreement(
+                        result_het_ab, result_homo_extreme_ab, rule
+                    )
+                    disagreement_ba_extreme_baseline = self.compute_disagreement(
+                        result_het_ba, result_homo_extreme_ba, rule
+                    )
+                    asymmetry_extreme_baseline = abs(disagreement_ab_extreme_baseline - disagreement_ba_extreme_baseline)
                     
-                    condorcet_ab = self.compute_condorcet_metrics(result_het_ab, result_homo, rule)
-                    condorcet_ba = self.compute_condorcet_metrics(result_het_ba, result_homo, rule)
+                    condorcet_ab = self.compute_condorcet_metrics(result_het_ab, result_homo_center_ab, rule)
+                    condorcet_ba = self.compute_condorcet_metrics(result_het_ba, result_homo_center_ba, rule)
+                    condorcet_ab_extreme_baseline = self.compute_condorcet_metrics(
+                        result_het_ab, result_homo_extreme_ab, rule
+                    )
+                    condorcet_ba_extreme_baseline = self.compute_condorcet_metrics(
+                        result_het_ba, result_homo_extreme_ba, rule
+                    )
                     
                     pair_data[rule] = {
                         'disagreement_ab': disagreement_ab,
                         'disagreement_ba': disagreement_ba,
                         'asymmetry': asymmetry,
+                        'disagreement_ab_extreme_baseline': disagreement_ab_extreme_baseline,
+                        'disagreement_ba_extreme_baseline': disagreement_ba_extreme_baseline,
+                        'asymmetry_extreme_baseline': asymmetry_extreme_baseline,
                         **{f'{k}_ab': v for k, v in condorcet_ab.items()},
-                        **{f'{k}_ba': v for k, v in condorcet_ba.items()}
+                        **{f'{k}_ba': v for k, v in condorcet_ba.items()},
+                        **{f'{k}_ab_extreme_baseline': v for k, v in condorcet_ab_extreme_baseline.items()},
+                        **{f'{k}_ba_extreme_baseline': v for k, v in condorcet_ba_extreme_baseline.items()},
                     }
                 
                 results['pairs'][pair_name] = pair_data

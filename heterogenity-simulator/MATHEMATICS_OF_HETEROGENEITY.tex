@@ -15,7 +15,7 @@
 % Use starred sections so the PDF's numbered structure is preserved.
 % ---------------------------------------------------------------------------
 
-\section*{Spatial model and geometry domain (corrected)}
+\section*{Spatial model and geometry domain}
 We model voters and candidates as points in a $d$-dimensional hypercube:
 \[
   x \in [-1, 1]^d.
@@ -65,19 +65,13 @@ Then a threshold $\tau \in [0,1]$ can be used to switch distance metrics:
 
 \bigskip
 \noindent
-\textbf{Merge note.} The remainder of this document follows the PDF structure \emph{Mathematics of Heterogeneous Distance Metrics in Spatial Voting: Simulator Specification and Methodology}, but applies the corrected geometry above whenever the PDF text assumes a $[0,1]^d$ domain.
-
-% ---------------------------------------------------------------------------
-% Main document: structure mirrors the PDF.
-% ---------------------------------------------------------------------------
-
 \section{Simulator Specification}
 
 \subsection{Introduction}
 This document provides a complete mathematical specification of the spatial voting simulator with heterogeneous distance metrics. The simulator models elections where voters evaluate candidates based on spatial positions in a policy space, but different voters may use different distance metrics to measure ``closeness'' to candidates.
 
 \paragraph{Methodology Note.}
-A critical consideration in experimental design is ensuring that the homogeneous baseline uses a metric different from the center metric in heterogeneous conditions. If both use the same metric (e.g., L2), center voters will have identical preferences in both conditions, leading to artificially low disagreement rates. The corrected methodology uses metric pairs where both metrics differ (e.g., L1--Cosine) to reveal true heterogeneity effects.
+Homogeneous comparisons are defined relative to a baseline metric chosen from the metric pair used in the heterogeneous assignment. By default, the baseline is the center metric; for completeness, results can also be computed relative to the extreme metric baseline.
 
 \subsection{Spatial Voting Model}
 
@@ -177,7 +171,7 @@ Voter utilities are computed from distances using a utility function. The primar
 \begin{equation}
   u_{v}(c)=\max\!\left(0,1-\frac{d_{v}(\mathbf{x}_{v},\mathbf{y}_{c})}{d_{\max}^{(\mathrm{diag})}}\right) \tag{12}
 \end{equation}
-where, under the corrected geometry $[-1,1]^d$, we use $d_{\max}^{(\mathrm{diag})}=2\sqrt{d}$ as the maximum possible Euclidean distance in the hypercube (the diagonal length). This ensures utilities are normalized to $[0,1]$ and are comparable across different voter positions.
+where, under the geometry $[-1,1]^d$, we use $d_{\max}^{(\mathrm{diag})}=2\sqrt{d}$ as the maximum possible Euclidean distance in the hypercube (the diagonal length). This ensures utilities are normalized to $[0,1]$ and are comparable across different voter positions.
 
 \subsection{Utility Matrix}
 For profile $p$, we construct a utility matrix $\mathbf{U}_{p}\in\mathbb{R}^{n_{v}\times n_{c}}$:
@@ -243,17 +237,18 @@ The primary measure of heterogeneity effects is the disagreement rate, defined a
 For a metric pair $(m_{\text{center}},m_{\text{extreme}})$ and threshold $\theta$, let:
 \begin{itemize}
   \item $w^{\text{het}}_{p}$ be the winner under heterogeneous conditions (center uses $m_{\text{center}}$, extreme uses $m_{\text{extreme}}$),
-  \item $w^{\text{homo}}_{p}$ be the winner under homogeneous conditions (all voters use the baseline metric).
+  \item $w^{\text{homo}}_{p}(m)$ be the winner under homogeneous conditions when all voters use a baseline metric $m$.
 \end{itemize}
-The disagreement rate is:
+We report disagreement relative to a chosen baseline metric $m_{\text{base}}\in\{m_{\text{center}},m_{\text{extreme}}\}$:
 \begin{equation}
-  D(m_{\text{center}},m_{\text{extreme}},\theta)=\frac{1}{N}\sum_{p=1}^{N}\mathbf{1}[w^{\text{het}}_{p}\ne w^{\text{homo}}_{p}]\times 100\% \tag{22}
+  D(m_{\text{center}},m_{\text{extreme}},\theta\mid m_{\text{base}})
+  =\frac{1}{N}\sum_{p=1}^{N}\mathbf{1}\!\left[w^{\text{het}}_{p}\ne w^{\text{homo}}_{p}(m_{\text{base}})\right]\times 100\% \tag{22}
 \end{equation}
 
 \subsection{Asymmetry Measure}
 For a metric pair $(A,B)$, we define the asymmetry as:
 \begin{equation}
-  \Delta_{A,B}(\theta)=|D(A\rightarrow B,\theta)-D(B\rightarrow A,\theta)| \tag{23}
+  \Delta_{A,B}(\theta\mid m_{\text{base}})=\left|D(A\rightarrow B,\theta\mid m_{\text{base}})-D(B\rightarrow A,\theta\mid m_{\text{base}})\right| \tag{23}
 \end{equation}
 where $D(A\rightarrow B,\theta)$ denotes disagreement when $A$ is assigned to center voters and $B$ to extreme voters.
 
@@ -340,7 +335,7 @@ All experiments use the following base configuration:
   \item Dimensions: $d\in\{1,2,3,4,5,7,10\}$.
   \item Threshold values: $\theta\in\{0.05,0.10,\ldots,0.95\}$ (19 points).
   \item Random seed: fixed at 42 for reproducibility.
-  \item Geometry method: uniform distribution in $[-1,1]^{d}$ (corrected geometry).
+  \item Geometry method: uniform distribution in $[-1,1]^{d}$.
   \item Utility function: linear (as defined above).
 \end{itemize}
 
@@ -452,7 +447,7 @@ This ensures that differences in outcomes are solely due to metric heterogeneity
 \subsection{Validation}
 
 \subsubsection{Methodology Validation}
-A critical validation step is ensuring that the homogeneous baseline uses a different metric from the center metric in heterogeneous conditions. If both use the same metric (e.g., L2), center voters will have identical preferences in both conditions, leading to artificially low disagreement rates. The corrected methodology uses metric pairs where both metrics differ (e.g., L1--Cosine) to reveal true heterogeneity effects.
+Homogeneous comparisons are performed using a baseline metric selected from the heterogeneous metric pair. Results may be reported relative to the center baseline, the extreme baseline, or both.
 
 \subsubsection{Statistical Validation}
 \begin{itemize}

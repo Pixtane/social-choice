@@ -35,7 +35,8 @@ This document describes the comprehensive research methodology used to investiga
 - Test voter counts: [10, 25, 50, 100, 200, 300, 400, 500]
 - For each voter count:
   - Run 200 profiles with heterogeneous metrics (L2 center, Cosine extreme, threshold=0.5)
-  - Run 200 profiles with homogeneous baseline (L2 for all)
+  - Run 200 profiles with homogeneous baseline (center metric)
+  - Optionally also run 200 profiles with homogeneous baseline (extreme metric)
   - Compare winners to compute disagreement rates
   - Compute Condorcet metrics (cycle rates, efficiency)
 
@@ -94,7 +95,9 @@ This document describes the comprehensive research methodology used to investiga
   - Run 200 profiles with A (center) -> B (extreme)
   - Run 200 profiles with B (center) -> A (extreme)
   - Run 200 profiles with homogeneous baseline (A)
-  - Compute disagreement rates for both directions
+  - Run 200 profiles with homogeneous baseline (B)
+  - Compute disagreement rates for both directions against the center-metric baseline
+  - Optionally also compute disagreement rates against the extreme-metric baseline
   - Calculate asymmetry: |D(A->B) - D(B->A)|
 
 **Analysis**:

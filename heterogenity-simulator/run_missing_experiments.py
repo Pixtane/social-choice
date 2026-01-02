@@ -1,11 +1,5 @@
 """
-Run missing experiments with corrected methodology.
-
-The issue: When center_metric = L2 and homogeneous baseline = L2, 
-center voters use L2 in both cases, so disagreement is 0.
-
-Solution: Re-run experiments comparing to a different baseline,
-or use metric pairs that show real effects.
+Run missing experiments for specific metric pairs.
 """
 
 import sys
@@ -18,11 +12,8 @@ from research_suite import ResearchConfig, HeterogeneityResearcher
 
 def main():
     print("=" * 80)
-    print("RUNNING MISSING EXPERIMENTS WITH CORRECTED METHODOLOGY")
+    print("RUNNING MISSING EXPERIMENTS")
     print("=" * 80)
-    print("\nIssue: L2 center + cosine extreme vs L2 homogeneous shows 0 disagreement")
-    print("because center voters use L2 in both cases.")
-    print("\nSolution: Re-run with L1-cosine pair (both different from each other)")
     print("=" * 80)
     
     config = ResearchConfig(
@@ -35,7 +26,7 @@ def main():
     
     researcher = HeterogeneityResearcher(config)
     
-    # Re-run key experiments with L1-cosine (both metrics different)
+    # Re-run key experiments with an alternate metric pair
     print("\n" + "=" * 80)
     print("RE-RUNNING: VOTER SCALING (L1-COSINE)")
     print("=" * 80)
@@ -69,8 +60,8 @@ def main():
     print("\n" + "=" * 80)
     print("EXPERIMENTS COMPLETE")
     print("=" * 80)
-    print("\nThese experiments use L1-cosine pair where both metrics differ,")
-    print("so we should see real heterogeneity effects.")
+    print("\nThese experiments report disagreement against the center-metric baseline by default,")
+    print("and also include extreme-metric baseline comparisons in the output.")
 
 if __name__ == "__main__":
     main()
