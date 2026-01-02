@@ -197,11 +197,9 @@ class UtilityConfig:
     # Saturated utility parameters
     saturation_threshold: float = 0.5  # Threshold for saturated utility
     
-    # Maximum distance for linear/quadratic utility (None = auto-calculate from n_dim)
-    d_max: Optional[float] = None  # If None, uses sqrt(n_dim) as max distance
-    
-    # Maximum distance for linear/quadratic utility (None = auto-calculate)
-    d_max: Optional[float] = None  # If None, uses sqrt(n_dim) as max distance
+    # Maximum distance for quadratic utility (optional).
+    # Linear utility uses per-voter normalization derived from geometry bounds.
+    d_max: Optional[float] = None
 
 
 @dataclass

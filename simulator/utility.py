@@ -9,6 +9,7 @@ from typing import Optional
 from .config import UtilityConfig
 from .heterogeneous_distance import compute_heterogeneous_distances
 from .config import GeometryConfig
+from .heterogeneous_distance import create_strategy
 
 
 def utilities_to_rankings(utilities: np.ndarray, epsilon: float = 1e-9) -> np.ndarray:
@@ -63,18 +64,57 @@ def compute_distances(
                 distances[v, c] = np.linalg.norm(diff, ord=np.inf)
             elif metric == 'cosine':
                 # Cosine distance = 1 - cosine similarity
-                norm_v = np.linalg.norm(voter_positions[v])
-                norm_c = np.linalg.norm(candidate_positions[c])
-                if norm_v > 0 and norm_c > 0:
-                    cos_sim = np.dot(voter_positions[v], candidate_positions[c]) / (norm_v * norm_c)
-                    cos_sim = float(np.clip(cos_sim, -1.0, 1.0))
-                    distances[v, c] = 1.0 - cos_sim
-                else:
-                    distances[v, c] = 0.0
+                vv = voter_positions[v]
+                cc = candidate_positions[c]
+                denom = (np.linalg.norm(vv) + 1e-10) * (np.linalg.norm(cc) + 1e-10)
+                cos_sim = float(np.dot(vv, cc) / denom)
+                cos_sim = float(np.clip(cos_sim, -1.0, 1.0))
+                distances[v, c] = 1.0 - cos_sim
             else:
                 raise ValueError(f"Unknown metric: {metric}")
     
     return distances
+
+
+def _compute_opposite_corner(
+    voter_positions: np.ndarray,
+    position_min: float,
+    position_max: float,
+) -> np.ndarray:
+    """
+    Compute the "opposite" hypercube corner for each voter.
+
+    The opposite corner is defined coordinate-wise as the bound (min/max)
+    that is farthest from the voter's coordinate along that axis.
+    """
+    # Compare distance to each bound per coordinate
+    dist_to_min = np.abs(voter_positions - position_min)
+    dist_to_max = np.abs(voter_positions - position_max)
+    use_min = dist_to_min >= dist_to_max
+    return np.where(use_min, position_min, position_max)
+
+
+def _pointwise_distance(
+    a: np.ndarray,  # (n, n_dim)
+    b: np.ndarray,  # (n, n_dim)
+    metric: str,
+) -> np.ndarray:
+    """Distance between corresponding rows of a and b."""
+    diff = a - b
+    if metric == 'l2':
+        return np.linalg.norm(diff, ord=2, axis=-1)
+    if metric == 'l1':
+        return np.linalg.norm(diff, ord=1, axis=-1)
+    if metric == 'chebyshev' or metric == 'linf':
+        return np.linalg.norm(diff, ord=np.inf, axis=-1)
+    if metric == 'cosine':
+        # 1 - cosine similarity, with epsilon to avoid division by zero
+        a_norm = a / (np.linalg.norm(a, axis=-1, keepdims=True) + 1e-10)
+        b_norm = b / (np.linalg.norm(b, axis=-1, keepdims=True) + 1e-10)
+        sim = np.sum(a_norm * b_norm, axis=-1)
+        sim = np.clip(sim, -1.0, 1.0)
+        return 1.0 - sim
+    raise ValueError(f"Unknown metric: {metric}")
 
 
 class UtilityComputer:
@@ -127,7 +167,10 @@ class UtilityComputer:
     def compute_utilities(
         self,
         distances: np.ndarray,
-        n_dim: int
+        n_dim: int,
+        *,
+        voter_positions: Optional[np.ndarray] = None,
+        geometry: Optional[GeometryConfig] = None,
     ) -> np.ndarray:
         """
         Convert distances to utilities.
@@ -156,13 +199,36 @@ class UtilityComputer:
             utilities = np.maximum(0.0, 1.0 - (distances / d_max)**2)
         
         elif utility_func == 'linear':
-            # Linear: u = max(0, 1 - d / d_max)
-            d_max = self.config.d_max
-            if d_max is None:
-                # Default assumes unit hypercube [0,1]^n_dim. If you change the geometry
-                # bounds (e.g. to [-1,1]^n_dim), set UtilityConfig.d_max explicitly.
-                d_max = np.sqrt(n_dim)
-            utilities = np.maximum(0.0, 1.0 - distances / d_max)
+            # Linear: per-voter normalization.
+            # u_v(c) = 1 - d_v(x_v, y_c) / d_max,v
+            # where d_max,v = d_v(x_v, opposite_corner(x_v)).
+            if voter_positions is None:
+                raise ValueError("linear utility requires voter_positions for per-voter normalization")
+
+            # Geometry bounds (default matches legacy [0, 1])
+            pmin = geometry.position_min if geometry is not None else 0.0
+            pmax = geometry.position_max if geometry is not None else 1.0
+
+            # Determine metric per voter (heterogeneous or homogeneous)
+            het = self.config.heterogeneous_distance
+            if het is not None and getattr(het, "enabled", False):
+                strategy = create_strategy(het, position_min=pmin, position_max=pmax)
+                voter_metrics = strategy.get_voter_metrics(voter_positions)
+            else:
+                voter_metrics = np.full((voter_positions.shape[0],), self.config.distance_metric, dtype=object)
+
+            # Compute opposite corners and per-voter max distances
+            opposite = _compute_opposite_corner(voter_positions, pmin, pmax)
+            d_max_v = np.empty((voter_positions.shape[0],), dtype=float)
+            for metric in np.unique(voter_metrics):
+                mask = voter_metrics == metric
+                if np.any(mask):
+                    d_max_v[mask] = _pointwise_distance(voter_positions[mask], opposite[mask], metric)
+
+            # Safe divide (degenerate geometries only)
+            safe_dmax = np.where(d_max_v > 1e-12, d_max_v, 1.0)
+            utilities = 1.0 - (distances / safe_dmax[:, np.newaxis])
+            utilities = np.clip(utilities, 0.0, 1.0)
         
         else:
             raise ValueError(f"Unknown utility function: {utility_func}")

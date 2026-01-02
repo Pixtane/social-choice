@@ -117,7 +117,6 @@ class HeterogeneityResearcher:
         voting_rules: List[str],
         dimension: int,
         baseline_metric: str,
-        d_max: float,
     ) -> ExperimentResult:
         """Run a homogeneous simulation using a single baseline distance metric."""
         config_homo = SimulationConfig(
@@ -129,7 +128,6 @@ class HeterogeneityResearcher:
             utility=UtilityConfig(
                 function='linear',
                 distance_metric=baseline_metric,
-                d_max=d_max,
                 heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
             ),
             rng_seed=self.config.rng_seed
@@ -201,7 +199,6 @@ class HeterogeneityResearcher:
                 utility=UtilityConfig(
                     function='linear',
                     distance_metric='l2',
-                    d_max=2.0 * np.sqrt(dimension),
                     heterogeneous_distance=HeterogeneousDistanceConfig(
                         enabled=True,
                         strategy='center_extreme',
@@ -215,7 +212,6 @@ class HeterogeneityResearcher:
             result_het = run_experiment(config_het, save_results=False, verbose=False)
             
             # Homogeneous baseline (center metric)
-            d_max = 2.0 * np.sqrt(dimension)
             result_homo_center = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
                 n_voters=n_voters,
@@ -223,7 +219,6 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=center_metric,
-                d_max=d_max,
             )
             result_homo_extreme = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
@@ -232,7 +227,6 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=extreme_metric,
-                d_max=d_max,
             )
             
             voter_data = {}
@@ -313,7 +307,6 @@ class HeterogeneityResearcher:
                 utility=UtilityConfig(
                     function='linear',
                     distance_metric='l2',
-                    d_max=2.0 * np.sqrt(dimension),
                     heterogeneous_distance=HeterogeneousDistanceConfig(
                         enabled=True,
                         strategy='center_extreme',
@@ -327,7 +320,6 @@ class HeterogeneityResearcher:
             result_het = run_experiment(config_het, save_results=False, verbose=False)
             
             # Homogeneous baseline
-            d_max = 2.0 * np.sqrt(dimension)
             result_homo_center = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
                 n_voters=n_voters,
@@ -335,7 +327,6 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=center_metric,
-                d_max=d_max,
             )
             result_homo_extreme = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
@@ -344,7 +335,6 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=extreme_metric,
-                d_max=d_max,
             )
             
             threshold_data = {}
@@ -424,7 +414,6 @@ class HeterogeneityResearcher:
                 utility=UtilityConfig(
                     function='linear',
                     distance_metric='l2',
-                    d_max=2.0 * np.sqrt(dimension),
                     heterogeneous_distance=HeterogeneousDistanceConfig(
                         enabled=True,
                         strategy='center_extreme',
@@ -438,7 +427,6 @@ class HeterogeneityResearcher:
             result_het = run_experiment(config_het, save_results=False, verbose=False)
             
             # Homogeneous baseline
-            d_max = 2.0 * np.sqrt(dimension)
             result_homo_center = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
                 n_voters=n_voters,
@@ -446,7 +434,6 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=center_metric,
-                d_max=d_max,
             )
             result_homo_extreme = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
@@ -455,7 +442,6 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=extreme_metric,
-                d_max=d_max,
             )
             
             dim_data = {}
@@ -538,7 +524,6 @@ class HeterogeneityResearcher:
                     utility=UtilityConfig(
                         function='linear',
                         distance_metric='l2',
-                        d_max=2.0 * np.sqrt(dimension),
                         heterogeneous_distance=HeterogeneousDistanceConfig(
                             enabled=True,
                             strategy='center_extreme',
@@ -561,7 +546,6 @@ class HeterogeneityResearcher:
                     utility=UtilityConfig(
                         function='linear',
                         distance_metric='l2',
-                        d_max=2.0 * np.sqrt(dimension),
                         heterogeneous_distance=HeterogeneousDistanceConfig(
                             enabled=True,
                             strategy='center_extreme',
@@ -575,7 +559,6 @@ class HeterogeneityResearcher:
                 result_het_ba = run_experiment(config_het_rev, save_results=False, verbose=False)
 
                 # Homogeneous baselines
-                d_max = 2.0 * np.sqrt(dimension)
                 # Baseline aligned with each heterogeneous run's center metric (default comparison)
                 result_homo_center_ab = self._run_homogeneous_baseline(
                     n_profiles=self.config.base_n_profiles,
@@ -584,7 +567,6 @@ class HeterogeneityResearcher:
                     voting_rules=self.config.voting_rules,
                     dimension=dimension,
                     baseline_metric=center_metric,
-                    d_max=d_max,
                 )
                 result_homo_center_ba = self._run_homogeneous_baseline(
                     n_profiles=self.config.base_n_profiles,
@@ -593,7 +575,6 @@ class HeterogeneityResearcher:
                     voting_rules=self.config.voting_rules,
                     dimension=dimension,
                     baseline_metric=extreme_metric,
-                    d_max=d_max,
                 )
                 # Secondary comparison baseline aligned with each heterogeneous run's extreme metric.
                 # These are the same two homogeneous runs as above, just swapped.

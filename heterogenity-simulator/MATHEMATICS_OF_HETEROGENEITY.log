@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.1)  2 JAN 2026 16:36
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.1)  2 JAN 2026 16:41
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -290,31 +290,36 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 12.
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
-{C:/Users/yaros/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] [2] [3] [4] [5]
-Overfull \hbox (2.32062pt too wide) in paragraph at lines 239--240
+{C:/Users/yaros/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] [2] [3]
+Overfull \hbox (12.00546pt too wide) in paragraph at lines 177--178
+ []\OT1/cmr/bx/n/10.95 Opposite cor-ner.[] \OT1/cmr/m/n/10.95 Un-der the ge-om-e-try $[\OMS/cmsy/m/n/10.95 ^^@\OT1/cmr/m/n/10.95 1\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 1][]$, de-fine the op-po-site cor-ner $\OT1/cmr/bx/n/10.95 z[] \OMS/cmsy/m/n/10.95 2 f^^@\OT1/cmr/m/n/10.95 1\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 1\OMS/cmsy/m/n/10.95 g[]$ \OT1/cmr/m/n/10.95 coordinate-
+ []
+
+[4] [5]
+Overfull \hbox (2.32062pt too wide) in paragraph at lines 255--256
 []$\OML/cmm/m/it/10.95 w[]$ \OT1/cmr/m/n/10.95 be the win-ner un-der het-ero-ge-neous con-di-tions (cen-ter uses $\OML/cmm/m/it/10.95 m[]$\OT1/cmr/m/n/10.95 , ex-treme uses $\OML/cmm/m/it/10.95 m[]$\OT1/cmr/m/n/10.95 ), 
  []
 
-[6] [7] [8] [9] [10] [11] (MATHEMATICS_OF_HETEROGENEITY.aux)
+[6] [7] [8] [9] [10] [11] [12] (MATHEMATICS_OF_HETEROGENEITY.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `MATHEMATICS_OF_HETEROGENEITY.out' has not changed.
-(rerunfilecheck)             Checksum: 99C7D022563B53E32E79966FD17704D9;10033.
+(rerunfilecheck)             Checksum: 6D27FAA667C879DF32EEA8DC4F4F958E;10033.
  ) 
 Here is how much of TeX's memory you used:
- 9541 strings out of 467870
- 141955 string characters out of 5434229
+ 9547 strings out of 467870
+ 142012 string characters out of 5434229
  562364 words of memory out of 5000000
  38165 multiletter control sequences out of 15000+600000
  636741 words of font info for 73 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,79p,451b,519s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,11n,79p,451b,515s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\yaros\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.pk><E:/Software/fonts/type1/public/amsfonts/cm/cmbx10.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmbx12.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmex10.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmmi10.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmmi6.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmmi8.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmr10.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmr17.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmr6.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmr8.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmsy10.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmsy6.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmsy8.pfb><E:/Software/fonts/type1/public/amsfonts/cm/cmti10.pfb><E:/Software/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on MATHEMATICS_OF_HETEROGENEITY.pdf (11 pages, 271118 bytes).
+Output written on MATHEMATICS_OF_HETEROGENEITY.pdf (12 pages, 273467 bytes).
 PDF statistics:
- 510 PDF objects out of 1000 (max. 8388607)
- 174 named destinations out of 1000 (max. 500000)
+ 520 PDF objects out of 1000 (max. 8388607)
+ 180 named destinations out of 1000 (max. 500000)
  481 words of extra memory for PDF output out of 10000 (max. 10000000)
 

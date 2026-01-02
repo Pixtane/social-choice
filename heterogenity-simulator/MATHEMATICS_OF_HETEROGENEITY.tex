@@ -167,11 +167,27 @@ Each row $v$ uses the metric $m_{v}$ assigned to voter $v$.
 \subsection{Utility Computation}
 
 \subsection{Utility Functions}
-Voter utilities are computed from distances using a utility function. The primary function used in this research is the linear utility function:
+Voter utilities are computed from distances using a utility function. The primary function used in this research is a per-voter normalized linear utility:
 \begin{equation}
-  u_{v}(c)=\max\!\left(0,1-\frac{d_{v}(\mathbf{x}_{v},\mathbf{y}_{c})}{d_{\max}^{(\mathrm{diag})}}\right) \tag{12}
+  u_{v}(c)=1-\frac{d_{v}(\mathbf{x}_{v},\mathbf{y}_{c})}{d_{\max,v}} \tag{12}
 \end{equation}
-where, under the geometry $[-1,1]^d$, we use $d_{\max}^{(\mathrm{diag})}=2\sqrt{d}$ as the maximum possible Euclidean distance in the hypercube (the diagonal length). This ensures utilities are normalized to $[0,1]$ and are comparable across different voter positions.
+where $d_{\max,v}$ is defined for each voter $v$ as the distance from $\mathbf{x}_{v}$ to the corner of the hypercube that is ``opposite'' to $\mathbf{x}_{v}$.
+
+\paragraph{Opposite corner.}
+Under the geometry $[-1,1]^d$, define the opposite corner $\mathbf{z}_{v}\in\{-1,1\}^{d}$ coordinate-wise by
+\begin{equation}
+  z_{v,k}=
+  \begin{cases}
+    -1 & \text{if } x_{v,k}\ge 0\\
+    \phantom{-}1 & \text{if } x_{v,k}<0
+  \end{cases}
+  \qquad (k=1,\ldots,d). \tag{12a}
+\end{equation}
+Then the per-voter maximum distance is
+\begin{equation}
+  d_{\max,v}=d_{v}(\mathbf{x}_{v},\mathbf{z}_{v}). \tag{12b}
+\end{equation}
+Because $\mathbf{z}_{v}$ is a corner, $d_{\max,v}$ is the maximum distance from $\mathbf{x}_{v}$ to any point in the domain, and utilities satisfy $u_{v}(c)\in[0,1]$ with $u_{v}(\mathbf{x}_{v})=1$ and $u_{v}(\mathbf{z}_{v})=0$.
 
 \subsection{Utility Matrix}
 For profile $p$, we construct a utility matrix $\mathbf{U}_{p}\in\mathbb{R}^{n_{v}\times n_{c}}$:

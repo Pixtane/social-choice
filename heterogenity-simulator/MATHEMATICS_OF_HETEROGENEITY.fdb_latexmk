@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1767364602.85275 "c:/Programming/fun/social-choice/heterogenity-simulator/MATHEMATICS_OF_HETEROGENEITY.tex" "MATHEMATICS_OF_HETEROGENEITY.pdf" "MATHEMATICS_OF_HETEROGENEITY" 1767364603.65793 0
+["pdflatex"] 1767364917.01824 "c:/Programming/fun/social-choice/heterogenity-simulator/MATHEMATICS_OF_HETEROGENEITY.tex" "MATHEMATICS_OF_HETEROGENEITY.pdf" "MATHEMATICS_OF_HETEROGENEITY" 1767364917.88194 0
   "C:/Users/yaros/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1767281373 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/yaros/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/tcrm1095.pk" 1767281377 12668 765fd72f7af290465f47bac699d32753 ""
   "C:/Users/yaros/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1767281268 13317654 221fee1ae2aa0dff439065e6169c9eb6 ""
@@ -83,10 +83,10 @@
   "E:/Software/tex/latex/refcount/refcount.sty" 1576433952 9878 9e94e8fa600d95f9c7731bb21dfb67a4 ""
   "E:/Software/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1751104012 9684 a33a14b82ce60d6e77cb9be689d79ee6 ""
   "E:/Software/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
-  "MATHEMATICS_OF_HETEROGENEITY.aux" 1767364603 8165 6b650bb17b7fcd881f9f68cf53ce8c50 "pdflatex"
-  "MATHEMATICS_OF_HETEROGENEITY.out" 1767364603 10033 99c7d022563b53e32e79966fd17704d9 "pdflatex"
-  "MATHEMATICS_OF_HETEROGENEITY.tex" 1767364601 23810 da5b98958083f616a089982997cc4fea ""
-  "c:/Programming/fun/social-choice/heterogenity-simulator/MATHEMATICS_OF_HETEROGENEITY.tex" 1767364601 23810 da5b98958083f616a089982997cc4fea ""
+  "MATHEMATICS_OF_HETEROGENEITY.aux" 1767364917 8271 aadbc400dfce6d3c6080a1691c5f771d "pdflatex"
+  "MATHEMATICS_OF_HETEROGENEITY.out" 1767364917 10033 6d27faa667c879df32eea8dc4f4f958e "pdflatex"
+  "MATHEMATICS_OF_HETEROGENEITY.tex" 1767364915 24356 f5d30469320dfb851ef9cf1f1aaf85a6 ""
+  "c:/Programming/fun/social-choice/heterogenity-simulator/MATHEMATICS_OF_HETEROGENEITY.tex" 1767364915 24356 f5d30469320dfb851ef9cf1f1aaf85a6 ""
   (generated)
   "MATHEMATICS_OF_HETEROGENEITY.aux"
   "MATHEMATICS_OF_HETEROGENEITY.log"
