@@ -1,5 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage{amsmath, amssymb}
+\usepackage{mathtools}
 \usepackage[margin=1in]{geometry}
 \usepackage[hidelinks,hypertexnames=false]{hyperref}
 
@@ -10,500 +11,708 @@
 \begin{document}
 \maketitle
 
-% ---------------------------------------------------------------------------
-% Preface: existing file content (wins on contradictions) placed first.
-% Use starred sections so the PDF's numbered structure is preserved.
-% ---------------------------------------------------------------------------
+\section{Simulator}
+\label{sec:simulator}
 
-\section*{Spatial model and geometry domain}
-We model voters and candidates as points in a $d$-dimensional hypercube:
-\[
-  x \in [-1, 1]^d.
-\]
-This choice is important for cosine distance: allowing negative coordinates permits directions spanning the full angular range $[0,\pi]$ (i.e.\ $180^\circ$). In contrast, sampling from $[0,1]^d$ restricts all vectors to the first orthant, which limits angles largely to $[0,\frac{\pi}{2}]$ (i.e.\ $90^\circ$), preventing cosine from expressing full opposition.
+This section describes the simulator as implemented in the codebase. All quantities and procedures discussed below correspond precisely to the computations performed: geometry sampling, heterogeneous distance perception, utility formation, ballot formation, voting rules, manipulation (optional), and evaluation metrics.
 
-\section*{Cosine distance and its range}
-For nonzero vectors $u,v \in \mathbb{R}^d$, cosine similarity is
-\[
-  \cos(u,v) \;=\; \frac{u \cdot v}{\lVert u \rVert_2 \, \lVert v \rVert_2},
-\]
-and cosine distance is
-\[
-  d_{\cos}(u,v) \;=\; 1 - \cos(u,v).
-\]
-Because $\cos(u,v) \in [-1,1]$, cosine distance satisfies
-\[
-  d_{\cos}(u,v) \in [0,2],
-\]
-achieving $0$ when the vectors are aligned ($\theta = 0$) and $2$ when the vectors are opposite ($\theta = \pi$).
+\section{Basic objects and indexing}
+\label{sec:sim-objects}
 
-\paragraph{Note on the zero vector.}
-If $u=0$ or $v=0$, cosine similarity is undefined; implementations typically add a small $\varepsilon$ to norms or define a fallback behavior.
-
-\section*{Center/extreme classification (normalized radius)}
-To classify voters by how ``central'' they are, we use distance from the geometric center of the hypercube:
-\[
-  c \;=\; \frac{(-1) + 1}{2}\mathbf{1} \;=\; 0.
-\]
-For a voter at position $x$, define the (unnormalized) radius
-\[
-  r(x) \;=\; \lVert x - c \rVert_2.
-\]
-The maximum possible radius in $[-1,1]^d$ is achieved at a corner $(\pm 1,\ldots,\pm 1)$:
-\[
-  r_{\max} \;=\; \sqrt{d}.
-\]
-We normalize centrality to $[0,1]$ via
-\[
-  \rho(x) \;=\; \frac{r(x)}{r_{\max}} \in [0,1].
-\]
-Then a threshold $\tau \in [0,1]$ can be used to switch distance metrics:
-\[
-  \rho(x) \le \tau \Rightarrow \text{center metric}, \qquad
-  \rho(x) > \tau \Rightarrow \text{extreme metric}.
-\]
-
-\bigskip
-\noindent
-\section{Simulator Specification}
-
-\subsection{Introduction}
-This document provides a complete mathematical specification of the spatial voting simulator with heterogeneous distance metrics. The simulator models elections where voters evaluate candidates based on spatial positions in a policy space, but different voters may use different distance metrics to measure ``closeness'' to candidates.
-
-\paragraph{Methodology Note.}
-Homogeneous comparisons are defined relative to a baseline metric chosen from the metric pair used in the heterogeneous assignment. By default, the baseline is the center metric; for completeness, results can also be computed relative to the extreme metric baseline.
-
-\subsection{Spatial Voting Model}
-
-\subsection{Basic Setup}
-Let $\mathcal{P}=\{1,2,\ldots,N\}$ be a set of $N$ election profiles. For each profile $p\in\mathcal{P}$, we have:
+Fix:
 \begin{itemize}
-  \item A set of voters $\mathcal{V}_{p}=\{1,2,\ldots,n_{v}\}$ with $n_{v}$ voters.
-  \item A set of candidates $\mathcal{C}_{p}=\{1,2,\ldots,n_{c}\}$ with $n_{c}$ candidates.
-  \item A $d$-dimensional policy space $\mathbb{R}^{d}$ (typically $d\in\{1,2,3,4,5,7,10\}$).
+  \item number of independent election instances (``profiles'') \(P \in \mathbb{N}\),
+  \item number of voters \(N \in \mathbb{N}\),
+  \item number of candidates \(M \in \mathbb{N}\), \(M \ge 2\),
+  \item spatial dimension \(d \in \mathbb{N}\), \(d \ge 1\),
+  \item geometry bounds \(p_{\min} < p_{\max}\) (defaults \(p_{\min}=0, p_{\max}=1\)),
+  \item a random seed \(s\) (optional; if absent, NumPy generates a fresh seed),
+  \item a numerical tolerance \(\varepsilon\) (stored in config but not used in ranking conversion).
 \end{itemize}
-Each voter $v\in\mathcal{V}_{p}$ has a position $\mathbf{x}_{v}\in[-1,1]^{d}$ representing their ideal policy point. Each candidate $c\in\mathcal{C}_{p}$ has a position $\mathbf{y}_{c}\in[-1,1]^{d}$ representing their policy platform.
 
-\subsection{Position Generation}
-For uniform distribution (the primary method used in this research), positions are generated as:
-\begin{align}
-  \mathbf{x}_{v} &\sim \mathrm{Uniform}([-1,1]^{d}) \quad \forall v\in\mathcal{V}_{p} \tag{1}\\
-  \mathbf{y}_{c} &\sim \mathrm{Uniform}([-1,1]^{d}) \quad \forall c\in\mathcal{C}_{p} \tag{2}
-\end{align}
-All positions are independently and identically distributed within the hypercube $[-1,1]^{d}$.
+Indices:
+\[
+  p \in \{1,\dots,P\},\quad
+  v \in \{1,\dots,N\},\quad
+  c \in \{1,\dots,M\},\quad
+  k \in \{1,\dots,d\}.
+\]
 
-\subsection{Distance Metrics}
+For each profile \(p\), the simulator samples:
+\[
+  x^{(p)}_v \in [p_{\min},p_{\max}]^d \quad\text{(voter positions)},\qquad
+  y^{(p)}_c \in [p_{\min},p_{\max}]^d \quad\text{(candidate positions)}.
+\]
 
-\subsection{Homogeneous Distance Metrics}
-In the standard spatial voting model, all voters use the same distance metric. We define four distance metrics:
+Given positions, it computes:
+\[
+  D^{(p)}_{v,c} \in \mathbb{R}_{\ge 0}\quad\text{(distance)},\qquad
+  u^{(p)}_{v,c} \in [0,1]\quad\text{(utility)},\qquad
+  R^{(p)}_v \in \{0,\dots,M-1\}^M\quad\text{(ranking permutation)}.
+\]
+Here \(R^{(p)}_v[0]\) is voter \(v\)'s top-ranked candidate index, etc.
 
-\subsubsection{Euclidean (L2) Distance}
-For voter position $\mathbf{x}_{v}$ and candidate position $\mathbf{y}_{c}$:
-\begin{equation}
-  d_{\mathrm{L2}}(\mathbf{x}_{v},\mathbf{y}_{c})=\|\mathbf{x}_{v}-\mathbf{y}_{c}\|_{2}
-  =\sqrt{\sum_{k=1}^{d}(x_{v,k}-y_{c,k})^{2}} \tag{3}
-\end{equation}
+\section{Randomness and reproducibility}
+\label{sec:sim-rng}
 
-\subsubsection{Manhattan (L1) Distance}
-\begin{equation}
-  d_{\mathrm{L1}}(\mathbf{x}_{v},\mathbf{y}_{c})=\|\mathbf{x}_{v}-\mathbf{y}_{c}\|_{1}
-  =\sum_{k=1}^{d}|x_{v,k}-y_{c,k}| \tag{4}
-\end{equation}
+All sampling uses NumPy's \texttt{default\_rng}. When a seed \(s\) is provided, the same seed is used for:
+\begin{itemize}
+  \item geometry sampling (voter/candidate positions),
+  \item voting-rule tie-breaking when enabled (see Section~\ref{sec:sim-ties}),
+  \item manipulation selection and poll noise when manipulation is enabled.
+\end{itemize}
 
-\subsubsection{Chebyshev (L\texorpdfstring{$\infty$}{∞}) Distance}
-\begin{equation}
-  d_{\mathrm{Chebyshev}}(\mathbf{x}_{v},\mathbf{y}_{c})=\|\mathbf{x}_{v}-\mathbf{y}_{c}\|_{\infty}
-  =\max_{k=1,\ldots,d}|x_{v,k}-y_{c,k}| \tag{5}
-\end{equation}
+\section{Spatial geometry generation}
+\label{sec:sim-geometry}
 
-\subsubsection{Cosine Distance}
-The cosine distance measures angular separation rather than spatial distance:
-\begin{equation}
-  d_{\mathrm{cosine}}(\mathbf{x}_{v},\mathbf{y}_{c})
-  =1-\frac{\mathbf{x}_{v}\cdot\mathbf{y}_{c}}{\|\mathbf{x}_{v}\|_{2}\|\mathbf{y}_{c}\|_{2}}
-  =1-\frac{\sum_{k=1}^{d}x_{v,k}y_{c,k}}
-  {\sqrt{\sum_{k=1}^{d}x_{v,k}^{2}}\sqrt{\sum_{k=1}^{d}y_{c,k}^{2}}} \tag{6}
-\end{equation}
-Note: If $\|\mathbf{x}_{v}\|_{2}=0$ or $\|\mathbf{y}_{c}\|_{2}=0$, we define $d_{\mathrm{cosine}}(\mathbf{x}_{v},\mathbf{y}_{c})=0$.
+The simulator supports the following \emph{implemented} geometry methods for each profile \(p\).
 
-\subsection{Heterogeneous Distance Assignment}
+\subsection{Uniform hypercube (\texttt{uniform})}
+\label{sec:geo-uniform}
 
-\subsection{Voter Centrality Measure}
-To assign different metrics to different voters, we first compute a \emph{centrality measure} for each voter. The centrality $\gamma_{v}\in[0,1]$ measures how ``extreme'' voter $v$ is relative to the center of the policy space.
+Independently for all \(p,v,k\):
+\[
+  (x^{(p)}_v)_k \sim \mathrm{Unif}(p_{\min}, p_{\max}),
+  \qquad
+  (y^{(p)}_c)_k \sim \mathrm{Unif}(p_{\min}, p_{\max}).
+\]
 
-Let $\mathbf{c}=(0,0,\ldots,0)\in\mathbb{R}^{d}$ be the geometric center of the hypercube $[-1,1]^d$. The centrality is computed as:
-\begin{equation}
-  \gamma_{v}=\frac{\|\mathbf{x}_{v}-\mathbf{c}\|_{2}}{d_{\max}^{(\mathrm{center})}} \tag{7}
-\end{equation}
-where $d_{\max}^{(\mathrm{center})}=\sqrt{d}$ is the maximum possible distance from the center to a corner of $[-1,1]^d$. The centrality is then clipped to $[0,1]$:
-\begin{equation}
-  \gamma_{v}=\min\!\left(1,\max\!\left(0,\frac{\|\mathbf{x}_{v}-\mathbf{c}\|_{2}}{d_{\max}^{(\mathrm{center})}}\right)\right) \tag{8}
-\end{equation}
-Thus, $\gamma_{v}=0$ for voters at the center, and $\gamma_{v}=1$ for voters at the extreme corners.
+\subsection{Clustered (\texttt{clustered})}
+\label{sec:geo-clustered}
 
-\subsection{Center-Extreme Strategy}
-The center-extreme strategy assigns one metric to central voters and a different metric to extreme voters based on a threshold parameter $\theta\in[0,1]$.
-For a given threshold $\theta$ and metric pair $(m_{\text{center}},m_{\text{extreme}})$, the metric assignment function is:
-\begin{equation}
-  m_{v}=
+Let \(\phi \in [0,1]\) be a dispersion parameter and let \(\sigma_0>0\) be the base cluster variance (code default \(\sigma_0=0.15\)).  Define:
+\[
+  \sigma_{\text{voter}} \coloneqq \phi \sqrt{d}\,\sigma_0,
+  \qquad
+  \sigma_{\text{cand}} \coloneqq \tfrac12\sigma_{\text{voter}}.
+\]
+For each profile \(p\), sample a cluster center \(m^{(p)} \in [p_{\min}+0.3\Delta,\,p_{\max}-0.3\Delta]^d\) where \(\Delta = p_{\max}-p_{\min}\), and then:
+\[
+  x^{(p)}_v \sim \mathcal{N}\!\left(m^{(p)}, \sigma_{\text{voter}}^2 I_d\right)\ \text{clipped coordinate-wise to }[p_{\min},p_{\max}],
+\]
+\[
+  y^{(p)}_c \sim \mathcal{N}\!\left(m^{(p)}, \sigma_{\text{cand}}^2 I_d\right)\ \text{clipped coordinate-wise to }[p_{\min},p_{\max}].
+\]
+
+\subsection{Single-peaked 1D (\texttt{single\_peaked})}
+\label{sec:geo-single-peaked}
+
+This method \emph{forces} \(d=1\). Voters are uniform on \([p_{\min},p_{\max}]\). Candidates are placed deterministically at evenly spaced positions between \(p_{\min}+0.2\Delta\) and \(p_{\max}-0.2\Delta\):
+\[
+  y^{(p)}_c = \bigl(p_{\min}+0.2\Delta\bigr) + \frac{c-1}{M-1}\bigl(0.6\Delta\bigr),
+  \qquad c=1,\dots,M.
+\]
+
+\subsection{Polarized (\texttt{polarized})}
+\label{sec:geo-polarized}
+
+Let \(\Delta=p_{\max}-p_{\min}\). Define three centers:
+\[
+  \ell = (p_{\min}+0.15\Delta)\mathbf{1}_d,\quad
+  r = (p_{\max}-0.15\Delta)\mathbf{1}_d,\quad
+  m = \tfrac12(p_{\min}+p_{\max})\mathbf{1}_d,
+\]
+and a common dispersion:
+\[
+  \sigma = 0.08\,\Delta\,\sqrt{d}.
+\]
+For each profile \(p\), sample faction sizes:
+\[
+  N_L = \left\lfloor N\,U_L\right\rfloor,\quad U_L \sim \mathrm{Unif}(0.35,0.50),
+\]
+\[
+  N_R = \left\lfloor N\,U_R\right\rfloor,\quad U_R \sim \mathrm{Unif}(0.35,0.50),
+\]
+\[
+  N_M = N - N_L - N_R.
+\]
+Then sample \(N_L\) voters from \(\mathcal{N}(\ell,\sigma^2 I_d)\), \(N_R\) voters from \(\mathcal{N}(r,\sigma^2 I_d)\), and \(N_M\) voters from \(\mathcal{N}(m,\sigma^2 I_d)\), each clipped to \([p_{\min},p_{\max}]^d\), and finally uniformly shuffle the voter order.
+
+Candidates: if \(M\ge 3\), then
+\[
+  y^{(p)}_1 \sim \mathcal{N}(\ell,(\sigma/2)^2 I_d),\quad
+  y^{(p)}_2 \sim \mathcal{N}(m,(\sigma/2)^2 I_d),\quad
+  y^{(p)}_3 \sim \mathcal{N}(r,(\sigma/2)^2 I_d),
+\]
+each clipped to \([p_{\min},p_{\max}]^d\). Any candidates \(c\ge 4\) are uniform in the hypercube. If \(M<3\), all candidates are uniform.
+
+\subsection{One-dimensional uniform (\texttt{1d})}
+\label{sec:geo-1d}
+
+This method forces \(d=1\). Voters and candidates are uniform on \([p_{\min},p_{\max}]\).
+
+\subsection{Two-dimensional triangle (\texttt{2d})}
+\label{sec:geo-2d}
+
+This method forces \(d=2\). Voters are uniform on \([p_{\min},p_{\max}]^2\). If \(M\ge 3\), candidates \(1,2,3\) are placed deterministically at:
+\[
+  y^{(p)}_1 = \bigl(p_{\min}+0.2\Delta,\ p_{\min}+0.3\Delta\bigr),\quad
+  y^{(p)}_2 = \bigl(p_{\max}-0.2\Delta,\ p_{\min}+0.3\Delta\bigr),\quad
+  y^{(p)}_3 = \bigl(\tfrac12(p_{\min}+p_{\max}),\ p_{\max}-0.2\Delta\bigr),
+\]
+and any candidates \(c\ge 4\) are uniform. If \(M<3\), all candidates are uniform in \([p_{\min},p_{\max}]^2\).
+
+\section{Distance metrics}
+\label{sec:sim-distance}
+
+Given a voter position \(x\in\mathbb{R}^d\) and candidate position \(y\in\mathbb{R}^d\), the simulator implements:
+\begin{align*}
+  d_{L2}(x,y)     & \coloneqq \|x-y\|_2,                                                                                            \\
+  d_{L1}(x,y)     & \coloneqq \|x-y\|_1 = \sum_{k=1}^d |x_k-y_k|,                                                                   \\
+  d_{\infty}(x,y) & \coloneqq \|x-y\|_{\infty} = \max_{k} |x_k-y_k|,                                                                \\
+  d_{\cos}(x,y)   & \coloneqq 1 - \mathrm{clip}\!\left(\frac{\langle x,y\rangle}{(\|x\|_2+\delta)(\|y\|_2+\delta)},\ -1,\ 1\right),
+\end{align*}
+with a small constant \(\delta = 10^{-10}\) used to avoid division by zero, and \(\mathrm{clip}\) denoting truncation to \([-1,1]\).
+
+\section{Heterogeneous distance perception}
+\label{sec:sim-heterogeneity}
+
+The \emph{heterogeneous distance} option assigns a metric \(\mu_v\) to each voter \(v\) as a function of that voter's spatial \emph{centrality}.  Distances are then computed using the assigned metric:
+\[
+  D^{(p)}_{v,c} \coloneqq d_{\mu^{(p)}_v}\!\left(x^{(p)}_v,\ y^{(p)}_c\right).
+\]
+When heterogeneous distance is disabled, a single metric \(\mu\) is used for all voters:
+\[
+  D^{(p)}_{v,c} \coloneqq d_{\mu}\!\left(x^{(p)}_v,\ y^{(p)}_c\right).
+\]
+
+\subsection{Centrality normalization}
+\label{sec:sim-centrality}
+
+Let the hypercube center be:
+\[
+  z \coloneqq \tfrac12(p_{\min}+p_{\max})\mathbf{1}_d,
+\]
+and let the maximum possible Euclidean distance from \(z\) to any corner be the half-diagonal:
+\[
+  L_{\max} \coloneqq \sqrt{d}\,\frac{p_{\max}-p_{\min}}{2}.
+\]
+The simulator defines each voter's centrality as normalized Euclidean distance to \(z\):
+\[
+  \mathrm{cent}(x) \coloneqq \mathrm{clip}\!\left(\frac{\|x-z\|_2}{L_{\max}},\ 0,\ 1\right).
+\]
+Note that this normalization is always Euclidean, even if the voter will later use a non-Euclidean metric for candidate evaluation.
+
+\subsection{Strategy A: center--extreme (\texttt{center\_extreme})}
+\label{sec:sim-center-extreme}
+
+Parameters:
+\begin{itemize}
+  \item center metric \(\mu_{\text{center}}\) (default \(L2\)),
+  \item extreme metric \(\mu_{\text{extreme}}\) (default cosine),
+  \item threshold \(t\in[0,1]\) (default \(t=0.5\)).
+\end{itemize}
+
+For a voter at position \(x\), define:
+\[
+  \mu(x) \coloneqq
   \begin{cases}
-    m_{\text{center}} & \text{if }\gamma_{v}\le \theta\\
-    m_{\text{extreme}} & \text{if }\gamma_{v}>\theta
-  \end{cases} \tag{9}
-\end{equation}
-The distance from voter $v$ to candidate $c$ is then:
-\begin{equation}
-  d_{v}(\mathbf{x}_{v},\mathbf{y}_{c})=d_{m_{v}}(\mathbf{x}_{v},\mathbf{y}_{c}) \tag{10}
-\end{equation}
-where $d_{m_{v}}$ is the distance function corresponding to metric $m_{v}$.
-
-\subsection{Heterogeneous Distance Matrix}
-For a profile $p$ with heterogeneous metrics, we compute a distance matrix $\mathbf{D}_{p}\in\mathbb{R}^{n_{v}\times n_{c}}$ where:
-\begin{equation}
-  [\mathbf{D}_{p}]_{v,c}=d_{v}(\mathbf{x}_{v},\mathbf{y}_{c})=d_{m_{v}}(\mathbf{x}_{v},\mathbf{y}_{c}) \tag{11}
-\end{equation}
-Each row $v$ uses the metric $m_{v}$ assigned to voter $v$.
-
-\subsection{Utility Computation}
-
-\subsection{Utility Functions}
-Voter utilities are computed from distances using a utility function. The primary function used in this research is a per-voter normalized linear utility:
-\begin{equation}
-  u_{v}(c)=1-\frac{d_{v}(\mathbf{x}_{v},\mathbf{y}_{c})}{d_{\max,v}} \tag{12}
-\end{equation}
-where $d_{\max,v}$ is defined for each voter $v$ as the distance from $\mathbf{x}_{v}$ to the corner of the hypercube that is ``opposite'' to $\mathbf{x}_{v}$.
-
-\paragraph{Opposite corner.}
-Under the geometry $[-1,1]^d$, define the opposite corner $\mathbf{z}_{v}\in\{-1,1\}^{d}$ coordinate-wise by
-\begin{equation}
-  z_{v,k}=
-  \begin{cases}
-    -1 & \text{if } x_{v,k}\ge 0\\
-    \phantom{-}1 & \text{if } x_{v,k}<0
+    \mu_{\text{center}},  & \mathrm{cent}(x) \le t, \\
+    \mu_{\text{extreme}}, & \mathrm{cent}(x) > t.
   \end{cases}
-  \qquad (k=1,\ldots,d). \tag{12a}
-\end{equation}
-Then the per-voter maximum distance is
-\begin{equation}
-  d_{\max,v}=d_{v}(\mathbf{x}_{v},\mathbf{z}_{v}). \tag{12b}
-\end{equation}
-Because $\mathbf{z}_{v}$ is a corner, $d_{\max,v}$ is the maximum distance from $\mathbf{x}_{v}$ to any point in the domain, and utilities satisfy $u_{v}(c)\in[0,1]$ with $u_{v}(\mathbf{x}_{v})=1$ and $u_{v}(\mathbf{z}_{v})=0$.
+\]
+Equality is classified as \emph{center} (\(\le t\)).
 
-\subsection{Utility Matrix}
-For profile $p$, we construct a utility matrix $\mathbf{U}_{p}\in\mathbb{R}^{n_{v}\times n_{c}}$:
-\begin{equation}
-  [\mathbf{U}_{p}]_{v,c}=u_{v}(c) \tag{13}
-\end{equation}
+\subsection{Strategy B: radial steps (\texttt{radial\_steps})}
+\label{sec:sim-radial-steps}
 
-\subsection{Preference Rankings}
-From utilities, we derive strict preference rankings. For voter $v$, the ranking $\pi_{v}$ is a permutation of $\mathcal{C}_{p}$ such that:
-\begin{equation}
-  \pi_{v}(1)\succ_{v}\pi_{v}(2)\succ_{v}\cdots\succ_{v}\pi_{v}(n_{c}) \tag{14}
-\end{equation}
-where $\pi_{v}(1)$ is the most preferred candidate. The ranking is computed as:
-\begin{equation}
-  \pi_{v}=\mathrm{argsort}(-\mathbf{u}_{v}) \tag{15}
-\end{equation}
-where $\mathbf{u}_{v}=[u_{v}(1),u_{v}(2),\ldots,u_{v}(n_{c})]$ is the utility vector for voter $v$, and $\mathrm{argsort}$ returns indices sorted in descending utility order. Ties (within numerical tolerance $\epsilon=10^{-9}$) are broken arbitrarily by index order.
+Parameters:
+\begin{itemize}
+  \item an ordered list of metrics \((\mu_0,\dots,\mu_{K-1})\) from center outward (default \((L1,L2,L\_{\infty})\)),
+  \item a boundary scaling mode in \{\texttt{linear}, \texttt{logarithmic}, \texttt{exponential}\},
+  \item a positive scaling parameter \(b>0\) (default \(b=2\)).
+\end{itemize}
 
-\subsection{Voting Rules}
-We implement three ordinal voting rules that operate on preference rankings:
+The simulator precomputes \(K-1\) boundaries \(0<\beta_1<\cdots<\beta_{K-1}<1\).
 
-\subsection{Plurality Rule}
-Each voter casts one vote for their top-ranked candidate. The winner is the candidate with the most first-place votes:
-\begin{align}
-  \mathrm{score}_{p}(c) &= \sum_{v\in\mathcal{V}_{p}}\mathbf{1}[\pi_{v}(1)=c] \tag{16}\\
-  w_{p} &= \arg\max_{c\in\mathcal{C}_{p}} \mathrm{score}_{p}(c) \tag{17}
-\end{align}
-Ties are broken randomly.
+\paragraph{Linear boundaries.}
+With \(K\) metrics, define equally spaced internal cutpoints:
+\[
+  (\beta_1,\dots,\beta_{K-1}) \coloneqq \left(\frac{1}{K}, \frac{2}{K}, \dots, \frac{K-1}{K}\right).
+\]
 
-\subsection{Borda Count}
-Each voter assigns points: $n_{c}-1$ points to their first choice, $n_{c}-2$ to their second, $\ldots$, $0$ to their last choice. The winner is the candidate with the highest total:
-\begin{equation}
-  \mathrm{score}_{p}(c)=\sum_{v\in\mathcal{V}_{p}}(n_{c}-\mathrm{rank}_{v}(c)-1) \tag{18}
-\end{equation}
-where $\mathrm{rank}_{v}(c)$ is the position of candidate $c$ in voter $v$'s ranking (0-indexed).
-\begin{equation}
-  w_{p}=\arg\max_{c\in\mathcal{C}_{p}}\mathrm{score}_{p}(c) \tag{19}
-\end{equation}
+\paragraph{Logarithmic boundaries.}
+Let \(\{\ell_i\}_{i=0}^{K}\) be \(K+1\) points logarithmically spaced between \(b^0=1\) and \(b^1=b\), i.e. \(\ell_i=b^{i/K}\). The code then normalizes these to \([0,1]\) via:
+\[
+  \tilde{\ell}_i \coloneqq \frac{\ell_i - 1}{b-1},
+\]
+and uses the internal points \(\beta_j = \tilde{\ell}_j\) for \(j=1,\dots,K-1\).
 
-\subsection{Instant Runoff Voting (IRV)}
-IRV proceeds in rounds. In each round:
+\paragraph{Exponential boundaries.}
+Let \(t_i=i/K\) for \(i=0,\dots,K\). The code maps linearly spaced \(t_i\) through:
+\[
+  \tilde{e}_i \coloneqq \frac{b^{t_i}-1}{b-1},
+\]
+and uses \(\beta_j=\tilde{e}_j\) for \(j=1,\dots,K-1\).
+
+\paragraph{Metric assignment.}
+Given a voter position \(x\), compute \(c=\mathrm{cent}(x)\). The region index is:
+\[
+  r(c) \coloneqq \min\Bigl(\bigl|\{j \in \{1,\dots,K-1\} : \beta_j < c\}\bigr|,\ K-1\Bigr).
+\]
+This matches the code's \texttt{searchsorted} behavior with the default left side: if \(c=\beta_j\), then \(r(c)=j-1\), so boundaries are included in the \emph{inner} region.
+Finally \(\mu(x)\coloneqq \mu_{r(c)}\).
+
+\section{Utility formation}
+\label{sec:sim-utility}
+
+Given distances \(D^{(p)}_{v,c}\), the simulator implements the following utility functions:
+
+\subsection{Gaussian utility (\texttt{gaussian})}
+\label{sec:util-gaussian}
+
+Let \(\sigma_{\text{fac}}>0\) be a configuration parameter (default \(\sigma_{\text{fac}}=0.5\)). Define:
+\[
+  \sigma \coloneqq \sigma_{\text{fac}}\sqrt{d}.
+\]
+Utilities are:
+\[
+  u^{(p)}_{v,c} \coloneqq \exp\!\left(-\frac{(D^{(p)}_{v,c})^2}{2\sigma^2}\right).
+\]
+
+\subsection{Quadratic utility (\texttt{quadratic})}
+\label{sec:util-quadratic}
+
+Let \(d_{\max}>0\) be a configured maximum distance. If \(d_{\max}\) is not provided, the code defaults to:
+\[
+  d_{\max} \coloneqq \sqrt{d},
+\]
+which corresponds to the Euclidean diameter of the unit hypercube \([0,1]^d\) and does \emph{not} automatically adjust if geometry bounds are changed.
+Utilities are:
+\[
+  u^{(p)}_{v,c} \coloneqq \max\!\left(0,\ 1 - \left(\frac{D^{(p)}_{v,c}}{d_{\max}}\right)^2\right).
+\]
+
+\subsection{Linear utility with per-voter normalization (\texttt{linear})}
+\label{sec:util-linear}
+
+This is the most important case for heterogeneous distance studies because the normalization depends on each voter's (possibly heterogeneous) metric.
+
+\paragraph{Opposite hypercube corner.}
+For a voter position \(x\in[p_{\min},p_{\max}]^d\), define the ``opposite corner'' \(o(x)\in\{p_{\min},p_{\max}\}^d\) coordinate-wise:
+\[
+  o(x)_k \coloneqq
+  \begin{cases}
+    p_{\min}, & |x_k - p_{\min}| \ge |x_k - p_{\max}|, \\
+    p_{\max}, & |x_k - p_{\min}| < |x_k - p_{\max}|.
+  \end{cases}
+\]
+Ties (\(=\)) go to \(p_{\min}\) (this is exactly the code's \(\ge\) branch).
+
+\paragraph{Per-voter maximum distance.}
+Let \(\mu_v\) be the metric assigned to voter \(v\) (heterogeneous) or the global metric (homogeneous). Define:
+\[
+  d_{\max,v} \coloneqq d_{\mu_v}\!\bigl(x_v,\, o(x_v)\bigr).
+\]
+To avoid division by zero in degenerate cases, the code uses a ``safe'' denominator:
+\[
+  \tilde{d}_{\max,v} \coloneqq
+  \begin{cases}
+    d_{\max,v}, & d_{\max,v} > 10^{-12}, \\
+    1,          & \text{otherwise}.
+  \end{cases}
+\]
+
+\paragraph{Linear utility.}
+Utilities are then:
+\[
+  u^{(p)}_{v,c} \coloneqq 1 - \frac{D^{(p)}_{v,c}}{\tilde{d}_{\max,v}},
+\]
+and finally clipped to \([0,1]\).
+
+\subsection{Non-implemented options}
+\label{sec:util-not-implemented}
+
+The configuration enum lists additional utility types (e.g.\ \texttt{exponential}, \texttt{saturated}), but the executed implementation raises an error for any utility function other than \texttt{gaussian}, \texttt{quadratic}, or \texttt{linear}. This chapter therefore treats only the implemented functions above.
+
+\section{From utilities to rankings}
+\label{sec:sim-rankings}
+
+For each profile \(p\) and voter \(v\), the simulator converts the utility vector \(\bigl(u^{(p)}_{v,1},\dots,u^{(p)}_{v,M}\bigr)\) into an ordinal ranking by sorting in descending utility:
+\[
+  R^{(p)}_v \coloneqq \mathrm{argsort}\bigl(-u^{(p)}_{v,\cdot}\bigr).
+\]
+No explicit \(\varepsilon\)-tie handling is applied; ties are broken by the underlying \texttt{argsort} ordering (which may be implementation-dependent).
+
+\section{Voting rules}
+\label{sec:sim-rules}
+
+Each profile is evaluated under one or more voting rules. Rules partition into:
+\begin{itemize}
+  \item \textbf{Cardinal rules} consuming utilities \(u_{v,c}\),
+  \item \textbf{Ordinal rules} consuming rankings \(R_v\).
+\end{itemize}
+
+\subsection{Tie-breaking conventions}
+\label{sec:sim-ties}
+
+Some rules call a common tie-breaker on a vector of candidate scores \(S \in \mathbb{R}^M\):
+\[
+  \mathrm{tiebreak}(S) \in \arg\max_{c} S_c.
+\]
+If \(|\arg\max S|=1\), the unique maximizer is selected. Otherwise:
+\begin{itemize}
+  \item \texttt{random}: pick uniformly at random among tied maxima using the simulator RNG,
+  \item \texttt{lexicographic}: pick the smallest candidate index among ties,
+  \item \texttt{none}: behaves identically to \texttt{lexicographic} in the current code.
+\end{itemize}
+Important: many rules use NumPy \(\arg\max/\arg\min\) internally without \(\mathrm{tiebreak}\); those ties resolve to the first index returned by NumPy.
+
+\subsection{Cardinal rules}
+\label{sec:rules-cardinal}
+
+Below, utilities are \(u_{v,c}\) for \(v=1,\dots,N\), \(c=1,\dots,M\).
+
+\paragraph{Utilitarian (\texttt{utilitarian}).}
+Score each candidate by total utility:
+\[
+  S_c \coloneqq \sum_{v=1}^{N} u_{v,c},
+  \qquad
+  \hat{c} \coloneqq \mathrm{tiebreak}(S).
+\]
+
+\paragraph{Approval (\texttt{approval}).}
+Let \(A_{v,c}\in\{0,1\}\) indicate whether voter \(v\) approves candidate \(c\). The code supports these approval policies:
+\begin{itemize}
+  \item \texttt{top\_k}: \(A_{v,c}=1\) iff \(c\) is among the \(k\) highest-utility candidates for voter \(v\),
+  \item \texttt{threshold}: \(A_{v,c}=1\) iff \(u_{v,c} > \tau\),
+  \item \texttt{mean}: \(A_{v,c}=1\) iff \(u_{v,c} > \frac{1}{M}\sum_{j=1}^{M} u_{v,j}\),
+  \item \texttt{above\_average}: \(A_{v,c}=1\) iff \(u_{v,c} > \frac{1}{NM}\sum_{v,j} u_{v,j}\).
+\end{itemize}
+Candidate scores and winner:
+\[
+  S_c \coloneqq \sum_{v=1}^{N} A_{v,c},
+  \qquad
+  \hat{c} \coloneqq \mathrm{tiebreak}(S).
+\]
+
+\paragraph{Score / range voting (\texttt{score}).}
+Let \(L\in\mathbb{N}\) be the configured maximum score (\texttt{score\_max}, default \(L=5\)). Each voter rescales their own utilities independently:
+\[
+  u^{\min}_v \coloneqq \min_c u_{v,c},\qquad
+  u^{\max}_v \coloneqq \max_c u_{v,c},\qquad
+  \rho_v \coloneqq u^{\max}_v - u^{\min}_v,
+\]
+with \(\rho_v\) replaced by \(1\) if \(\rho_v=0\).
+Normalized utilities:
+\[
+  \tilde{u}_{v,c} \coloneqq \frac{u_{v,c}-u^{\min}_v}{\rho_v} \in [0,1].
+\]
+Ballots:
+\[
+  b_{v,c} \coloneqq
+  \begin{cases}
+    \mathrm{round}(L\,\tilde{u}_{v,c}), & \text{if granularity is integer},    \\
+    L\,\tilde{u}_{v,c},                 & \text{if granularity is continuous}.
+  \end{cases}
+\]
+Scores and winner:
+\[
+  S_c \coloneqq \sum_{v=1}^{N} b_{v,c},
+  \qquad
+  \hat{c} \coloneqq \mathrm{tiebreak}(S).
+\]
+
+\paragraph{STAR (\texttt{star}).}
+First compute score totals \(S_c\) exactly as in \texttt{score}. Let the finalists be the two candidates with highest totals:
+\[
+  (a,b) \coloneqq \text{the first two indices in } \mathrm{argsort}(-S).
+\]
+Then perform an automatic runoff using the \emph{original utilities} (not the rounded score ballots):
+\[
+  V_a \coloneqq \left|\{v : u_{v,a} > u_{v,b}\}\right|,\qquad
+  V_b \coloneqq \left|\{v : u_{v,b} > u_{v,a}\}\right|.
+\]
+If \(V_a > V_b\) select \(a\); if \(V_b > V_a\) select \(b\). If \(V_a=V_b\), select the finalist with greater (or equal) score total \(S\) (i.e.\ choose \(a\) if \(S_a \ge S_b\), else choose \(b\)).
+
+\paragraph{Median utility (\texttt{median}).}
+Compute per-candidate medians:
+\[
+  S_c \coloneqq \mathrm{median}\bigl(u_{1,c},\dots,u_{N,c}\bigr),
+  \qquad
+  \hat{c} \coloneqq \mathrm{tiebreak}(S).
+\]
+
+\paragraph{Quadratic voting (\texttt{quadratic}).}
+The code applies a signed square root transform to utilities:
+\[
+  w_{v,c} \coloneqq \mathrm{sign}(u_{v,c})\,\sqrt{|u_{v,c}|},
+  \qquad
+  S_c \coloneqq \sum_{v=1}^{N} w_{v,c},
+  \qquad
+  \hat{c} \coloneqq \mathrm{tiebreak}(S).
+\]
+Note: when utilities are nonnegative (as in this simulator's implemented utility functions), this reduces to \(w_{v,c}=\sqrt{u_{v,c}}\).
+
+\subsection{Ordinal rules}
+\label{sec:rules-ordinal}
+
+Below, \(R_v\) is voter \(v\)'s ranking permutation, with \(R_v[0]\) the top choice.
+
+\paragraph{Plurality (\texttt{plurality}).}
+First-choice counts:
+\[
+  S_c \coloneqq \left|\{v : R_v[0]=c\}\right|,
+  \qquad
+  \hat{c} \coloneqq \mathrm{tiebreak}(S).
+\]
+
+\paragraph{Anti-plurality / veto (\texttt{anti\_plurality}, \texttt{veto}).}
+Last-place counts \(L_c \coloneqq |\{v : R_v[M-1]=c\}|\). The code sets scores \(S_c = -L_c\) and applies \(\mathrm{tiebreak}\).
+
+\paragraph{Borda (\texttt{borda}).}
+Assign points \(M-1, M-2, \dots, 0\) to ranks \(0,1,\dots,M-1\). Score:
+\[
+  S_c \coloneqq \sum_{v=1}^{N} \bigl(M-1-\mathrm{rank}_v(c)\bigr),
+\]
+where \(\mathrm{rank}_v(c)\) is the index \(r\) such that \(R_v[r]=c\). Winner: \(\hat{c}=\mathrm{tiebreak}(S)\).
+
+\paragraph{IRV (\texttt{irv}).}
+Maintain an active set \(A \subseteq \{0,\dots,M-1\}\), initially all candidates active. In each round:
+\begin{itemize}
+  \item each voter contributes one vote to their highest-ranked active candidate,
+  \item if some candidate has strictly more than half of active votes, that candidate wins,
+  \item otherwise eliminate the active candidate with the \emph{fewest} first-choice votes (ties resolve by smallest index via \(\arg\min\) behavior), remove it from \(A\), and repeat.
+\end{itemize}
+If no strict majority occurs, the last remaining active candidate wins.
+
+\paragraph{Coombs (\texttt{coombs}).}
+As in IRV, but elimination removes the active candidate with the \emph{most} last-place votes among active candidates (ties resolve by smallest index via \(\arg\max\)).
+
+\paragraph{Condorcet winner test (\texttt{condorcet}).}
+Compute pairwise margins (Section~\ref{sec:sim-pairwise}). A Condorcet winner is a candidate that beats every other candidate by positive margin. If none exists, the voting-rule engine returns winner index \(-1\).
+
+\paragraph{Minimax (\texttt{minimax}).}
+Compute pairwise margins \(m_{i,j}\). For each candidate \(c\), define its worst defeat as:
+\[
+  W_c \coloneqq \max_{j\ne c}(-m_{c,j}),
+\]
+and set score \(S_c \coloneqq -W_c\). Winner is \(\mathrm{tiebreak}(S)\).
+
+\paragraph{Copeland (\texttt{copeland}).}
+Let \(w_c = |\{j\ne c : m_{c,j}>0\}|\) and \(\ell_c = |\{j\ne c : m_{c,j}<0\}|\). Score \(S_c \coloneqq w_c-\ell_c\). Winner is \(\mathrm{tiebreak}(S)\).
+
+\paragraph{Schulze / beatpath (\texttt{schulze}).}
+Compute pairwise margins and initialize a ``strength'' matrix:
+\[
+  P_{i,j} \coloneqq \max(m_{i,j},0)\quad (i\ne j),\quad P_{i,i}=0.
+\]
+Then apply the Floyd--Warshall-style update:
+\[
+  P_{i,j} \leftarrow \max\!\bigl(P_{i,j},\ \min(P_{i,k},P_{k,j})\bigr)\quad\text{for all }k,i,j,\ i\ne j.
+\]
+Finally, the code counts for each \(i\) how many \(j\ne i\) satisfy \(P_{i,j} > P_{j,i}\), and selects the maximum by \(\mathrm{tiebreak}\).
+
+\paragraph{Ranked pairs / Tideman (\texttt{ranked\_pairs}).}
+Build the set of directed pair victories \((w,\ell)\) with a positive margin, each annotated by its margin value. Sort these victories by decreasing margin. Iteratively ``lock'' a victory unless it would create a directed cycle in the locked graph. The winner is the candidate with no incoming edge in the locked graph; if multiple, the code selects the smallest index by scanning from \(0\) upward.
+
+\paragraph{Bucklin (\texttt{bucklin}).}
+Initialize scores \(S_c=0\). For \(r=0,1,\dots,M-1\):
+\begin{itemize}
+  \item add 1 to each voter's candidate at rank \(r\),
+  \item if \(\max_c S_c\) exceeds \(N/2\) (strictly), select \(\arg\max S\) (ties by smallest index).
+\end{itemize}
+If no majority ever occurs, select \(\mathrm{tiebreak}(S)\) after the final round.
+
+\paragraph{Nanson (\texttt{nanson}).}
+Iteratively compute Borda scores on the active set and eliminate all candidates with below-average Borda score among active candidates. If no candidate is eliminated in a round (all remaining have score \(\ge\) average), stop. Winner is the smallest index remaining active.
+
+\paragraph{Baldwin (\texttt{baldwin}).}
+Iteratively compute Borda scores on the active set and eliminate the single candidate with lowest Borda score (ties by smallest index). Winner is the last remaining active candidate (smallest index if a tie in active representation).
+
+\paragraph{Kemeny--Young (\texttt{kemeny\_young}).}
+If \(M>8\), the code falls back to the Schulze method. Otherwise it enumerates all permutations \(\pi\) of candidates and scores each permutation by the sum of pairwise margins consistent with \(\pi\):
+\[
+  K(\pi) \coloneqq \sum_{i<j} m_{\pi_i,\pi_j}.
+\]
+It selects a maximizer \(\pi^\star\) (first encountered in enumeration order among ties) and declares \(\pi^\star_0\) the winner.
+
+\section{Strategic manipulation (optional)}
+\label{sec:sim-manipulation}
+
+Manipulation is optional. When enabled, the simulator selects a subset of voters as manipulators and then modifies either:
+\begin{itemize}
+  \item utilities (for \texttt{bullet} strategy under cardinal rules), and/or
+  \item rankings (for ordinal-rule strategies \texttt{compromise}, \texttt{burial}, \texttt{pushover}, \texttt{optimal}).
+\end{itemize}
+When a rule is cardinal, the simulator passes manipulated \emph{utilities} into the voting rule; when a rule is ordinal, it passes manipulated \emph{rankings}.
+Thus, in the implemented code, most ranking-only manipulation strategies do not affect cardinal rules.
+
+\subsection{Manipulator fraction and truncation}
+\label{sec:manip-fraction}
+
+Let \(f \in [0,1]\) be the configured manipulator fraction. The number of manipulators is:
+\[
+  N_{\text{manip}} \coloneqq \left\lfloor fN \right\rfloor,
+\]
+clipped to \([0,N]\).
+
+\subsection{Manipulator selection methods}
+\label{sec:manip-selection}
+
+The code supports:
+\begin{itemize}
+  \item \texttt{random}: uniform subset of size \(N_{\text{manip}}\) without replacement,
+  \item \texttt{extremists}: pick voters with largest variance \(\mathrm{Var}_c(u_{v,c})\),
+  \item \texttt{centrists}: pick voters minimizing \(\sum_c (u_{v,c}-\bar{u}_c)^2\) where \(\bar{u}_c=\frac1N\sum_v u_{v,c}\),
+  \item \texttt{informed}: approximate expected winner by plurality on \(\mathrm{argsort}(-u)\) first choices; pick voters maximizing \(\max_c u_{v,c} - u_{v,c^\star}\).
+\end{itemize}
+
+\subsection{Poll information (for \texttt{polls} and \texttt{full} information levels)}
+\label{sec:manip-polls}
+
+The polling model uses first-choice counts \(C_c\) from sincere rankings.
+\begin{itemize}
+  \item \texttt{full}: vote shares are \(C_c/N\),
+  \item \texttt{polls}: add Gaussian noise \(C_c + \eta_c\) with \(\eta_c \sim \mathcal{N}(0,\sigma^2)\), \(\sigma = \texttt{poll\_noise}\cdot N\); clamp at 0 and renormalize to shares.
+\end{itemize}
+The set of ``viable'' candidates is those with share \(>0.1\) (in \texttt{polls}) or count \(>0.1N\) (in \texttt{full}).
+
+\subsection{Manipulation strategies}
+\label{sec:manip-strategies}
+
+\paragraph{Bullet (\texttt{bullet}).}
+Only applied for cardinal rules. For each manipulating voter \(v\), let \(c_1 = R_v[0]\) be their sincere top choice. Set:
+\[
+  u'_{v,c} \coloneqq 0\ \ (c\ne c_1),\qquad
+  u'_{v,c_1} \coloneqq u_{v,c_1}.
+\]
+
+\paragraph{Compromise (\texttt{compromise}).}
+Only modifies rankings and only when poll info is available. If a manipulator's top choice is not viable, the code promotes the first viable candidate appearing in their ranking to first place and keeps the remaining candidates in their original relative order.
+
+\paragraph{Burial (\texttt{burial}).}
+Only modifies rankings and only when poll info is available. If the poll ``frontrunner'' is not the voter's top choice, move the frontrunner to last place.
+
+\paragraph{Pushover (\texttt{pushover}).}
+Only modifies rankings and only when poll info is available. Let the ``weakest'' candidate be the one with smallest poll vote share. If that candidate is not already first, the code inserts the weakest candidate into \emph{second} position (index 1) while keeping the voter's sincere top choice in first place.
+
+\paragraph{Optimal (\texttt{optimal}).}
+For \(M \le 5\), for each manipulator \(v\), the code enumerates all possible rankings \(\pi\) and selects the one that maximizes the manipulator's \emph{sincere} utility for the resulting winner under the chosen voting rule. Note that for \emph{cardinal} rules, the implementation only varies rankings while passing unchanged utilities into the rule, so the winner is unaffected by \(\pi\) and the ``optimal'' search is effectively vacuous. For \(M>5\), the code falls back to a compromise call without poll info (which returns without changing rankings, i.e.\ performs no change).
+
+\section{Evaluation metrics}
+\label{sec:sim-metrics}
+
+Metrics are computed \emph{using sincere utilities and rankings}, even if manipulation is enabled, so that welfare comparisons are measured against the true underlying preferences.
+
+\subsection{Social utility vector}
+\label{sec:sim-social-utility}
+
+Define per-candidate mean utility:
+\[
+  \bar{u}_c \coloneqq \frac{1}{N}\sum_{v=1}^{N} u_{v,c}.
+\]
+For a selected winner \(\hat{c}\), define:
+\[
+  U_{\text{win}} \coloneqq \bar{u}_{\hat{c}},\quad
+  U_{\max} \coloneqq \max_c \bar{u}_c,\quad
+  U_{\min} \coloneqq \min_c \bar{u}_c.
+\]
+
+\subsection{Voter Satisfaction Efficiency (VSE)}
+\label{sec:sim-vse}
+
+Let \(\Delta U = U_{\max}-U_{\min}\). If \(\Delta U > \varepsilon\), the code computes:
+\[
+  \mathrm{VSE} \coloneqq \frac{U_{\text{win}}-U_{\min}}{\Delta U}.
+\]
+Otherwise (all candidates essentially tied), it sets \(\mathrm{VSE}=1\).
+
+\subsection{Regret}
+\label{sec:sim-regret}
+
+Regret is:
+\[
+  \mathrm{Regret} \coloneqq U_{\max}-U_{\text{win}},
+\]
+and a normalized regret ratio \(\mathrm{Regret}/\Delta U\) is computed when \(\Delta U>\varepsilon\), else 0.
+
+\subsection{Winner rank by social utility}
+\label{sec:sim-winner-rank}
+
+Let \(\pi\) be candidates sorted by descending \(\bar{u}_c\) (via \(\mathrm{argsort}(-\bar{u})\)). The winner rank is the index \(r\) such that \(\pi_r=\hat{c}\). Ties follow \(\mathrm{argsort}\) ordering.
+
+\subsection{Pairwise margins and Condorcet winner}
+\label{sec:sim-pairwise}
+
+From rankings \(R_v\), define pairwise margin matrix \(m\in\mathbb{Z}^{M\times M}\):
+\[
+  m_{i,j} \coloneqq |\{v: i \text{ is ranked above } j \text{ by } v\}| - |\{v: j \text{ is ranked above } i \text{ by } v\}|.
+\]
+A Condorcet winner exists if some \(c\) satisfies \(m_{c,j}>0\) for all \(j\ne c\).
+
+\subsection{Cycle detection and classification}
+\label{sec:sim-cycles}
+
+For \(M=3\), the code declares a cycle iff no Condorcet winner exists. It classifies cycles as:
+\begin{itemize}
+  \item type 1 if \(0 \succ 1\), \(1 \succ 2\), and \(2 \succ 0\) by positive margins,
+  \item type 2 if \(1 \succ 0\), \(0 \succ 2\), and \(2 \succ 1\) by positive margins.
+\end{itemize}
+For \(M>3\), the code constructs the directed graph of strict pairwise-majority edges \(\{i\to j: m_{i,j}>0\}\) and applies a DFS-like check for cyclic reachability (as implemented).
+
+\section{Pipeline summary}
+\label{sec:sim-pipeline}
+
+For each profile \(p=1,\dots,P\):
 \begin{enumerate}
-  \item Count first-place votes: $\mathrm{votes}_{p}(c)=\sum_{v\in\mathcal{V}_{p}}\mathbf{1}[\pi_{v}(1)=c]$.
-  \item If any candidate has $>n_{v}/2$ votes, that candidate wins.
-  \item Otherwise, eliminate the candidate with fewest first-place votes.
-  \item Redistribute votes from the eliminated candidate to each voter's next-ranked remaining candidate.
-  \item Repeat until a candidate has a majority.
+  \item sample voter and candidate positions \(\{x^{(p)}_v\}, \{y^{(p)}_c\}\) according to the chosen geometry (Section~\ref{sec:sim-geometry});
+  \item compute distances \(D^{(p)}_{v,c}\) either with one metric or with heterogeneous per-voter metrics (Sections~\ref{sec:sim-distance}--\ref{sec:sim-heterogeneity});
+  \item compute utilities \(u^{(p)}_{v,c}\) from distances (Section~\ref{sec:sim-utility});
+  \item compute rankings \(R^{(p)}_v\) by sorting utilities (Section~\ref{sec:sim-rankings});
+  \item optionally apply manipulation to obtain manipulated ballots (Section~\ref{sec:sim-manipulation});
+  \item apply a voting rule to select a winner \(\hat{c}^{(p)}\) (Section~\ref{sec:sim-rules});
+  \item if the chosen rule returns ``no winner'' (only \texttt{condorcet} does so), the simulator falls back to the utilitarian winner \(\arg\max_c \bar{u}_c\);
+  \item compute metrics (VSE, regret, Condorcet/cycle properties) using sincere utilities and rankings (Section~\ref{sec:sim-metrics}).
 \end{enumerate}
-Formally, let $\mathcal{C}^{(r)}_{p}$ be the set of remaining candidates in round $r$, with $\mathcal{C}^{(0)}_{p}=\mathcal{C}_{p}$. In round $r$:
-\begin{equation}
-  \mathrm{votes}^{(r)}_{p}(c)=\sum_{v\in\mathcal{V}_{p}}\mathbf{1}\!\left[\pi_{v}\!\left(\min\{k:\pi_{v}(k)\in\mathcal{C}^{(r)}_{p}\}\right)=c\right] \tag{20}
-\end{equation}
-The elimination rule is:
-\begin{equation}
-  c^{(r)}_{\mathrm{elim}}=\arg\min_{c\in\mathcal{C}^{(r)}_{p}}\mathrm{votes}^{(r)}_{p}(c) \tag{21}
-\end{equation}
-and $\mathcal{C}^{(r+1)}_{p}=\mathcal{C}^{(r)}_{p}\setminus\{c^{(r)}_{\mathrm{elim}}\}$. The process terminates when $\exists c\in\mathcal{C}^{(r)}_{p}:\mathrm{votes}^{(r)}_{p}(c)>n_{v}/2$, and $w_{p}=c$.
 
-\section{Experimental Methodology}
+\section{Research methodology implemented in the repository}
+\label{sec:sim-methodology}
 
-\subsection{Disagreement Rate}
-The primary measure of heterogeneity effects is the disagreement rate, defined as the fraction of profiles where the heterogeneous winner differs from the homogeneous winner.
-For a metric pair $(m_{\text{center}},m_{\text{extreme}})$ and threshold $\theta$, let:
+The repository contains two research harnesses (\texttt{heterogenity-simulator/} and \texttt{heterogeneity-research/}) that instantiate the simulator repeatedly to measure the effect of heterogeneous distance on outcomes. This section documents the \emph{executed methodology} of the main comprehensive suite (\texttt{heterogenity-simulator/research\_suite.py}); it is the procedure used to generate the large JSON result files in \texttt{heterogenity-simulator/results/}.
+
+\subsection{Common experimental configuration}
+\label{sec:method-common}
+
+Unless explicitly varied by a phase, the research suite uses:
 \begin{itemize}
-  \item $w^{\text{het}}_{p}$ be the winner under heterogeneous conditions (center uses $m_{\text{center}}$, extreme uses $m_{\text{extreme}}$),
-  \item $w^{\text{homo}}_{p}(m)$ be the winner under homogeneous conditions when all voters use a baseline metric $m$.
-\end{itemize}
-We report disagreement relative to a chosen baseline metric $m_{\text{base}}\in\{m_{\text{center}},m_{\text{extreme}}\}$:
-\begin{equation}
-  D(m_{\text{center}},m_{\text{extreme}},\theta\mid m_{\text{base}})
-  =\frac{1}{N}\sum_{p=1}^{N}\mathbf{1}\!\left[w^{\text{het}}_{p}\ne w^{\text{homo}}_{p}(m_{\text{base}})\right]\times 100\% \tag{22}
-\end{equation}
-
-\subsection{Asymmetry Measure}
-For a metric pair $(A,B)$, we define the asymmetry as:
-\begin{equation}
-  \Delta_{A,B}(\theta\mid m_{\text{base}})=\left|D(A\rightarrow B,\theta\mid m_{\text{base}})-D(B\rightarrow A,\theta\mid m_{\text{base}})\right| \tag{23}
-\end{equation}
-where $D(A\rightarrow B,\theta)$ denotes disagreement when $A$ is assigned to center voters and $B$ to extreme voters.
-
-\subsection{Voter Scaling Analysis}
-To understand how effects depend on voter count, we compute disagreement rates for different values of $n_{v}$:
-\begin{equation}
-  D(n_{v};m_{\text{center}},m_{\text{extreme}},\theta)=\frac{1}{N}\sum_{p=1}^{N}\mathbf{1}[w^{\text{het}}_{p}(n_{v})\ne w^{\text{homo}}_{p}(n_{v})] \tag{24}
-\end{equation}
-We test $n_{v}\in\{10,25,50,100,200,300,400,500\}$ and fit a linear trend:
-\begin{equation}
-  D(n_{v})=\alpha n_{v}+\beta+\epsilon \tag{25}
-\end{equation}
-where $\alpha$ is the slope (change per voter) and $\beta$ is the intercept.
-
-\subsection{Threshold Sweep}
-To detect phase transitions, we sweep the threshold parameter:
-\begin{equation}
-  \theta\in\{0.05,0.10,0.15,\ldots,0.95\} \tag{26}
-\end{equation}
-For each $\theta$, we compute $D(\theta)$ and analyze:
-\begin{itemize}
-  \item Inflection points: values where $\frac{d^{2}D}{d\theta^{2}}=0$,
-  \item Maximum curvature: $\max_{\theta}\left|\frac{d^{2}D}{d\theta^{2}}\right|$,
-  \item Sudden jumps: $\max_{\theta}\left|\frac{dD}{d\theta}\right|$.
+  \item geometry: \texttt{uniform} in dimension \(d\) with bounds \(p_{\min}=-1\), \(p_{\max}=1\),
+  \item utility: \texttt{linear} (Section~\ref{sec:util-linear}),
+  \item voting rules: \(\{\texttt{plurality},\texttt{borda},\texttt{irv}\}\),
+  \item number of candidates: \(M=5\),
+  \item number of profiles: \(P=200\),
+  \item random seed: \(s=42\).
 \end{itemize}
 
-\subsection{Dimensional Scaling}
-To understand dimensional dependence, we compute disagreement for different dimensions $d$:
-\begin{equation}
-  D(d;m_{\text{center}},m_{\text{extreme}},\theta)=\frac{1}{N}\sum_{p=1}^{N}\mathbf{1}[w^{\text{het}}_{p}(d)\ne w^{\text{homo}}_{p}(d)] \tag{27}
-\end{equation}
-We test $d\in\{1,2,3,4,5,7,10\}$ and fit a power law:
-\begin{equation}
-  D(d)=D_{0}\cdot d^{\alpha}\quad \text{for } d\le d_{\text{peak}} \tag{28}
-\end{equation}
-Using log-log regression:
-\begin{equation}
-  \log D(d)=\log D_{0}+\alpha\log d+\epsilon \tag{29}
-\end{equation}
-For $d>d_{\text{peak}}$, we fit a linear model:
-\begin{equation}
-  D(d)=D_{\text{peak}}+\beta(d-d_{\text{peak}})+\epsilon \tag{30}
-\end{equation}
+\subsection{Heterogeneous vs.\ homogeneous baselines}
+\label{sec:method-baselines}
 
-\subsection{Condorcet Metrics}
-
-\subsubsection{Condorcet Winner}
-A candidate $c$ is a Condorcet winner if they beat all other candidates in pairwise majority comparisons. Formally, define the pairwise margin:
-\begin{equation}
-  m_{c,c'}=\sum_{v\in\mathcal{V}_{p}}\mathbf{1}[\pi_{v}(c)<\pi_{v}(c')]
-  -\sum_{v\in\mathcal{V}_{p}}\mathbf{1}[\pi_{v}(c')<\pi_{v}(c)] \tag{31}
-\end{equation}
-where $\pi_{v}(c)<\pi_{v}(c')$ means voter $v$ prefers $c$ to $c'$ (lower rank number = higher preference). Candidate $c$ is a Condorcet winner if:
-\begin{equation}
-  \mathrm{CW}(c)\Leftrightarrow \forall c'\ne c:\; m_{c,c'}>0 \tag{32}
-\end{equation}
-Equivalently, $c$ beats $c'$ in a pairwise majority vote if $m_{c,c'}>0$, which occurs when more than half of voters prefer $c$ to $c'$.
-
-\subsubsection{Condorcet Cycle}
-A profile has a Condorcet cycle if no Condorcet winner exists:
-\begin{equation}
-  \mathrm{Cycle}_{p}=\mathbf{1}[\nexists c\in\mathcal{C}_{p}:\mathrm{CW}(c)] \tag{33}
-\end{equation}
-The cycle rate is:
-\begin{equation}
-  C=\frac{1}{N}\sum_{p=1}^{N}\mathrm{Cycle}_{p}\times 100\% \tag{34}
-\end{equation}
-
-\subsubsection{Condorcet Efficiency}
-The Condorcet efficiency of a voting rule is the fraction of profiles where the rule selects the Condorcet winner (when one exists):
-\begin{equation}
-  E=\frac{1}{N_{\mathrm{CW}}}\sum_{p:\exists \mathrm{CW}}\mathbf{1}[w_{p}=\mathrm{CW}_{p}]\times 100\% \tag{35}
-\end{equation}
-where $N_{\mathrm{CW}}$ is the number of profiles with a Condorcet winner, and $\mathrm{CW}_{p}$ is the Condorcet winner in profile $p$.
-
-\subsection{Experimental Configuration}
-
-\subsubsection{Base Parameters}
-All experiments use the following base configuration:
+The suite focuses on the \texttt{center\_extreme} heterogeneity strategy (Section~\ref{sec:sim-center-extreme}). For a specified ordered metric pair \((\mu_{\text{center}}, \mu_{\text{extreme}})\) and threshold \(t\), it runs:
 \begin{itemize}
-  \item Number of profiles: $N=200$ (minimum for statistical significance).
-  \item Number of voters: $n_{v}=100$ (base case, with scaling tests from 10 to 500).
-  \item Number of candidates: $n_{c}=5$.
-  \item Dimensions: $d\in\{1,2,3,4,5,7,10\}$.
-  \item Threshold values: $\theta\in\{0.05,0.10,\ldots,0.95\}$ (19 points).
-  \item Random seed: fixed at 42 for reproducibility.
-  \item Geometry method: uniform distribution in $[-1,1]^{d}$.
-  \item Utility function: linear (as defined above).
+  \item a \textbf{heterogeneous} configuration with \(\mu(x)=\mu_{\text{center}}\) for \(\mathrm{cent}(x)\le t\) and \(\mu(x)=\mu_{\text{extreme}}\) otherwise,
+  \item a \textbf{homogeneous center baseline} using the single metric \(\mu_{\text{center}}\),
+  \item a \textbf{homogeneous extreme baseline} using the single metric \(\mu_{\text{extreme}}\).
 \end{itemize}
 
-\subsubsection{Metric Pairs Tested}
-We test all ordered pairs of the four metrics:
-\begin{equation}
-  \mathcal{M}=\{\mathrm{L1},\mathrm{L2},\mathrm{Cosine},\mathrm{Chebyshev}\} \tag{36}
-\end{equation}
-For each pair $(A,B)\in\mathcal{M}\times\mathcal{M}$ with $A\ne B$, we test both directions:
+For each voting rule, the suite records:
 \begin{itemize}
-  \item $A\rightarrow B$: center voters use $A$, extreme voters use $B$.
-  \item $B\rightarrow A$: center voters use $B$, extreme voters use $A$.
-\end{itemize}
-This yields $4\times 3=12$ ordered pairs.
-
-\subsubsection{Experimental Phases}
-
-\subsubsection{Phase 1: Voter Scaling}
-For metric pair (L1, Cosine) with $\theta=0.5$ and $d=2$:
-\begin{equation}
-  \{D(n_{v}):n_{v}\in\{10,25,50,100,200,300,400,500\}\} \tag{37}
-\end{equation}
-
-\subsubsection{Phase 2: Threshold Sweep}
-For metric pair (L1, Cosine) with $n_{v}=100$ and $d=2$:
-\begin{equation}
-  \{D(\theta):\theta\in\{0.05,0.10,\ldots,0.95\}\} \tag{38}
-\end{equation}
-
-\subsubsection{Phase 3: Dimensional Scaling}
-For metric pair (L1, Cosine) with $n_{v}=100$ and $\theta=0.5$:
-\begin{equation}
-  \{D(d):d\in\{1,2,3,4,5,7,10\}\} \tag{39}
-\end{equation}
-
-\subsubsection{Phase 4: Metric Pair Interactions}
-For all 12 ordered pairs with $n_{v}=100$, $d=2$, and $\theta=0.5$:
-\begin{equation}
-  \{D(A\rightarrow B),D(B\rightarrow A),\Delta_{A,B}:(A,B)\in\mathcal{M}\times\mathcal{M},A\ne B\} \tag{40}
-\end{equation}
-
-\subsubsection{Phase 5: Verification}
-Re-run Phase 4 with $n_{v}=500$ to verify conclusions at higher voter counts.
-
-\subsection{Statistical Analysis}
-
-\subsubsection{Coefficient of Variation}
-To assess stability of effects across voter counts, we compute the coefficient of variation:
-\begin{equation}
-  \mathrm{CV}=\frac{\sigma_{D}}{\mu_{D}} \tag{41}
-\end{equation}
-where $\mu_{D}$ and $\sigma_{D}$ are the mean and standard deviation of disagreement rates across voter counts.
-
-\subsubsection{Power Law Fitting}
-For dimensional scaling, we fit:
-\begin{equation}
-  \log D(d)=\alpha\log d+\beta+\epsilon \tag{42}
-\end{equation}
-and compute the coefficient of determination:
-\begin{equation}
-  R^{2}=1-\frac{\mathrm{SS}_{\mathrm{res}}}{\mathrm{SS}_{\mathrm{tot}}} \tag{43}
-\end{equation}
-where:
-\begin{align}
-  \mathrm{SS}_{\mathrm{res}} &= \sum_{d}\left(\log D(d)-\widehat{\log D}(d)\right)^{2} \tag{44}\\
-  \mathrm{SS}_{\mathrm{tot}} &= \sum_{d}\left(\log D(d)-\overline{\log D}\right)^{2} \tag{45}
-\end{align}
-
-\subsection{Interaction Strength Hierarchy}
-For each voting rule $R$, we rank metric pairs by average disagreement:
-\begin{equation}
-  S_{A,B}=\frac{D(A\rightarrow B)+D(B\rightarrow A)}{2} \tag{46}
-\end{equation}
-Pairs are sorted in descending order of $S_{A,B}$ to form the hierarchy.
-
-\section{Implementation and Validation}
-
-\subsection{Implementation Details}
-
-\subsubsection{Numerical Precision}
-\begin{itemize}
-  \item Distance computations use double precision (64-bit floating point).
-  \item Utility normalization uses maximum distance per voter to avoid division by zero.
-  \item Ranking tie-breaking uses $\epsilon=10^{-9}$ tolerance.
-  \item All random number generation uses NumPy's Mersenne Twister with fixed seed.
+  \item \textbf{VSE} and \textbf{cycle / Condorcet metrics} (Section~\ref{sec:sim-metrics}) for heterogeneous and baseline runs,
+  \item \textbf{VSE differences} (heterogeneous minus baseline),
+  \item \textbf{disagreement rate} between heterogeneous and baseline winners:
+        \[
+          \mathrm{Disagree} \coloneqq 100 \cdot \frac{1}{P}\sum_{p=1}^{P} \mathbf{1}\!\left[\hat{c}^{(p)}_{\text{het}} \ne \hat{c}^{(p)}_{\text{homo}}\right].
+        \]
 \end{itemize}
 
-\subsubsection{Computational Complexity}
-For a single profile with $n_{v}$ voters and $n_{c}$ candidates in $d$ dimensions:
+\subsection{Phases of the comprehensive suite}
+\label{sec:method-phases}
+
+The suite executes the following phases:
 \begin{itemize}
-  \item Distance computation: $O(n_{v}\cdot n_{c}\cdot d)$.
-  \item Utility computation: $O(n_{v}\cdot n_{c})$.
-  \item Ranking computation: $O(n_{v}\cdot n_{c}\log n_{c})$ (sorting).
-  \item Plurality: $O(n_{v})$.
-  \item Borda: $O(n_{v}\cdot n_{c})$.
-  \item IRV: $O(n_{v}\cdot n_{c}^{2})$ worst case.
+  \item \textbf{Voter scaling}: vary \(N\in\{10,25,50,100,200,300,400,500\}\) with fixed \(d=2\), \(t=0.5\), and default metrics \((L2,\cos)\).
+  \item \textbf{Threshold sweep}: vary \(t\) over 19 values \(t \in \{0.05,0.10,\dots,0.95\}\) with fixed \(N=100\), \(d=2\), metrics \((L2,\cos)\).
+  \item \textbf{Dimensional scaling}: vary \(d\in\{1,2,3,4,5,7,10\}\) with fixed \(N=100\), \(t=0.5\), metrics \((L2,\cos)\).
+  \item \textbf{Metric-pair interactions}: for the metric set \(\{L1,L2,\cos,L_{\infty}\}\), run all ordered pairs \((\mu_{\text{center}},\mu_{\text{extreme}})\) with \(\mu_{\text{center}}\ne\mu_{\text{extreme}}\) at fixed \(N=100\), \(d=2\), \(t=0.5\). The suite also runs the reversed direction \((\mu_{\text{extreme}},\mu_{\text{center}})\) and reports the absolute difference in disagreement rates as an \emph{asymmetry} measure.
+  \item \textbf{Final verification}: repeats the metric-pair interaction experiment at \(N=500\) (same \(d,t,P\)) to assess stability at larger electorates.
 \end{itemize}
-Total per profile: $O(n_{v}\cdot n_{c}^{2}\cdot d)$ in the worst case (IRV).
-
-\subsubsection{Reproducibility}
-All experiments use:
-\begin{itemize}
-  \item Fixed random seed: 42.
-  \item Deterministic algorithms (no parallelization that could affect order).
-  \item Exact same geometry generation across heterogeneous and homogeneous runs.
-\end{itemize}
-This ensures that differences in outcomes are solely due to metric heterogeneity, not random variation.
-
-\subsection{Validation}
-
-\subsubsection{Methodology Validation}
-Homogeneous comparisons are performed using a baseline metric selected from the heterogeneous metric pair. Results may be reported relative to the center baseline, the extreme baseline, or both.
-
-\subsubsection{Statistical Validation}
-\begin{itemize}
-  \item Minimum 200 profiles per configuration for statistical significance.
-  \item Multiple independent runs with different random seeds (when testing robustness).
-  \item Cross-validation across voting rules.
-  \item Verification at higher voter counts (500 voters).
-\end{itemize}
-
-\section{Summary of Key Findings}
-The mathematical framework described above enables investigation of several phenomena:
-
-\subsection{Asymmetric Metric Interactions}
-The order of metric assignment matters: $D(A\rightarrow B,\theta)\ne D(B\rightarrow A,\theta)$ for most metric pairs $(A,B)$. The asymmetry magnitude is:
-\begin{equation}
-  \Delta_{A,B}(\theta)=|D(A\rightarrow B,\theta)-D(B\rightarrow A,\theta)| \tag{47}
-\end{equation}
-
-\subsection{Dimensional Scaling}
-Disagreement rates scale with dimension following a power law:
-\begin{equation}
-  D(d)\sim d^{\alpha} \tag{48}
-\end{equation}
-with scaling exponent $\alpha$ typically in the range $[9.0,9.5]$ for the L1--Cosine metric pair.
-
-\subsection{Voter Count Dependence}
-Disagreement rates decrease with voter count:
-\begin{equation}
-  D(n_{v})=\alpha n_{v}+\beta \tag{49}
-\end{equation}
-with negative slope $\alpha<0$, indicating stronger heterogeneity effects in smaller electorates.
-
-\subsection{Interaction Strength Hierarchy}
-Different metric pairs create systematically different effects. Cosine-based assignments (Cosine $\rightarrow$ any other metric) show the strongest interactions ($\sim 58$--$62\%$ disagreement), while L2-based assignments show minimal effects due to methodology constraints.
-
-\subsection{Conclusion}
-This mathematical specification provides a complete description of the spatial voting simulator with heterogeneous distance metrics. The simulator enables systematic investigation of how different distance metrics affect voting outcomes, with rigorous experimental methodology and statistical analysis.
-
-The key innovation is the heterogeneous distance assignment, which models cognitive diversity in how voters perceive policy distances. This framework allows investigation of phenomena such as asymmetric metric interactions, dimensional scaling laws, and voter count dependencies.
-
-The mathematical framework is fully specified, enabling replication and extension of the research. All experimental parameters, statistical measures, and computational procedures are precisely defined to ensure reproducibility.
-
 \end{document}
