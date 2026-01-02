@@ -7,6 +7,7 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 0 - Structural Size Parameters
 
 **REQUIRED:**
+
 - **Number of voters**: 100 (fixed per profile)
 - **Number of candidates**: 5 (fixed per profile)
 - **Issue space dimension**: Variable (1, 2, 3, 4, 5, 7, 10)
@@ -19,6 +20,7 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 1 - Issue Space Geometry
 
 **REQUIRED:**
+
 - **Space type**: Euclidean (standard spatial voting)
 - **Axis meaning**: Independent issues
 - **Axis scaling**: Uniform
@@ -30,6 +32,7 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 2 - Voter Ideal-Point Generation
 
 **REQUIRED:**
+
 - **Distribution family**: Center-extreme strategy (threshold-based)
   - Center voters: Compact cluster near origin
   - Extreme voters: Distributed in periphery
@@ -37,6 +40,7 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 - **Threshold parameter θ**: Controls assignment (0.05 to 0.95 in 0.05 increments)
 
 **CRITICAL**: The threshold θ is the key parameter for:
+
 - **Phenomenon 1** (Asymmetric Metric Interaction): Order of metric assignment matters
 - **Phenomenon 3** (Threshold Phase Transitions): Sigmoidal response curves
 
@@ -47,6 +51,7 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 3 - Candidate Position Generation
 
 **REQUIRED:**
+
 - **Candidate distribution**: Uniform random (or same as voters - not explicitly specified)
 - **Candidate count regime**: Fixed (5 candidates)
 - **Position constraints**: Must be distinct
@@ -58,7 +63,8 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 4 - Distance (Geometry) Functions
 
 **REQUIRED:**
-- **Metric family**: 
+
+- **Metric family**:
   - L1 (Manhattan)
   - L2 (Euclidean)
   - L∞ (Chebyshev)
@@ -69,12 +75,14 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 **CRITICAL**: This is the core of all findings!
 
 **Requirements**:
+
 1. Must support **all 12 metric pairs**: (L1, L2, Cosine, Chebyshev) × 2 orders = 12 combinations
 2. Must assign metrics based on **radial distance from origin** (threshold θ)
 3. Must support **asymmetric assignment**: Metric A to center, Metric B to extreme (order matters!)
 4. Must support **homogeneous baseline**: All voters use same metric (for comparison)
 
 **Implementation**:
+
 - For each voter, compute distance from origin: `r = ||voter_position||`
 - If `r < θ_percentile`: assign metric A (center metric)
 - Else: assign metric B (extreme metric)
@@ -85,6 +93,7 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 5 - Utility Functions
 
 **REQUIRED:**
+
 - **Utility mapping**: Linear or quadratic (standard spatial voting)
   - Typically: `u = -distance` or `u = -distance²`
 - **Utility bounds**: Unbounded (standard)
@@ -97,6 +106,7 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 6 - Preference Formation
 
 **REQUIRED:**
+
 - **Strict vs weak preferences**: Strict (no ties)
 - **Noise in evaluation**: None (deterministic preferences from utilities)
 
@@ -113,7 +123,8 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 8 - Voting Rule
 
 **REQUIRED:**
-- **Voting system**: 
+
+- **Voting system**:
   - Plurality
   - Borda
   - IRV (Instant Runoff Voting)
@@ -127,6 +138,7 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 9 - Aggregation Mechanics
 
 **REQUIRED:**
+
 - **Standard implementations** for each voting rule
 - **Pairwise margin definition**: Simple majority (for Condorcet analysis)
 
@@ -137,6 +149,7 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 10 - Post-Processing / Outcome Interpretation
 
 **REQUIRED:**
+
 - **Single winner**: Yes (one winner per profile)
 
 ---
@@ -144,18 +157,21 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 ## LAYER 11 - Metrics (What You Record)
 
 **REQUIRED:**
+
 - **Disagreement rate**: Percentage of profiles where heterogeneous winner ≠ homogeneous winner
 - **VSE difference**: Change in Voter Satisfaction Efficiency (heterogeneous - homogeneous)
 - **Cycle rate**: Percentage of profiles with Condorcet cycles (intransitive preferences)
 - **Condorcet efficiency**: Percentage of profiles where voting rule selects Condorcet winner (when one exists)
 
 **CRITICAL METRICS**:
+
 1. **Disagreement rate** (primary metric for all 5 phenomena)
 2. **Cycle rate** (for Phenomenon 4: Preference Destabilization Paradox)
 3. **Condorcet efficiency** (for Phenomenon 4: Preference Destabilization Paradox)
 4. **VSE difference** (mentioned but not primary focus)
 
 **Implementation**:
+
 - For each profile, run **two simulations**:
   1. **Heterogeneous**: Voters use different metrics (center vs extreme)
   2. **Homogeneous**: All voters use same metric (baseline)
@@ -173,24 +189,24 @@ This document lists the **minimum viable set of variables** (from `VARIABLES.md`
 
 ### Core Requirements (Must Have)
 
-✅ **LAYER 0**: Variable dimensions (1-10D), 100 voters, 5 candidates, 150-200 runs  
-✅ **LAYER 2**: Threshold-based center-extreme voter distribution (θ parameter)  
-✅ **LAYER 4**: 4 metrics (L1, L2, Cosine, Chebyshev) with per-voter heterogeneity  
-✅ **LAYER 4**: Radius-based regime switching (threshold θ controls assignment)  
-✅ **LAYER 4**: Asymmetric metric assignment (order matters: A→B vs B→A)  
-✅ **LAYER 8**: 3 voting rules (Plurality, Borda, IRV)  
+✅ **LAYER 0**: Variable dimensions (1-10D), 100 voters, 5 candidates, 150-200 runs
+✅ **LAYER 2**: Threshold-based center-extreme voter distribution (θ parameter)
+✅ **LAYER 4**: 4 metrics (L1, L2, Cosine, Chebyshev) with per-voter heterogeneity
+✅ **LAYER 4**: Radius-based regime switching (threshold θ controls assignment)
+✅ **LAYER 4**: Asymmetric metric assignment (order matters: A→B vs B→A)
+✅ **LAYER 8**: 3 voting rules (Plurality, Borda, IRV)
 ✅ **LAYER 11**: 4 metrics (disagreement rate, cycle rate, Condorcet efficiency, VSE difference)
 
 ### Secondary Requirements (Should Have)
 
-✅ **LAYER 1**: Euclidean space, uniform scaling  
-✅ **LAYER 3**: Fixed candidate count, distinct positions  
-✅ **LAYER 5**: Linear/quadratic utility mapping  
+✅ **LAYER 1**: Euclidean space, uniform scaling
+✅ **LAYER 3**: Fixed candidate count, distinct positions
+✅ **LAYER 5**: Linear/quadratic utility mapping
 ✅ **LAYER 6**: Strict preferences, no noise
 
 ### Not Required
 
-❌ **LAYER 7**: Acceptability thresholds  
+❌ **LAYER 7**: Acceptability thresholds
 ❌ **LAYER 12**: Temporal variation
 
 ---
@@ -220,7 +236,7 @@ Each configuration needs 150-200 profiles, so approximately **1.4M - 1.9M total 
 for voter in voters:
     r = distance_from_origin(voter.position)
     r_percentile = percentile_rank(r, all_voter_distances)
-    
+
     if r_percentile < theta:
         voter.metric = center_metric  # e.g., L2
     else:
@@ -230,6 +246,7 @@ for voter in voters:
 ### Asymmetric Testing
 
 For each metric pair (A, B), test **both orders**:
+
 - **Order 1**: A → center, B → extreme
 - **Order 2**: B → center, A → extreme
 
@@ -241,7 +258,7 @@ This reveals the asymmetry (Phenomenon 1).
 for profile in profiles:
     winner_homogeneous = run_election(profile, metric=all_same)
     winner_heterogeneous = run_election(profile, metric=threshold_based)
-    
+
     if winner_homogeneous != winner_heterogeneous:
         disagreements += 1
 
@@ -275,8 +292,3 @@ Following `VARIABLES.md`'s recommendation, the minimal subset is:
 ---
 
 _Generated from analysis of `FINDINGS.md` and `VARIABLES.md`_
-
-
-
-
-

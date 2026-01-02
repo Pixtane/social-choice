@@ -5,6 +5,7 @@ A rich terminal-based GUI application built with [Textual](https://textual.textu
 ## Features
 
 ### 🎨 Interactive Interface
+
 - **Welcome Screen**: Main menu with quick access to all features
 - **Configuration Screen**: Comprehensive simulation setup with real-time validation
 - **Simulation Runner**: Live progress tracking with detailed logs
@@ -14,27 +15,33 @@ A rich terminal-based GUI application built with [Textual](https://textual.textu
 ### ⚙️ Configuration Options
 
 #### Basic Parameters
+
 - Number of election profiles (1-100,000)
 - Number of voters per profile (3-1,000)
 - Number of candidates (2-20)
 
 #### Spatial Geometry
+
 - **Methods**: uniform, clustered, single_peaked, polarized, 1d, 2d
 - **Dimensions**: 1-10D spatial representation
 - Custom geometry parameters (phi, variance, etc.)
 
 #### Voting Rules
+
 Choose from 20+ voting rules including:
+
 - **Ordinal**: Plurality, Borda, IRV, Condorcet methods (Minimax, Copeland, Schulze, Ranked Pairs, Kemeny-Young), Coombs, Bucklin, Nanson, Baldwin
 - **Cardinal**: Approval, Score, STAR, Utilitarian, Median, Quadratic
 
 #### Strategic Manipulation
+
 - Enable/disable strategic voting
 - Manipulator fraction (0.0-1.0)
 - Strategies: bullet, compromise, burial, pushover, optimal
 - Information levels: none, polls, full
 
 #### Utility Functions
+
 - **Functions**: Gaussian, Quadratic, Linear, Exponential
 - **Distance Metrics**: L2 (Euclidean), L1 (Manhattan), Cosine, Chebyshev
 - Configurable sigma factor for Gaussian utilities
@@ -42,18 +49,21 @@ Choose from 20+ voting rules including:
 ### 📊 Results Display
 
 #### Summary View
+
 - Aggregate metrics table with VSE (Voter Satisfaction Efficiency)
 - Condorcet efficiency and cycle statistics
 - Winner rank distributions
 - Compute time tracking
 
 #### Detailed View
+
 - Per-rule performance metrics
 - Winner statistics breakdown
 - Condorcet properties analysis
 - Configuration review
 
 #### Saved Experiments
+
 - Browse previous simulations
 - Load and compare results
 - Quick experiment lookup
@@ -61,16 +71,19 @@ Choose from 20+ voting rules including:
 ## Installation
 
 ### Prerequisites
+
 ```bash
 pip install -r requirements.txt
 ```
 
 Required packages:
+
 - `textual>=0.47.0` - TUI framework
 - `rich>=13.0.0` - Rich text formatting
 - `numpy>=1.20.0` - Numerical computations
 
 ### Quick Start
+
 ```bash
 # Launch the GUI
 python run_gui.py
@@ -88,11 +101,13 @@ run_gui()
 ### Running a Simulation
 
 1. **Launch the Application**
+
    ```bash
    python run_gui.py
    ```
 
 2. **Configure Your Simulation**
+
    - Select "New Simulation" from the main menu
    - Set basic parameters (profiles, voters, candidates)
    - Choose spatial geometry method and dimensions
@@ -102,6 +117,7 @@ run_gui()
    - Set random seed for reproducibility (optional)
 
 3. **Run the Simulation**
+
    - Press `Ctrl+S` or click "Run Simulation"
    - Monitor progress with real-time updates
    - View detailed logs of each step
@@ -115,6 +131,7 @@ run_gui()
 ### Quick Simulation
 
 For rapid testing with sensible defaults:
+
 1. Select "Quick Simulation" from main menu
 2. Enter basic parameters only
 3. Uses default voting rules: Plurality, Borda, IRV, Approval, STAR, Schulze
@@ -129,42 +146,50 @@ For rapid testing with sensible defaults:
 ## Keyboard Shortcuts
 
 ### Global
+
 - `Q` - Quit application
 - `D` - Toggle dark mode
 - `Escape` - Go back/cancel
 
 ### Configuration Screen
+
 - `Ctrl+S` - Run simulation
 - `Tab` - Navigate between fields
 
 ### Results Screen
+
 - `D` - Open detailed view
 
 ### Saved Experiments
+
 - `L` - Load selected experiment
 - `R` - Refresh experiment list
 
 ## Configuration Tips
 
 ### For Quick Comparisons
+
 - Use 1,000-10,000 profiles
 - Keep voters at 25-50
 - 3 candidates for classic scenarios
 - 2D uniform geometry is fast and interpretable
 
 ### For Research-Grade Results
+
 - Use 10,000+ profiles for statistical significance
 - Vary voters (25, 50, 100) to test scalability
 - Test with 3-5 candidates
 - Try different geometries: uniform, polarized, single_peaked
 
 ### For Strategic Voting Analysis
+
 - Enable manipulation with 20% fraction
 - Compare results with/without manipulation
 - Test different strategies (compromise, burial, bullet)
 - Use full information level for theoretical analysis
 
 ### For Performance Testing
+
 - Start small (100 profiles) to test configuration
 - Scale up gradually
 - Complex rules (Kemeny-Young, optimal manipulation) are computationally intensive
@@ -173,7 +198,9 @@ For rapid testing with sensible defaults:
 ## Output Files
 
 Simulations automatically save to:
+
 - **Inputs**: `simulator/inputs/YYYY-MM-DD_HH-MM-SS_<id>.npz`
+
   - Voter positions
   - Candidate positions
   - Utilities and rankings
@@ -189,6 +216,7 @@ Simulations automatically save to:
 ## Architecture
 
 ### Screen Flow
+
 ```
 WelcomeScreen
     ├── ConfigurationScreen → SimulationRunScreen → ResultsScreen → DetailedResultsScreen
@@ -207,6 +235,7 @@ WelcomeScreen
 - **SavedExperimentsScreen**: File browser for experiments
 
 ### Threading Model
+
 - Simulations run in background threads (via `@work` decorator)
 - UI remains responsive during computation
 - Progress updates via `call_from_thread`
@@ -215,6 +244,7 @@ WelcomeScreen
 ## Troubleshooting
 
 ### Import Errors
+
 ```bash
 # Ensure you're in the project root
 cd social-choice
@@ -225,18 +255,22 @@ python -m simulator.gui
 ```
 
 ### Terminal Size
+
 Textual requires a minimum terminal size. If layout issues occur:
+
 - Maximize your terminal window
 - Use a terminal with at least 80 columns × 24 rows
 - Try full-screen mode
 
 ### Performance Issues
+
 - Reduce number of profiles for faster results
 - Disable complex voting rules (Kemeny-Young)
 - Use fewer dimensions in spatial model
 - Disable manipulation for baseline comparisons
 
 ### Data Loading
+
 - Ensure `simulator/inputs/` and `simulator/results/` directories exist
 - Check file permissions for write access
 - Verify NumPy version compatibility for .npz files
@@ -244,7 +278,9 @@ Textual requires a minimum terminal size. If layout issues occur:
 ## Advanced Usage
 
 ### Custom Themes
+
 Modify the CSS in `simulator/gui.py` to customize colors and layout:
+
 ```python
 CSS = """
 Screen {
@@ -257,6 +293,7 @@ Button {
 ```
 
 ### Programmatic Access
+
 ```python
 from simulator import SimulationConfig, GeometryConfig
 from simulator.gui import SimulationRunScreen, VotingSimulatorApp
@@ -278,14 +315,14 @@ app.run()
 
 ## Comparison with CLI
 
-| Feature | GUI | CLI |
-|---------|-----|-----|
-| Ease of Use | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| Visual Feedback | ⭐⭐⭐⭐⭐ | ⭐⭐ |
-| Scripting | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Real-time Progress | ⭐⭐⭐⭐⭐ | ⭐⭐ |
-| Batch Processing | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Results Exploration | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Feature             | GUI        | CLI        |
+| ------------------- | ---------- | ---------- |
+| Ease of Use         | ⭐⭐⭐⭐⭐ | ⭐⭐⭐     |
+| Visual Feedback     | ⭐⭐⭐⭐⭐ | ⭐⭐       |
+| Scripting           | ⭐⭐       | ⭐⭐⭐⭐⭐ |
+| Real-time Progress  | ⭐⭐⭐⭐⭐ | ⭐⭐       |
+| Batch Processing    | ⭐⭐       | ⭐⭐⭐⭐⭐ |
+| Results Exploration | ⭐⭐⭐⭐⭐ | ⭐⭐⭐     |
 
 **Use GUI for**: Interactive exploration, quick prototyping, visual analysis
 **Use CLI for**: Automation, batch jobs, HPC clusters, scripting
@@ -308,10 +345,3 @@ The GUI is built with modularity in mind. To add features:
 ## License
 
 Same as the parent Spatial Voting Simulator project.
-
-
-
-
-
-
-
