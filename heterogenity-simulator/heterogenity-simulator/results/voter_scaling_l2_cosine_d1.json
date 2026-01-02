@@ -1,0 +1,66 @@
+{
+  "center_metric": "l2",
+  "extreme_metric": "cosine",
+  "threshold": 0.5,
+  "dimension": 1,
+  "voter_counts": [
+    1000
+  ],
+  "data": {
+    "1000": {
+      "plurality": {
+        "disagreement_rate": 16.0,
+        "vse_het": 0.6654892104767994,
+        "vse_homo": 0.7164334208121547,
+        "vse_difference": -0.05094421033535523,
+        "disagreement_rate_extreme_baseline": 55.00000000000001,
+        "vse_homo_extreme_baseline": 1.0,
+        "vse_difference_extreme_baseline": -0.33451078952320057,
+        "cycle_rate_het_extreme_baseline": 94.0,
+        "cycle_rate_homo_extreme_baseline": 97.0,
+        "cycle_rate_delta_extreme_baseline": -3.0,
+        "condorcet_efficiency_het_extreme_baseline": 34.0,
+        "condorcet_efficiency_homo_extreme_baseline": 100.0,
+        "condorcet_efficiency_delta_extreme_baseline": -66.0,
+        "cycle_rate_het": 94.0,
+        "cycle_rate_homo": 94.0,
+        "cycle_rate_delta": 0.0,
+        "condorcet_efficiency_het": 34.0,
+        "condorcet_efficiency_homo": 31.0,
+        "condorcet_efficiency_delta": 3.0
+      }
+    }
+  },
+  "effective_radius_by_voters": {
+    "1000": {
+      "effective_radius_mean": 0.5011106852534892,
+      "effective_radius_std": 0.0139911224690815,
+      "effective_radius_min": 0.4550187348367205,
+      "effective_radius_max": 0.531793945942076
+    }
+  },
+  "metric_usage_by_voters": {
+    "1000": {
+      "cosine": {
+        "count_mean": 500.0,
+        "count_std": 0.0,
+        "count_min": 500.0,
+        "count_max": 500.0,
+        "frac_mean": 0.5,
+        "frac_std": 0.0,
+        "frac_min": 0.5,
+        "frac_max": 0.5
+      },
+      "l2": {
+        "count_mean": 500.0,
+        "count_std": 0.0,
+        "count_min": 500.0,
+        "count_max": 500.0,
+        "frac_mean": 0.5,
+        "frac_std": 0.0,
+        "frac_min": 0.5,
+        "frac_max": 0.5
+      }
+    }
+  }
+}

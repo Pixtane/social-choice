@@ -2,22 +2,23 @@
 
 ## Abstract
 
-This document presents revised findings from systematic investigation of heterogeneous distance metrics in spatial voting models. We verify and correct original findings, and report new discoveries through rigorous experimental methodology with 200+ profiles and systematic voter scaling analysis.
+This document presents findings from systematic investigation of heterogeneous distance metrics in spatial voting models, using rigorous experimental methodology with 200+ profiles and systematic voter scaling analysis.
 
-**Key Correction**: The original research used L2 (center) + Cosine (extreme) vs L2 (homogeneous), which showed 0% disagreement because center voters used L2 in both cases. This research uses L1 (center) + Cosine (extreme) vs L1 (homogeneous) to reveal true heterogeneity effects.
+Homogeneous comparisons use the center-metric baseline by default, and the raw experiment outputs also include comparisons against the extreme-metric baseline.
 
 ---
 
 ## Research Methodology
 
 This research uses rigorous experimental design:
+
 - **Minimum 200 profiles** per configuration for statistical significance
 - **Minimum 100 voters** for stable results (verified through scaling)
 - **Voter scaling tests**: 10-500 voters to understand voter count effects
 - **Final verification**: 500 voters to confirm conclusions
 - **Systematic parameter sweeps**: thresholds, dimensions, metric pairs
 
-**Critical Methodology Fix**: Experiments use L1-Cosine metric pair (both metrics differ) rather than L2-Cosine (where center metric matches homogeneous baseline).
+Experiments report disagreement against the center-metric baseline (default), with optional extreme-metric baseline comparisons included in the raw outputs.
 
 See `METHODOLOGY.md` for complete details.
 
@@ -131,6 +132,47 @@ See `METHODOLOGY.md` for complete details.
 
 ---
 
+## Finding 5: Centrality Concentration Explains Effective Radius Stabilization
+
+### Discovery
+
+**Finding**: The normalized L2 centrality used by the simulator concentrates as dimension increases,
+so the percentile cutoff ("effective radius") stabilizes near **√(1/3) ≈ 0.57735** rather than growing with √d.
+
+### Why √(1/3) shows up (and why max distance doesn't matter)
+
+The simulator defines voter centrality as:
+
+- distance from the hypercube center using L2
+- **divided by the half-diagonal** (max possible distance from center)
+
+For uniform sampling in [-1, 1]^d, the typical squared coordinate is E[X^2] = 1/3.
+So the typical radius is ||X|| ≈ √(d/3), and dividing by √d yields √(1/3).
+In high d, concentration of measure makes this extremely tight, so percentiles collapse together.
+
+### Statistical distribution vs dimension (as generated)
+
+Below, centrality stats are computed over all sampled voters; effective radius is the per-profile
+percentile cutoff with threshold t = 0.50.
+
+|   d | centrality mean | centrality std | centrality p50 | eff_radius mean | eff_radius std | eff_radius p50 |
+| --: | --------------: | -------------: | -------------: | --------------: | -------------: | -------------: |
+|   1 |         0.49952 |        0.28889 |        0.49919 |         0.49675 |        0.03304 |        0.49639 |
+|   2 |         0.54101 |        0.20135 |        0.56438 |         0.56239 |        0.01969 |        0.56192 |
+|   3 |         0.55410 |        0.16089 |        0.56755 |         0.56635 |        0.01339 |        0.56627 |
+|   5 |         0.56453 |        0.12112 |        0.57202 |         0.57115 |        0.01096 |        0.57128 |
+|  10 |         0.57120 |        0.08345 |        0.57448 |         0.57379 |        0.00763 |        0.57398 |
+|  20 |         0.57448 |        0.05819 |        0.57620 |         0.57570 |        0.00505 |        0.57567 |
+|  50 |         0.57615 |        0.03673 |        0.57671 |         0.57641 |        0.00326 |        0.57646 |
+| 100 |         0.57675 |        0.02584 |        0.57701 |         0.57685 |        0.00243 |        0.57695 |
+| 200 |         0.57701 |        0.01826 |        0.57716 |         0.57706 |        0.00163 |        0.57706 |
+
+**Interpretation**: As d increases, the standard deviation shrinks and the median approaches √(1/3) from 1/2.
+That’s why the effective radius stabilizes despite the raw Euclidean diameter growing with √d.
+Increasing voters reduces the standard deviation, but the median still approaches √(1/3) from 1/2.
+
+---
+
 ## Finding 4: Metric Interaction Strength Hierarchy
 
 ### Discovery
@@ -236,5 +278,6 @@ These corrections have important implications for understanding how metric heter
 - Research methodology: `heterogenity-simulator/METHODOLOGY.md`
 - Research code: `heterogenity-simulator/research_suite.py`
 - Analysis code: `heterogenity-simulator/analyze_results.py`
+- Centrality concentration analysis: `heterogenity-simulator/centrality_concentration.py`
 
-_Document generated: 2026-01-01T16:49:07.446169_
+_Document generated: 2026-01-02T19:30:12.622320_

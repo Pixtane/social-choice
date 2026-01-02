@@ -19,16 +19,16 @@ def main():
 
     # Minimal config for testing
     config = ResearchConfig(
-        base_n_profiles=200,  # Very small for testing
-        base_n_voters=100,
-        voter_scaling_range=[100],  # Just 2 points
-        verification_n_voters=100,
-        verification_n_profiles=200,
+        base_n_profiles=100,  # Very small for testing
+        base_n_voters=1000,
+        voter_scaling_range=[1000],  # Just 2 points
+        verification_n_voters=1000,
+        verification_n_profiles=100,
         thresholds=[0.5],  # Just 3 thresholds
-        dimensions=[2, 3, 5],
+        dimensions=[1, 2, 3, 5],
         metrics=['l2', 'cosine'],  # Just 2 metrics
         voting_rules=['plurality'],  # Just one rule
-        threshold_mode='radius'
+        threshold_mode='percentile',
     )
 
     researcher = HeterogeneityResearcher(config)
@@ -37,8 +37,8 @@ def main():
     result = researcher.experiment_voter_scaling(
         center_metric='l2',
         extreme_metric='cosine',
-        threshold=0.57735026919,
-        dimension=200
+        threshold=0.5,
+        dimension=1
     )
 
     print("\n" + "=" * 80)

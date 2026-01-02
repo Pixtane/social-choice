@@ -24,14 +24,14 @@ def analyze_threshold_data(filepath: Path):
     """Analyze threshold sweep data properly."""
     with open(filepath, 'r') as f:
         data = json.load(f)
-    
+
     thresholds = np.array(data['thresholds'])
     results = {}
-    
+
     for rule in ['plurality', 'borda', 'irv']:
         disagreements = []
         valid_thresholds = []
-        
+
         for t in thresholds:
             # Try different key formats
             key = f"{t:.2f}"
@@ -39,11 +39,11 @@ def analyze_threshold_data(filepath: Path):
                 key = f"{t:.1f}"
             if key not in data['data']:
                 key = str(t)
-            
+
             if key in data['data'] and rule in data['data'][key]:
                 disagreements.append(data['data'][key][rule]['disagreement_rate'])
                 valid_thresholds.append(t)
-        
+
         if len(disagreements) > 0:
             disagreements = np.array(disagreements)
             results[rule] = {
@@ -54,28 +54,43 @@ def analyze_threshold_data(filepath: Path):
                 'range': float(np.max(disagreements) - np.min(disagreements)),
                 'all_values': disagreements.tolist()
             }
-    
+
     return results
+
+
+def _try_load_json(path: Path):
+    if not path.exists():
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _format_q(stats: dict, key: str, decimals: int = 4) -> str:
+    q = (stats or {}).get("quantiles", {})
+    if key not in q:
+        return "N/A"
+    return format_float(q[key], decimals)
 
 
 def main():
     results_dir = Path("heterogenity-simulator/results")
     analysis_file = results_dir / "full_analysis.json"
-    
+
     if not analysis_file.exists():
         print("Error: Analysis file not found. Run analyze_results.py first.")
         return
-    
+
     with open(analysis_file, 'r') as f:
         analysis = json.load(f)
-    
+
     # Read raw data for better analysis
     voter_scaling_file = results_dir / "voter_scaling_l1_cosine_d2.json"
     threshold_file = results_dir / "threshold_sweep_l1_cosine_d2_v100.json"
     dim_scaling_file = results_dir / "dimensional_scaling_l1_cosine_v100.json"
-    
+    concentration_file = results_dir / "centrality_concentration_report.json"
+
     md_lines = []
-    
+
     # Header
     md_lines.append("# Novel Phenomena in Heterogeneous Distance Metrics for Spatial Voting (Revised)")
     md_lines.append("")
@@ -87,7 +102,7 @@ def main():
     md_lines.append("")
     md_lines.append("---")
     md_lines.append("")
-    
+
     # Methodology
     md_lines.append("## Research Methodology")
     md_lines.append("")
@@ -104,7 +119,7 @@ def main():
     md_lines.append("")
     md_lines.append("---")
     md_lines.append("")
-    
+
     # Voter scaling
     if 'voter_scaling' in analysis and 'trends' in analysis['voter_scaling']:
         md_lines.append("## Finding 1: Voter Count Effects")
@@ -113,9 +128,9 @@ def main():
         md_lines.append("")
         md_lines.append("**Finding**: Heterogeneity effects **decrease** systematically with voter count. This is a critical discovery not explored in the original research.")
         md_lines.append("")
-        
+
         trends = analysis['voter_scaling']['trends']
-        
+
         for rule, data in trends.items():
             md_lines.append(f"### {rule.capitalize()} Rule")
             md_lines.append("")
@@ -126,21 +141,21 @@ def main():
             md_lines.append("")
             md_lines.append(f"**Interpretation**: Disagreement decreases by approximately {format_percentage(abs(data.get('slope', 0)) * 100)} per 100 voters, suggesting heterogeneity effects are more pronounced in smaller electorates.")
             md_lines.append("")
-        
+
         md_lines.append("---")
         md_lines.append("")
-    
+
     # Threshold sweep
     if threshold_file.exists():
         threshold_data = analyze_threshold_data(threshold_file)
-        
+
         md_lines.append("## Finding 2: Threshold Effects")
         md_lines.append("")
         md_lines.append("### Discovery")
         md_lines.append("")
         md_lines.append("**Finding**: For the L1-Cosine metric pair, disagreement rates are relatively stable across threshold values, suggesting the threshold parameter may have less impact than originally hypothesized.")
         md_lines.append("")
-        
+
         for rule, data in threshold_data.items():
             md_lines.append(f"### {rule.capitalize()} Rule")
             md_lines.append("")
@@ -150,10 +165,10 @@ def main():
             md_lines.append(f"- **Minimum**: {format_percentage(data.get('min', 0))}")
             md_lines.append(f"- **Maximum**: {format_percentage(data.get('max', 0))}")
             md_lines.append("")
-        
+
         md_lines.append("---")
         md_lines.append("")
-    
+
     # Dimensional scaling
     if 'dimensional_scaling' in analysis:
         md_lines.append("## Finding 3: Dimensional Scaling Laws")
@@ -162,9 +177,9 @@ def main():
         md_lines.append("")
         md_lines.append("**Finding**: Heterogeneity effects **increase dramatically** with dimensionality, peaking at the highest tested dimension (10D), contrary to original findings of peak at 2-3D.")
         md_lines.append("")
-        
+
         dim_data = analysis['dimensional_scaling']
-        
+
         for rule, data in dim_data.items():
             md_lines.append(f"### {rule.capitalize()} Rule")
             md_lines.append("")
@@ -172,19 +187,77 @@ def main():
             md_lines.append(f"- **Peak disagreement**: {format_percentage(data.get('peak_disagreement', 0))}")
             md_lines.append(f"- **Minimum disagreement** (1D): {format_percentage(data.get('min_disagreement', 0))}")
             md_lines.append(f"- **Maximum disagreement** (10D): {format_percentage(data.get('max_disagreement', 0))}")
-            
+
             if data.get('scaling_exponent') is not None:
                 md_lines.append(f"- **Scaling exponent**: α = {format_float(data.get('scaling_exponent', 0), 2)}")
                 if data.get('r_squared') is not None:
                     md_lines.append(f"- **R²**: {format_float(data.get('r_squared', 0), 3)}")
-            
+
             md_lines.append("")
             md_lines.append(f"**Interpretation**: Disagreement increases from {format_percentage(data.get('min_disagreement', 0))} at 1D to {format_percentage(data.get('max_disagreement', 0))} at 10D, showing strong dimensional scaling. This contradicts the original finding of peak at 2-3D.")
             md_lines.append("")
-        
+
         md_lines.append("---")
         md_lines.append("")
-    
+
+    # Centrality / effective-radius concentration (geometry-only)
+    concentration = _try_load_json(concentration_file)
+    if concentration and isinstance(concentration.get("by_dimension"), dict):
+        md_lines.append("## Finding 5: Centrality Concentration Explains Effective Radius Stabilization")
+        md_lines.append("")
+        md_lines.append("### Discovery")
+        md_lines.append("")
+        md_lines.append("**Finding**: The normalized L2 centrality used by the simulator concentrates as dimension increases,")
+        md_lines.append("so the percentile cutoff (\"effective radius\") stabilizes near **√(1/3) ≈ 0.57735** rather than growing with √d.")
+        md_lines.append("")
+        md_lines.append("### Why √(1/3) shows up (and why max distance doesn't matter)")
+        md_lines.append("")
+        md_lines.append("The simulator defines voter centrality as:")
+        md_lines.append("- distance from the hypercube center using L2")
+        md_lines.append("- **divided by the half-diagonal** (max possible distance from center)")
+        md_lines.append("")
+        md_lines.append("For uniform sampling in [-1, 1]^d, the typical squared coordinate is E[X^2] = 1/3.")
+        md_lines.append("So the typical radius is ||X|| ≈ √(d/3), and dividing by √d yields √(1/3).")
+        md_lines.append("In high d, concentration of measure makes this extremely tight, so percentiles collapse together.")
+        md_lines.append("")
+        md_lines.append("### Statistical distribution vs dimension (as generated)")
+        md_lines.append("")
+        md_lines.append("Below, centrality stats are computed over all sampled voters; effective radius is the per-profile")
+        md_lines.append(f"percentile cutoff with threshold t = {format_float(concentration.get('config', {}).get('threshold', 0.5), 2)}.")
+        md_lines.append("")
+        md_lines.append("| d | centrality mean | centrality std | centrality p50 | eff_radius mean | eff_radius std | eff_radius p50 |")
+        md_lines.append("|---:|---:|---:|---:|---:|---:|---:|")
+
+        by_dim = concentration["by_dimension"]
+        dims_sorted = sorted([int(k) for k in by_dim.keys()])
+        for d in dims_sorted:
+            rec = by_dim.get(str(d), {})
+            cent_stats = ((rec.get("centrality") or {}).get("stats") or {})
+            eff_stats = ((rec.get("effective_radius_percentile_mode") or {}).get("stats") or {})
+            md_lines.append(
+                "| "
+                + str(d)
+                + " | "
+                + format_float(cent_stats.get("mean"), 5)
+                + " | "
+                + format_float(cent_stats.get("std"), 5)
+                + " | "
+                + _format_q(cent_stats, "p50", 5)
+                + " | "
+                + format_float(eff_stats.get("mean"), 5)
+                + " | "
+                + format_float(eff_stats.get("std"), 5)
+                + " | "
+                + _format_q(eff_stats, "p50", 5)
+                + " |"
+            )
+        md_lines.append("")
+        md_lines.append("**Interpretation**: As d increases, the standard deviation shrinks and the median approaches √(1/3).")
+        md_lines.append("That’s why the effective radius stabilizes despite the raw Euclidean diameter growing with √d.")
+        md_lines.append("")
+        md_lines.append("---")
+        md_lines.append("")
+
     # Metric pairs
     if 'metric_pairs' in analysis:
         md_lines.append("## Finding 4: Metric Interaction Strength Hierarchy")
@@ -193,9 +266,9 @@ def main():
         md_lines.append("")
         md_lines.append("**Finding**: Different metric pairs create systematically different magnitudes of heterogeneity effects, with cosine-based pairs showing the strongest interactions.")
         md_lines.append("")
-        
+
         pairs_data = analysis['metric_pairs']
-        
+
         if 'hierarchy' in pairs_data:
             for rule, hierarchy in pairs_data['hierarchy'].items():
                 md_lines.append(f"### {rule.capitalize()} Rule (strongest to weakest)")
@@ -203,7 +276,7 @@ def main():
                 for i, item in enumerate(hierarchy[:6], 1):
                     md_lines.append(f"{i}. **{item['pair']}**: {format_percentage(item['strength'])}")
                 md_lines.append("")
-        
+
         md_lines.append("### Key Observations")
         md_lines.append("")
         md_lines.append("1. **Cosine-based pairs** (cosine_l1, cosine_l2, cosine_chebyshev) show the strongest effects (58-62%)")
@@ -213,7 +286,7 @@ def main():
         md_lines.append("")
         md_lines.append("---")
         md_lines.append("")
-    
+
     # Corrections
     md_lines.append("## Major Corrections to Original Findings")
     md_lines.append("")
@@ -223,31 +296,31 @@ def main():
     md_lines.append("")
     md_lines.append("**Correction**: Use L1 (center) + Cosine (extreme) vs L1 (homogeneous) to reveal true heterogeneity effects.")
     md_lines.append("")
-    
+
     md_lines.append("### 2. Dimensional Scaling")
     md_lines.append("")
     md_lines.append("**Original Finding**: Peak effects at 2-3 dimensions")
     md_lines.append("")
     md_lines.append("**Corrected Finding**: Effects **increase** with dimension, peaking at 10D (highest tested). Disagreement ranges from 0% at 1D to 31-53% at 10D depending on voting rule.")
     md_lines.append("")
-    
+
     md_lines.append("### 3. Voter Count Effects")
     md_lines.append("")
     md_lines.append("**Original Finding**: Fixed 100 voters, no scaling analysis")
     md_lines.append("")
     md_lines.append("**New Finding**: Disagreement **decreases** with voter count. Effects are more pronounced in smaller electorates (25.5% at 10 voters vs 12% at 500 voters for Plurality).")
     md_lines.append("")
-    
+
     md_lines.append("### 4. Threshold Effects")
     md_lines.append("")
     md_lines.append("**Original Finding**: Strong phase transitions with sigmoidal curves")
     md_lines.append("")
     md_lines.append("**Corrected Finding**: For L1-Cosine pair, disagreement is relatively stable across thresholds (~15-21%), suggesting threshold may have less impact than originally thought.")
     md_lines.append("")
-    
+
     md_lines.append("---")
     md_lines.append("")
-    
+
     # New discoveries
     md_lines.append("## New Discoveries")
     md_lines.append("")
@@ -255,20 +328,20 @@ def main():
     md_lines.append("")
     md_lines.append("**Discovery**: Heterogeneity effects are **inversely related** to voter count. Smaller electorates show stronger heterogeneity effects, suggesting that heterogeneity may be more important in small-group decision-making than in large-scale elections.")
     md_lines.append("")
-    
+
     md_lines.append("### 2. Dimensional Scaling Reversal")
     md_lines.append("")
     md_lines.append("**Discovery**: Contrary to original findings, effects **increase** with dimension rather than peaking at 2-3D. This suggests that in high-dimensional policy spaces, metric heterogeneity becomes more important.")
     md_lines.append("")
-    
+
     md_lines.append("### 3. Metric Pair Hierarchy")
     md_lines.append("")
     md_lines.append("**Discovery**: Cosine-based metric assignments create the strongest heterogeneity effects (58-62%), significantly stronger than L1-based (15-21%) or Chebyshev-based (11-14.5%) assignments.")
     md_lines.append("")
-    
+
     md_lines.append("---")
     md_lines.append("")
-    
+
     # Conclusion
     md_lines.append("## Conclusion")
     md_lines.append("")
@@ -283,7 +356,7 @@ def main():
     md_lines.append("")
     md_lines.append("---")
     md_lines.append("")
-    
+
     # References
     md_lines.append("## References")
     md_lines.append("")
@@ -291,20 +364,17 @@ def main():
     md_lines.append("- Research methodology: `heterogenity-simulator/METHODOLOGY.md`")
     md_lines.append("- Research code: `heterogenity-simulator/research_suite.py`")
     md_lines.append("- Analysis code: `heterogenity-simulator/analyze_results.py`")
+    md_lines.append("- Centrality concentration analysis: `heterogenity-simulator/centrality_concentration.py`")
     md_lines.append("")
     md_lines.append(f"_Document generated: {datetime.now().isoformat()}_")
     md_lines.append("")
-    
+
     output_path = Path("heterogenity-simulator/FINDINGS-2.md")
     output_path.write_text("\n".join(md_lines), encoding='utf-8')
-    
+
     print(f"Enhanced findings document generated: {output_path}")
     print(f"Length: {len(md_lines)} lines")
 
 
 if __name__ == "__main__":
     main()
-
-
-
-
