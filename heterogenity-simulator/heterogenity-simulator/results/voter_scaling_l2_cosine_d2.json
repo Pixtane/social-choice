@@ -1,0 +1,66 @@
+{
+  "center_metric": "l2",
+  "extreme_metric": "cosine",
+  "threshold": 0.57735026919,
+  "dimension": 2,
+  "voter_counts": [
+    100
+  ],
+  "data": {
+    "100": {
+      "plurality": {
+        "disagreement_rate": 11.5,
+        "vse_het": 0.8374511345669666,
+        "vse_homo": 0.8575108970156985,
+        "vse_difference": -0.020059762448731866,
+        "disagreement_rate_extreme_baseline": 42.5,
+        "vse_homo_extreme_baseline": 0.7046361816338009,
+        "vse_difference_extreme_baseline": 0.1328149529331657,
+        "cycle_rate_het_extreme_baseline": 94.5,
+        "cycle_rate_homo_extreme_baseline": 89.0,
+        "cycle_rate_delta_extreme_baseline": 5.5,
+        "condorcet_efficiency_het_extreme_baseline": 56.544502617801044,
+        "condorcet_efficiency_homo_extreme_baseline": 48.55072463768116,
+        "condorcet_efficiency_delta_extreme_baseline": 7.993777980119887,
+        "cycle_rate_het": 94.5,
+        "cycle_rate_homo": 93.0,
+        "cycle_rate_delta": 1.5,
+        "condorcet_efficiency_het": 56.544502617801044,
+        "condorcet_efficiency_homo": 56.41025641025641,
+        "condorcet_efficiency_delta": 0.1342462075446349
+      }
+    }
+  },
+  "effective_radius_by_voters": {
+    "100": {
+      "effective_radius_mean": 0.57735026919,
+      "effective_radius_std": 0.0,
+      "effective_radius_min": 0.57735026919,
+      "effective_radius_max": 0.57735026919
+    }
+  },
+  "metric_usage_by_voters": {
+    "100": {
+      "cosine": {
+        "count_mean": 47.63,
+        "count_std": 4.746904254353568,
+        "count_min": 33.0,
+        "count_max": 61.0,
+        "frac_mean": 0.47629999999999995,
+        "frac_std": 0.047469042543535685,
+        "frac_min": 0.33,
+        "frac_max": 0.61
+      },
+      "l2": {
+        "count_mean": 52.37,
+        "count_std": 4.746904254353568,
+        "count_min": 39.0,
+        "count_max": 67.0,
+        "frac_mean": 0.5237,
+        "frac_std": 0.04746904254353568,
+        "frac_min": 0.39,
+        "frac_max": 0.67
+      }
+    }
+  }
+}

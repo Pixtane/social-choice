@@ -200,10 +200,41 @@ Parameters:
 \begin{itemize}
   \item center metric \(\mu_{\text{center}}\) (default \(L2\)),
   \item extreme metric \(\mu_{\text{extreme}}\) (default cosine),
+  \item threshold mode in \{\texttt{percentile}, \texttt{radius}\} (default \texttt{percentile}),
   \item threshold \(t\in[0,1]\) (default \(t=0.5\)).
 \end{itemize}
 
-For a voter at position \(x\), define:
+\paragraph{Percentile mode.}
+Let \(c_v \coloneqq \mathrm{cent}(x_v)\) be the normalized L2 centrality for each voter \(v=1,\dots,N\).
+Let \(\sigma\) be a permutation of \(\{1,\dots,N\}\) that sorts voters by increasing centrality:
+\[
+  c_{\sigma(1)} \le c_{\sigma(2)} \le \cdots \le c_{\sigma(N)}.
+\]
+Define the center group size:
+\[
+  K \coloneqq \lfloor tN \rfloor.
+\]
+Then the closest \(K\) voters \(\{\sigma(1),\dots,\sigma(K)\}\) use \(\mu_{\text{center}}\) and the remaining voters use \(\mu_{\text{extreme}}\):
+\[
+  \mu_v \coloneqq
+  \begin{cases}
+    \mu_{\text{center}},  & v \in \{\sigma(1),\dots,\sigma(K)\}, \\
+    \mu_{\text{extreme}}, & \text{otherwise}.
+  \end{cases}
+\]
+
+\paragraph{Effective radius.}
+For reporting, define the effective radius as the cutoff centrality:
+\[
+  r_{\mathrm{eff}} \coloneqq
+  \begin{cases}
+    0,             & K=0,    \\
+    c_{\sigma(K)}, & K\ge 1.
+  \end{cases}
+\]
+
+\paragraph{Radius mode.}
+In radius mode, the threshold \(t\) is applied directly to normalized centrality:
 \[
   \mu(x) \coloneqq
   \begin{cases}
@@ -211,7 +242,6 @@ For a voter at position \(x\), define:
     \mu_{\text{extreme}}, & \mathrm{cent}(x) > t.
   \end{cases}
 \]
-Equality is classified as \emph{center} (\(\le t\)).
 
 \subsection{Strategy B: radial steps (\texttt{radial\_steps})}
 \label{sec:sim-radial-steps}

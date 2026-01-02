@@ -14,29 +14,29 @@ from datetime import datetime
 @dataclass
 class GeometryConfig:
     """Configuration for spatial geometry generation."""
-    
+
     # Generation method
     method: Literal[
-        'uniform', 'clustered', 'single_peaked', 
+        'uniform', 'clustered', 'single_peaked',
         'polarized', '1d', '2d', 'custom'
     ] = 'uniform'
-    
+
     # Spatial dimensions
     n_dim: int = 2
-    
+
     # Clustering parameters
     cluster_variance: float = 0.15  # For clustered generation
     phi: float = 0.5  # Dispersion parameter (0=tight, 1=loose)
-    
+
     # Candidate placement
     candidate_method: Literal[
         'random', 'fixed_triangle', 'fixed_line', 'clustered'
     ] = 'random'
-    
+
     # Bounds for positions
     position_min: float = 0.0
     position_max: float = 1.0
-    
+
     def validate(self) -> None:
         """Validate configuration parameters."""
         if self.n_dim < 1:
@@ -50,31 +50,31 @@ class GeometryConfig:
 @dataclass
 class ManipulationConfig:
     """Configuration for strategic voting manipulation."""
-    
+
     # Whether manipulation is enabled
     enabled: bool = False
-    
+
     # Fraction of voters who manipulate (0.0 to 1.0)
     manipulator_fraction: float = 0.2
-    
+
     # How manipulators are selected
     selection_method: Literal[
         'random', 'extremists', 'centrists', 'informed'
     ] = 'random'
-    
+
     # Manipulation strategy
     strategy: Literal[
         'bullet', 'compromise', 'burial', 'pushover', 'optimal'
     ] = 'compromise'
-    
+
     # Information available to manipulators
     information_level: Literal[
         'none', 'polls', 'full'  # none=blind, polls=approximate, full=exact
     ] = 'polls'
-    
+
     # For poll-based information: noise in polls
     poll_noise: float = 0.1
-    
+
     def validate(self) -> None:
         """Validate configuration parameters."""
         if not 0 <= self.manipulator_fraction <= 1:
@@ -86,18 +86,18 @@ class ManipulationConfig:
 @dataclass
 class VotingRuleConfig:
     """Configuration for voting rule parameters."""
-    
+
     # Approval voting parameters
     approval_policy: Literal['top_k', 'threshold', 'mean', 'above_average'] = 'top_k'
     approval_k: int = 2  # For top_k: approve top k candidates
     approval_threshold: float = 0.5  # For threshold: approve if utility > threshold
-    
+
     # Score voting parameters
     score_max: int = 5  # Maximum score (0 to score_max)
     score_granularity: Literal['continuous', 'integer'] = 'integer'
-    
+
     # STAR voting uses score_max
-    
+
     # Tie-breaking
     tiebreak_method: Literal['random', 'lexicographic', 'none'] = 'random'
 
@@ -105,64 +105,71 @@ class VotingRuleConfig:
 @dataclass
 class HeterogeneousDistanceConfig:
     """Configuration for heterogeneous distance metrics.
-    
+
     Allows different voters to use different distance metrics based on
     their position in space. Two strategies are available:
-    
+
     1. center_extreme: Center voters use one metric (default L2),
        extreme voters use cosine. Controlled by a threshold parameter.
-       
+
     2. radial_steps: Different metrics at different radial distances.
        L1 in center, L2 further out, Chebyshev at extremes.
        Boundaries defined by a scaling function.
     """
-    
+
     # Whether heterogeneous distance is enabled
     enabled: bool = False
-    
+
     # Strategy type
     strategy: Literal['center_extreme', 'radial_steps'] = 'center_extreme'
-    
+
     # =========================================================================
     # Center-Extreme Strategy Parameters
     # =========================================================================
-    
+
     # Metric used by center voters
     center_metric: Literal['l2', 'l1', 'cosine', 'chebyshev'] = 'l2'
-    
+
     # Metric used by extreme voters (always cosine by default)
     extreme_metric: Literal['l2', 'l1', 'cosine', 'chebyshev'] = 'cosine'
-    
-    # Threshold for "extreme" classification (distance from center)
-    # Expressed as fraction of max possible distance (0.0-1.0)
-    # Voters beyond this threshold use extreme_metric
+
+    # Threshold mode for center-extreme classification.
+    # - 'percentile': t is a percentile in [0, 1] over voters' normalized L2 centrality.
+    #                 The closest floor(t * N) voters use center_metric; the rest use extreme_metric.
+    # - 'radius':     t is a radial cutoff in [0, 1] on normalized L2 centrality.
+    #                 Voters with cent(x) <= t use center_metric; others use extreme_metric.
+    center_extreme_threshold_mode: Literal['percentile', 'radius'] = 'percentile'
+
+    # Threshold parameter t in [0, 1]. Interpretation depends on center_extreme_threshold_mode.
     extreme_threshold: float = 0.5
-    
+
     # =========================================================================
     # Radial Steps Strategy Parameters
     # =========================================================================
-    
+
     # Ordered list of metrics from center outward
     # Default: L1 (center) -> L2 (middle) -> Chebyshev (far)
     radial_metrics: List[str] = field(
         default_factory=lambda: ['l1', 'l2', 'chebyshev']
     )
-    
+
     # How boundaries between metrics are spaced
     # 'linear': Equal spacing
     # 'logarithmic': Boundaries at log scale (more near center)
     # 'exponential': Boundaries at exp scale (more near edge)
     radial_scaling: Literal['linear', 'logarithmic', 'exponential'] = 'linear'
-    
+
     # Base parameter for non-linear scaling
     # For logarithmic: log_base controls compression
     # For exponential: exp_rate controls expansion
     scaling_parameter: float = 2.0
-    
+
     def validate(self) -> None:
         """Validate configuration parameters."""
         if self.extreme_threshold < 0 or self.extreme_threshold > 1:
             raise ValueError("extreme_threshold must be in [0, 1]")
+        if self.center_extreme_threshold_mode not in ('percentile', 'radius'):
+            raise ValueError("center_extreme_threshold_mode must be 'percentile' or 'radius'")
         if len(self.radial_metrics) < 2:
             raise ValueError("radial_metrics must have at least 2 metrics")
         valid_metrics = {'l1', 'l2', 'cosine', 'chebyshev'}
@@ -173,30 +180,30 @@ class HeterogeneousDistanceConfig:
             raise ValueError("scaling_parameter must be > 0")
 
 
-@dataclass 
+@dataclass
 class UtilityConfig:
     """Configuration for utility computation."""
-    
+
     # Utility function type
     function: Literal['gaussian', 'quadratic', 'linear', 'exponential', 'saturated'] = 'gaussian'
-    
+
     # Distance metric (used when heterogeneous is disabled)
     distance_metric: Literal['l2', 'l1', 'cosine', 'chebyshev'] = 'l2'
-    
+
     # Heterogeneous distance configuration
     heterogeneous_distance: HeterogeneousDistanceConfig = field(
         default_factory=HeterogeneousDistanceConfig
     )
-    
+
     # Gaussian utility parameters
     sigma_factor: float = 0.5  # sigma = sigma_factor * sqrt(n_dim)
-    
+
     # Exponential utility parameters
     decay_rate: float = 2.0
-    
+
     # Saturated utility parameters
     saturation_threshold: float = 0.5  # Threshold for saturated utility
-    
+
     # Maximum distance for quadratic utility (optional).
     # Linear utility uses per-voter normalization derived from geometry bounds.
     d_max: Optional[float] = None
@@ -205,33 +212,33 @@ class UtilityConfig:
 @dataclass
 class SimulationConfig:
     """Master configuration for simulation runs."""
-    
+
     # Unique experiment identifier
     experiment_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
-    
+
     # Timestamp
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    
+
     # Core simulation parameters
     n_profiles: int = 1000
     n_voters: int = 25
     n_candidates: int = 3
-    
+
     # Voting rules to evaluate (list of rule names)
     voting_rules: List[str] = field(default_factory=lambda: ['plurality', 'borda', 'irv'])
-    
+
     # Sub-configurations
     geometry: GeometryConfig = field(default_factory=GeometryConfig)
     manipulation: ManipulationConfig = field(default_factory=ManipulationConfig)
     voting_rule_config: VotingRuleConfig = field(default_factory=VotingRuleConfig)
     utility: UtilityConfig = field(default_factory=UtilityConfig)
-    
+
     # Reproducibility
     rng_seed: Optional[int] = None
-    
+
     # Epsilon for floating point comparisons
     epsilon: float = 1e-9
-    
+
     def validate(self) -> None:
         """Validate all configuration parameters."""
         if self.n_profiles < 1:
@@ -240,10 +247,10 @@ class SimulationConfig:
             raise ValueError("n_voters must be >= 1")
         if self.n_candidates < 2:
             raise ValueError("n_candidates must be >= 2")
-        
+
         self.geometry.validate()
         self.manipulation.validate()
-    
+
     def to_dict(self) -> dict:
         """Convert configuration to dictionary for storage."""
         result = {
@@ -265,7 +272,7 @@ class SimulationConfig:
             'rng_seed': self.rng_seed,
             'epsilon': self.epsilon,
         }
-        
+
         # Add heterogeneous distance config if enabled
         het_config = self.utility.heterogeneous_distance
         result['heterogeneous_distance_enabled'] = het_config.enabled
@@ -273,11 +280,12 @@ class SimulationConfig:
             result['heterogeneous_strategy'] = het_config.strategy
             result['heterogeneous_center_metric'] = het_config.center_metric
             result['heterogeneous_extreme_metric'] = het_config.extreme_metric
+            result['heterogeneous_center_extreme_threshold_mode'] = het_config.center_extreme_threshold_mode
             result['heterogeneous_extreme_threshold'] = het_config.extreme_threshold
             result['heterogeneous_radial_metrics'] = het_config.radial_metrics
             result['heterogeneous_radial_scaling'] = het_config.radial_scaling
             result['heterogeneous_scaling_parameter'] = het_config.scaling_parameter
-        
+
         return result
 
 
@@ -299,7 +307,7 @@ AVAILABLE_VOTING_RULES = {
     'bucklin': {'type': 'ordinal', 'description': 'Bucklin voting'},
     'nanson': {'type': 'ordinal', 'description': 'Nanson method'},
     'baldwin': {'type': 'ordinal', 'description': 'Baldwin method'},
-    
+
     # Cardinal rules
     'approval': {'type': 'cardinal', 'description': 'Approval voting'},
     'score': {'type': 'cardinal', 'description': 'Score/range voting'},
@@ -349,5 +357,3 @@ AVAILABLE_DISTANCE_METRICS = {
     'cosine': 'Cosine distance (directional similarity)',
     'chebyshev': 'Chebyshev (max coordinate difference)',
 }
-
-

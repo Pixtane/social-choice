@@ -1,0 +1,66 @@
+{
+  "center_metric": "l2",
+  "extreme_metric": "cosine",
+  "threshold": 0.57735026919,
+  "dimension": 200,
+  "voter_counts": [
+    100
+  ],
+  "data": {
+    "100": {
+      "plurality": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9098930598988556,
+        "vse_homo": 0.9763966165332489,
+        "vse_difference": -0.06650355663439333,
+        "disagreement_rate_extreme_baseline": 57.49999999999999,
+        "vse_homo_extreme_baseline": 0.7782748889504145,
+        "vse_difference_extreme_baseline": 0.13161817094844108,
+        "cycle_rate_het_extreme_baseline": 93.5,
+        "cycle_rate_homo_extreme_baseline": 91.5,
+        "cycle_rate_delta_extreme_baseline": 2.0,
+        "condorcet_efficiency_het_extreme_baseline": 75.0,
+        "condorcet_efficiency_homo_extreme_baseline": 58.11965811965812,
+        "condorcet_efficiency_delta_extreme_baseline": 16.88034188034188,
+        "cycle_rate_het": 93.5,
+        "cycle_rate_homo": 94.0,
+        "cycle_rate_delta": -0.5,
+        "condorcet_efficiency_het": 75.0,
+        "condorcet_efficiency_homo": 90.47619047619048,
+        "condorcet_efficiency_delta": -15.476190476190482
+      }
+    }
+  },
+  "effective_radius_by_voters": {
+    "100": {
+      "effective_radius_mean": 0.57735026919,
+      "effective_radius_std": 0.0,
+      "effective_radius_min": 0.57735026919,
+      "effective_radius_max": 0.57735026919
+    }
+  },
+  "metric_usage_by_voters": {
+    "100": {
+      "cosine": {
+        "count_mean": 49.34,
+        "count_std": 5.5185505343341745,
+        "count_min": 35.0,
+        "count_max": 66.0,
+        "frac_mean": 0.49339999999999995,
+        "frac_std": 0.05518550534334175,
+        "frac_min": 0.35,
+        "frac_max": 0.66
+      },
+      "l2": {
+        "count_mean": 50.66,
+        "count_std": 5.5185505343341745,
+        "count_min": 34.0,
+        "count_max": 65.0,
+        "frac_mean": 0.5066,
+        "frac_std": 0.05518550534334175,
+        "frac_min": 0.34,
+        "frac_max": 0.65
+      }
+    }
+  }
+}
