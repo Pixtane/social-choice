@@ -139,7 +139,8 @@ def generate_preferences(
         # Compute distances and utilities for this profile
         distances = utility_computer.compute_distances(
             spatial_profile.voter_positions[i],
-            spatial_profile.candidate_positions[i]
+            spatial_profile.candidate_positions[i],
+            geometry=config.geometry,
         )
         utilities[i] = utility_computer.compute_utilities(distances, n_dim)
         rankings[i] = utilities_to_rankings(utilities[i], config.epsilon)

@@ -28,7 +28,8 @@ class GeometryGenerator:
     """
     Generates spatial voter and candidate positions.
     
-    All methods return positions in [0, 1]^n_dim space.
+    All methods return positions in [position_min, position_max]^n_dim space,
+    as configured by `GeometryConfig.position_min` / `GeometryConfig.position_max`.
     """
     
     def __init__(self, config: GeometryConfig, rng: Optional[np.random.Generator] = None):
@@ -83,7 +84,7 @@ class GeometryGenerator:
         n_candidates: int
     ) -> SpatialProfile:
         """
-        Uniform random distribution in [0,1]^n_dim.
+        Uniform random distribution in [position_min, position_max]^n_dim.
         
         Most unbiased spatial distribution - voters and candidates
         uniformly distributed throughout the space.

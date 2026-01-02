@@ -169,10 +169,11 @@ class HeterogeneityResearcher:
                 n_voters=n_voters,
                 n_candidates=self.config.base_n_candidates,
                 voting_rules=self.config.voting_rules,
-                geometry=GeometryConfig(method='uniform', n_dim=dimension),
+                geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
                 utility=UtilityConfig(
                     function='linear',
                     distance_metric='l2',
+                    d_max=2.0 * np.sqrt(dimension),
                     heterogeneous_distance=HeterogeneousDistanceConfig(
                         enabled=True,
                         strategy='center_extreme',
@@ -191,10 +192,11 @@ class HeterogeneityResearcher:
                 n_voters=n_voters,
                 n_candidates=self.config.base_n_candidates,
                 voting_rules=self.config.voting_rules,
-                geometry=GeometryConfig(method='uniform', n_dim=dimension),
+                geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
                 utility=UtilityConfig(
                     function='linear',
                     distance_metric=center_metric,
+                    d_max=2.0 * np.sqrt(dimension),
                     heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
                 ),
                 rng_seed=self.config.rng_seed
@@ -266,10 +268,11 @@ class HeterogeneityResearcher:
                 n_voters=n_voters,
                 n_candidates=self.config.base_n_candidates,
                 voting_rules=self.config.voting_rules,
-                geometry=GeometryConfig(method='uniform', n_dim=dimension),
+                geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
                 utility=UtilityConfig(
                     function='linear',
                     distance_metric='l2',
+                    d_max=2.0 * np.sqrt(dimension),
                     heterogeneous_distance=HeterogeneousDistanceConfig(
                         enabled=True,
                         strategy='center_extreme',
@@ -288,10 +291,11 @@ class HeterogeneityResearcher:
                 n_voters=n_voters,
                 n_candidates=self.config.base_n_candidates,
                 voting_rules=self.config.voting_rules,
-                geometry=GeometryConfig(method='uniform', n_dim=dimension),
+                geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
                 utility=UtilityConfig(
                     function='linear',
                     distance_metric=center_metric,
+                    d_max=2.0 * np.sqrt(dimension),
                     heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
                 ),
                 rng_seed=self.config.rng_seed
@@ -362,10 +366,11 @@ class HeterogeneityResearcher:
                 n_voters=n_voters,
                 n_candidates=self.config.base_n_candidates,
                 voting_rules=self.config.voting_rules,
-                geometry=GeometryConfig(method='uniform', n_dim=dimension),
+                geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
                 utility=UtilityConfig(
                     function='linear',
                     distance_metric='l2',
+                    d_max=2.0 * np.sqrt(dimension),
                     heterogeneous_distance=HeterogeneousDistanceConfig(
                         enabled=True,
                         strategy='center_extreme',
@@ -384,10 +389,11 @@ class HeterogeneityResearcher:
                 n_voters=n_voters,
                 n_candidates=self.config.base_n_candidates,
                 voting_rules=self.config.voting_rules,
-                geometry=GeometryConfig(method='uniform', n_dim=dimension),
+                geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
                 utility=UtilityConfig(
                     function='linear',
                     distance_metric=center_metric,
+                    d_max=2.0 * np.sqrt(dimension),
                     heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
                 ),
                 rng_seed=self.config.rng_seed
@@ -461,10 +467,11 @@ class HeterogeneityResearcher:
                     n_voters=n_voters,
                     n_candidates=self.config.base_n_candidates,
                     voting_rules=self.config.voting_rules,
-                    geometry=GeometryConfig(method='uniform', n_dim=dimension),
+                    geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
                     utility=UtilityConfig(
                         function='linear',
                         distance_metric='l2',
+                        d_max=2.0 * np.sqrt(dimension),
                         heterogeneous_distance=HeterogeneousDistanceConfig(
                             enabled=True,
                             strategy='center_extreme',
@@ -483,10 +490,11 @@ class HeterogeneityResearcher:
                     n_voters=n_voters,
                     n_candidates=self.config.base_n_candidates,
                     voting_rules=self.config.voting_rules,
-                    geometry=GeometryConfig(method='uniform', n_dim=dimension),
+                    geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
                     utility=UtilityConfig(
                         function='linear',
                         distance_metric='l2',
+                        d_max=2.0 * np.sqrt(dimension),
                         heterogeneous_distance=HeterogeneousDistanceConfig(
                             enabled=True,
                             strategy='center_extreme',
@@ -505,10 +513,11 @@ class HeterogeneityResearcher:
                     n_voters=n_voters,
                     n_candidates=self.config.base_n_candidates,
                     voting_rules=self.config.voting_rules,
-                    geometry=GeometryConfig(method='uniform', n_dim=dimension),
+                    geometry=GeometryConfig(method='uniform', n_dim=dimension, position_min=-1.0, position_max=1.0),
                     utility=UtilityConfig(
                         function='linear',
                         distance_metric=center_metric,
+                        d_max=2.0 * np.sqrt(dimension),
                         heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
                     ),
                     rng_seed=self.config.rng_seed

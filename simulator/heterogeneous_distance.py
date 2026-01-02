@@ -51,6 +51,7 @@ def compute_cosine_distance(
         voters_norm[:, np.newaxis, :] * cands_norm[np.newaxis, :, :],
         axis=-1
     )
+    similarity = np.clip(similarity, -1.0, 1.0)
     return 1.0 - similarity
 
 
@@ -89,31 +90,35 @@ def compute_distance_single_metric(
 
 def compute_voter_centrality(
     voter_positions: np.ndarray,  # (n_voters, n_dim)
-    center: Optional[np.ndarray] = None  # (n_dim,) or None for auto
+    center: Optional[np.ndarray] = None,  # (n_dim,) or None for auto
+    position_min: float = 0.0,
+    position_max: float = 1.0,
 ) -> np.ndarray:
     """
-    Compute how "central" each voter is.
+    Compute how "central" each voter is within a hypercube.
     
-    Returns normalized distance from center (0 = center, 1 = edge).
+    Returns normalized distance from center (0 = center, 1 = farthest corner).
     
     Args:
         voter_positions: Voter position array (n_voters, n_dim)
-        center: Center point (default: centroid of positions)
+        center: Center point (default: geometric center of the hypercube)
+        position_min: Minimum coordinate value (hypercube lower bound)
+        position_max: Maximum coordinate value (hypercube upper bound)
         
     Returns:
         Array of shape (n_voters,) with values in [0, 1]
     """
     if center is None:
-        # Use geometric center of the space [0, 1]^n_dim
+        # Use geometric center of the configured hypercube.
         n_dim = voter_positions.shape[-1]
-        center = np.full(n_dim, 0.5)
+        center = np.full(n_dim, (position_min + position_max) / 2.0)
     
     # Compute distances from center
     distances = np.linalg.norm(voter_positions - center, axis=-1)
     
-    # Normalize to [0, 1] based on max possible distance
+    # Normalize to [0, 1] based on max possible distance from center.
     n_dim = voter_positions.shape[-1]
-    max_distance = np.sqrt(n_dim) * 0.5  # Half diagonal of unit hypercube
+    max_distance = np.sqrt(n_dim) * (position_max - position_min) / 2.0  # Half diagonal
     
     normalized = distances / max_distance
     return np.clip(normalized, 0, 1)
@@ -203,7 +208,9 @@ class CenterExtremeStrategy(HeterogeneousDistanceStrategy):
         center_metric: str = 'l2',
         extreme_metric: str = 'cosine',
         threshold: float = 0.5,
-        center: Optional[np.ndarray] = None
+        center: Optional[np.ndarray] = None,
+        position_min: float = 0.0,
+        position_max: float = 1.0,
     ):
         """
         Initialize the strategy.
@@ -218,6 +225,8 @@ class CenterExtremeStrategy(HeterogeneousDistanceStrategy):
         self.extreme_metric = extreme_metric
         self.threshold = threshold
         self.center = center
+        self.position_min = position_min
+        self.position_max = position_max
         
         # Validate metrics
         for m in [center_metric, extreme_metric]:
@@ -229,7 +238,12 @@ class CenterExtremeStrategy(HeterogeneousDistanceStrategy):
         voter_positions: np.ndarray
     ) -> np.ndarray:
         """Classify each voter as using center or extreme metric."""
-        centrality = compute_voter_centrality(voter_positions, self.center)
+        centrality = compute_voter_centrality(
+            voter_positions,
+            center=self.center,
+            position_min=self.position_min,
+            position_max=self.position_max,
+        )
         
         # Voters with centrality > threshold are extremists
         metrics = np.where(
@@ -292,7 +306,9 @@ class RadialStepsStrategy(HeterogeneousDistanceStrategy):
         metrics: List[str] = None,
         scaling: str = 'linear',
         scaling_parameter: float = 2.0,
-        center: Optional[np.ndarray] = None
+        center: Optional[np.ndarray] = None,
+        position_min: float = 0.0,
+        position_max: float = 1.0,
     ):
         """
         Initialize the strategy.
@@ -307,6 +323,8 @@ class RadialStepsStrategy(HeterogeneousDistanceStrategy):
         self.scaling = scaling
         self.scaling_parameter = scaling_parameter
         self.center = center
+        self.position_min = position_min
+        self.position_max = position_max
         
         # Validate metrics
         for m in self.metrics:
@@ -358,7 +376,12 @@ class RadialStepsStrategy(HeterogeneousDistanceStrategy):
         voter_positions: np.ndarray
     ) -> np.ndarray:
         """Assign metrics based on radial distance."""
-        centrality = compute_voter_centrality(voter_positions, self.center)
+        centrality = compute_voter_centrality(
+            voter_positions,
+            center=self.center,
+            position_min=self.position_min,
+            position_max=self.position_max,
+        )
         
         # Determine which region each voter belongs to
         # Using searchsorted to find the appropriate bucket
@@ -407,7 +430,11 @@ class RadialStepsStrategy(HeterogeneousDistanceStrategy):
 # Factory Function
 # =============================================================================
 
-def create_strategy(config: HeterogeneousDistanceConfig) -> HeterogeneousDistanceStrategy:
+def create_strategy(
+    config: HeterogeneousDistanceConfig,
+    position_min: float = 0.0,
+    position_max: float = 1.0,
+) -> HeterogeneousDistanceStrategy:
     """
     Create a heterogeneous distance strategy from configuration.
     
@@ -421,14 +448,18 @@ def create_strategy(config: HeterogeneousDistanceConfig) -> HeterogeneousDistanc
         return CenterExtremeStrategy(
             center_metric=config.center_metric,
             extreme_metric=config.extreme_metric,
-            threshold=config.extreme_threshold
+            threshold=config.extreme_threshold,
+            position_min=position_min,
+            position_max=position_max,
         )
     
     elif config.strategy == 'radial_steps':
         return RadialStepsStrategy(
             metrics=config.radial_metrics,
             scaling=config.radial_scaling,
-            scaling_parameter=config.scaling_parameter
+            scaling_parameter=config.scaling_parameter,
+            position_min=position_min,
+            position_max=position_max,
         )
     
     else:
@@ -442,7 +473,9 @@ def create_strategy(config: HeterogeneousDistanceConfig) -> HeterogeneousDistanc
 def compute_heterogeneous_distances(
     voter_positions: np.ndarray,
     candidate_positions: np.ndarray,
-    config: HeterogeneousDistanceConfig
+    config: HeterogeneousDistanceConfig,
+    position_min: float = 0.0,
+    position_max: float = 1.0,
 ) -> np.ndarray:
     """
     Compute distances using heterogeneous metrics.
@@ -457,7 +490,7 @@ def compute_heterogeneous_distances(
     Returns:
         Distance matrix of shape (..., n_voters, n_candidates)
     """
-    strategy = create_strategy(config)
+    strategy = create_strategy(config, position_min=position_min, position_max=position_max)
     
     if voter_positions.ndim == 2:
         # Single profile

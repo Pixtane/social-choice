@@ -7,6 +7,8 @@ Handles distance and utility computations for spatial voting models.
 import numpy as np
 from typing import Optional
 from .config import UtilityConfig
+from .heterogeneous_distance import compute_heterogeneous_distances
+from .config import GeometryConfig
 
 
 def utilities_to_rankings(utilities: np.ndarray, epsilon: float = 1e-9) -> np.ndarray:
@@ -65,6 +67,7 @@ def compute_distances(
                 norm_c = np.linalg.norm(candidate_positions[c])
                 if norm_v > 0 and norm_c > 0:
                     cos_sim = np.dot(voter_positions[v], candidate_positions[c]) / (norm_v * norm_c)
+                    cos_sim = float(np.clip(cos_sim, -1.0, 1.0))
                     distances[v, c] = 1.0 - cos_sim
                 else:
                     distances[v, c] = 0.0
@@ -89,7 +92,8 @@ class UtilityComputer:
     def compute_distances(
         self,
         voter_positions: np.ndarray,
-        candidate_positions: np.ndarray
+        candidate_positions: np.ndarray,
+        geometry: Optional[GeometryConfig] = None,
     ) -> np.ndarray:
         """
         Compute distances between voters and candidates.
@@ -101,10 +105,23 @@ class UtilityComputer:
         Returns:
             (n_voters, n_candidates) distance matrix
         """
+        het = self.config.heterogeneous_distance
+        if het is not None and getattr(het, "enabled", False):
+            # Use configured geometry bounds when available; default matches legacy [0, 1].
+            pmin = geometry.position_min if geometry is not None else 0.0
+            pmax = geometry.position_max if geometry is not None else 1.0
+            return compute_heterogeneous_distances(
+                voter_positions,
+                candidate_positions,
+                het,
+                position_min=pmin,
+                position_max=pmax,
+            )
+
         return compute_distances(
             voter_positions,
             candidate_positions,
-            self.config.distance_metric
+            self.config.distance_metric,
         )
     
     def compute_utilities(
@@ -133,7 +150,8 @@ class UtilityComputer:
             # Quadratic: u = max(0, 1 - (d / d_max)²)
             d_max = self.config.d_max
             if d_max is None:
-                # Use diagonal of unit hypercube as max distance
+                # Default assumes unit hypercube [0,1]^n_dim. If you change the geometry
+                # bounds (e.g. to [-1,1]^n_dim), set UtilityConfig.d_max explicitly.
                 d_max = np.sqrt(n_dim)
             utilities = np.maximum(0.0, 1.0 - (distances / d_max)**2)
         
@@ -141,7 +159,8 @@ class UtilityComputer:
             # Linear: u = max(0, 1 - d / d_max)
             d_max = self.config.d_max
             if d_max is None:
-                # Use diagonal of unit hypercube as max distance
+                # Default assumes unit hypercube [0,1]^n_dim. If you change the geometry
+                # bounds (e.g. to [-1,1]^n_dim), set UtilityConfig.d_max explicitly.
                 d_max = np.sqrt(n_dim)
             utilities = np.maximum(0.0, 1.0 - distances / d_max)
         

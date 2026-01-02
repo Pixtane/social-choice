@@ -1,1 +1,498 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb}
+\usepackage[margin=1in]{geometry}
+\usepackage[hidelinks,hypertexnames=false]{hyperref}
 
+\title{Mathematics of Heterogeneous Distance Metrics}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+% ---------------------------------------------------------------------------
+% Preface: existing file content (wins on contradictions) placed first.
+% Use starred sections so the PDF's numbered structure is preserved.
+% ---------------------------------------------------------------------------
+
+\section*{Spatial model and geometry domain (corrected)}
+We model voters and candidates as points in a $d$-dimensional hypercube:
+\[
+  x \in [-1, 1]^d.
+\]
+This choice is important for cosine distance: allowing negative coordinates permits directions spanning the full angular range $[0,\pi]$ (i.e.\ $180^\circ$). In contrast, sampling from $[0,1]^d$ restricts all vectors to the first orthant, which limits angles largely to $[0,\frac{\pi}{2}]$ (i.e.\ $90^\circ$), preventing cosine from expressing full opposition.
+
+\section*{Cosine distance and its range}
+For nonzero vectors $u,v \in \mathbb{R}^d$, cosine similarity is
+\[
+  \cos(u,v) \;=\; \frac{u \cdot v}{\lVert u \rVert_2 \, \lVert v \rVert_2},
+\]
+and cosine distance is
+\[
+  d_{\cos}(u,v) \;=\; 1 - \cos(u,v).
+\]
+Because $\cos(u,v) \in [-1,1]$, cosine distance satisfies
+\[
+  d_{\cos}(u,v) \in [0,2],
+\]
+achieving $0$ when the vectors are aligned ($\theta = 0$) and $2$ when the vectors are opposite ($\theta = \pi$).
+
+\paragraph{Note on the zero vector.}
+If $u=0$ or $v=0$, cosine similarity is undefined; implementations typically add a small $\varepsilon$ to norms or define a fallback behavior.
+
+\section*{Center/extreme classification (normalized radius)}
+To classify voters by how ``central'' they are, we use distance from the geometric center of the hypercube:
+\[
+  c \;=\; \frac{(-1) + 1}{2}\mathbf{1} \;=\; 0.
+\]
+For a voter at position $x$, define the (unnormalized) radius
+\[
+  r(x) \;=\; \lVert x - c \rVert_2.
+\]
+The maximum possible radius in $[-1,1]^d$ is achieved at a corner $(\pm 1,\ldots,\pm 1)$:
+\[
+  r_{\max} \;=\; \sqrt{d}.
+\]
+We normalize centrality to $[0,1]$ via
+\[
+  \rho(x) \;=\; \frac{r(x)}{r_{\max}} \in [0,1].
+\]
+Then a threshold $\tau \in [0,1]$ can be used to switch distance metrics:
+\[
+  \rho(x) \le \tau \Rightarrow \text{center metric}, \qquad
+  \rho(x) > \tau \Rightarrow \text{extreme metric}.
+\]
+
+\bigskip
+\noindent
+\textbf{Merge note.} The remainder of this document follows the PDF structure \emph{Mathematics of Heterogeneous Distance Metrics in Spatial Voting: Simulator Specification and Methodology}, but applies the corrected geometry above whenever the PDF text assumes a $[0,1]^d$ domain.
+
+% ---------------------------------------------------------------------------
+% Main document: structure mirrors the PDF.
+% ---------------------------------------------------------------------------
+
+\section{Simulator Specification}
+
+\subsection{Introduction}
+This document provides a complete mathematical specification of the spatial voting simulator with heterogeneous distance metrics. The simulator models elections where voters evaluate candidates based on spatial positions in a policy space, but different voters may use different distance metrics to measure ``closeness'' to candidates.
+
+\paragraph{Methodology Note.}
+A critical consideration in experimental design is ensuring that the homogeneous baseline uses a metric different from the center metric in heterogeneous conditions. If both use the same metric (e.g., L2), center voters will have identical preferences in both conditions, leading to artificially low disagreement rates. The corrected methodology uses metric pairs where both metrics differ (e.g., L1--Cosine) to reveal true heterogeneity effects.
+
+\subsection{Spatial Voting Model}
+
+\subsection{Basic Setup}
+Let $\mathcal{P}=\{1,2,\ldots,N\}$ be a set of $N$ election profiles. For each profile $p\in\mathcal{P}$, we have:
+\begin{itemize}
+  \item A set of voters $\mathcal{V}_{p}=\{1,2,\ldots,n_{v}\}$ with $n_{v}$ voters.
+  \item A set of candidates $\mathcal{C}_{p}=\{1,2,\ldots,n_{c}\}$ with $n_{c}$ candidates.
+  \item A $d$-dimensional policy space $\mathbb{R}^{d}$ (typically $d\in\{1,2,3,4,5,7,10\}$).
+\end{itemize}
+Each voter $v\in\mathcal{V}_{p}$ has a position $\mathbf{x}_{v}\in[-1,1]^{d}$ representing their ideal policy point. Each candidate $c\in\mathcal{C}_{p}$ has a position $\mathbf{y}_{c}\in[-1,1]^{d}$ representing their policy platform.
+
+\subsection{Position Generation}
+For uniform distribution (the primary method used in this research), positions are generated as:
+\begin{align}
+  \mathbf{x}_{v} &\sim \mathrm{Uniform}([-1,1]^{d}) \quad \forall v\in\mathcal{V}_{p} \tag{1}\\
+  \mathbf{y}_{c} &\sim \mathrm{Uniform}([-1,1]^{d}) \quad \forall c\in\mathcal{C}_{p} \tag{2}
+\end{align}
+All positions are independently and identically distributed within the hypercube $[-1,1]^{d}$.
+
+\subsection{Distance Metrics}
+
+\subsection{Homogeneous Distance Metrics}
+In the standard spatial voting model, all voters use the same distance metric. We define four distance metrics:
+
+\subsubsection{Euclidean (L2) Distance}
+For voter position $\mathbf{x}_{v}$ and candidate position $\mathbf{y}_{c}$:
+\begin{equation}
+  d_{\mathrm{L2}}(\mathbf{x}_{v},\mathbf{y}_{c})=\|\mathbf{x}_{v}-\mathbf{y}_{c}\|_{2}
+  =\sqrt{\sum_{k=1}^{d}(x_{v,k}-y_{c,k})^{2}} \tag{3}
+\end{equation}
+
+\subsubsection{Manhattan (L1) Distance}
+\begin{equation}
+  d_{\mathrm{L1}}(\mathbf{x}_{v},\mathbf{y}_{c})=\|\mathbf{x}_{v}-\mathbf{y}_{c}\|_{1}
+  =\sum_{k=1}^{d}|x_{v,k}-y_{c,k}| \tag{4}
+\end{equation}
+
+\subsubsection{Chebyshev (L\texorpdfstring{$\infty$}{∞}) Distance}
+\begin{equation}
+  d_{\mathrm{Chebyshev}}(\mathbf{x}_{v},\mathbf{y}_{c})=\|\mathbf{x}_{v}-\mathbf{y}_{c}\|_{\infty}
+  =\max_{k=1,\ldots,d}|x_{v,k}-y_{c,k}| \tag{5}
+\end{equation}
+
+\subsubsection{Cosine Distance}
+The cosine distance measures angular separation rather than spatial distance:
+\begin{equation}
+  d_{\mathrm{cosine}}(\mathbf{x}_{v},\mathbf{y}_{c})
+  =1-\frac{\mathbf{x}_{v}\cdot\mathbf{y}_{c}}{\|\mathbf{x}_{v}\|_{2}\|\mathbf{y}_{c}\|_{2}}
+  =1-\frac{\sum_{k=1}^{d}x_{v,k}y_{c,k}}
+  {\sqrt{\sum_{k=1}^{d}x_{v,k}^{2}}\sqrt{\sum_{k=1}^{d}y_{c,k}^{2}}} \tag{6}
+\end{equation}
+Note: If $\|\mathbf{x}_{v}\|_{2}=0$ or $\|\mathbf{y}_{c}\|_{2}=0$, we define $d_{\mathrm{cosine}}(\mathbf{x}_{v},\mathbf{y}_{c})=0$.
+
+\subsection{Heterogeneous Distance Assignment}
+
+\subsection{Voter Centrality Measure}
+To assign different metrics to different voters, we first compute a \emph{centrality measure} for each voter. The centrality $\gamma_{v}\in[0,1]$ measures how ``extreme'' voter $v$ is relative to the center of the policy space.
+
+Let $\mathbf{c}=(0,0,\ldots,0)\in\mathbb{R}^{d}$ be the geometric center of the hypercube $[-1,1]^d$. The centrality is computed as:
+\begin{equation}
+  \gamma_{v}=\frac{\|\mathbf{x}_{v}-\mathbf{c}\|_{2}}{d_{\max}^{(\mathrm{center})}} \tag{7}
+\end{equation}
+where $d_{\max}^{(\mathrm{center})}=\sqrt{d}$ is the maximum possible distance from the center to a corner of $[-1,1]^d$. The centrality is then clipped to $[0,1]$:
+\begin{equation}
+  \gamma_{v}=\min\!\left(1,\max\!\left(0,\frac{\|\mathbf{x}_{v}-\mathbf{c}\|_{2}}{d_{\max}^{(\mathrm{center})}}\right)\right) \tag{8}
+\end{equation}
+Thus, $\gamma_{v}=0$ for voters at the center, and $\gamma_{v}=1$ for voters at the extreme corners.
+
+\subsection{Center-Extreme Strategy}
+The center-extreme strategy assigns one metric to central voters and a different metric to extreme voters based on a threshold parameter $\theta\in[0,1]$.
+For a given threshold $\theta$ and metric pair $(m_{\text{center}},m_{\text{extreme}})$, the metric assignment function is:
+\begin{equation}
+  m_{v}=
+  \begin{cases}
+    m_{\text{center}} & \text{if }\gamma_{v}\le \theta\\
+    m_{\text{extreme}} & \text{if }\gamma_{v}>\theta
+  \end{cases} \tag{9}
+\end{equation}
+The distance from voter $v$ to candidate $c$ is then:
+\begin{equation}
+  d_{v}(\mathbf{x}_{v},\mathbf{y}_{c})=d_{m_{v}}(\mathbf{x}_{v},\mathbf{y}_{c}) \tag{10}
+\end{equation}
+where $d_{m_{v}}$ is the distance function corresponding to metric $m_{v}$.
+
+\subsection{Heterogeneous Distance Matrix}
+For a profile $p$ with heterogeneous metrics, we compute a distance matrix $\mathbf{D}_{p}\in\mathbb{R}^{n_{v}\times n_{c}}$ where:
+\begin{equation}
+  [\mathbf{D}_{p}]_{v,c}=d_{v}(\mathbf{x}_{v},\mathbf{y}_{c})=d_{m_{v}}(\mathbf{x}_{v},\mathbf{y}_{c}) \tag{11}
+\end{equation}
+Each row $v$ uses the metric $m_{v}$ assigned to voter $v$.
+
+\subsection{Utility Computation}
+
+\subsection{Utility Functions}
+Voter utilities are computed from distances using a utility function. The primary function used in this research is the linear utility function:
+\begin{equation}
+  u_{v}(c)=\max\!\left(0,1-\frac{d_{v}(\mathbf{x}_{v},\mathbf{y}_{c})}{d_{\max}^{(\mathrm{diag})}}\right) \tag{12}
+\end{equation}
+where, under the corrected geometry $[-1,1]^d$, we use $d_{\max}^{(\mathrm{diag})}=2\sqrt{d}$ as the maximum possible Euclidean distance in the hypercube (the diagonal length). This ensures utilities are normalized to $[0,1]$ and are comparable across different voter positions.
+
+\subsection{Utility Matrix}
+For profile $p$, we construct a utility matrix $\mathbf{U}_{p}\in\mathbb{R}^{n_{v}\times n_{c}}$:
+\begin{equation}
+  [\mathbf{U}_{p}]_{v,c}=u_{v}(c) \tag{13}
+\end{equation}
+
+\subsection{Preference Rankings}
+From utilities, we derive strict preference rankings. For voter $v$, the ranking $\pi_{v}$ is a permutation of $\mathcal{C}_{p}$ such that:
+\begin{equation}
+  \pi_{v}(1)\succ_{v}\pi_{v}(2)\succ_{v}\cdots\succ_{v}\pi_{v}(n_{c}) \tag{14}
+\end{equation}
+where $\pi_{v}(1)$ is the most preferred candidate. The ranking is computed as:
+\begin{equation}
+  \pi_{v}=\mathrm{argsort}(-\mathbf{u}_{v}) \tag{15}
+\end{equation}
+where $\mathbf{u}_{v}=[u_{v}(1),u_{v}(2),\ldots,u_{v}(n_{c})]$ is the utility vector for voter $v$, and $\mathrm{argsort}$ returns indices sorted in descending utility order. Ties (within numerical tolerance $\epsilon=10^{-9}$) are broken arbitrarily by index order.
+
+\subsection{Voting Rules}
+We implement three ordinal voting rules that operate on preference rankings:
+
+\subsection{Plurality Rule}
+Each voter casts one vote for their top-ranked candidate. The winner is the candidate with the most first-place votes:
+\begin{align}
+  \mathrm{score}_{p}(c) &= \sum_{v\in\mathcal{V}_{p}}\mathbf{1}[\pi_{v}(1)=c] \tag{16}\\
+  w_{p} &= \arg\max_{c\in\mathcal{C}_{p}} \mathrm{score}_{p}(c) \tag{17}
+\end{align}
+Ties are broken randomly.
+
+\subsection{Borda Count}
+Each voter assigns points: $n_{c}-1$ points to their first choice, $n_{c}-2$ to their second, $\ldots$, $0$ to their last choice. The winner is the candidate with the highest total:
+\begin{equation}
+  \mathrm{score}_{p}(c)=\sum_{v\in\mathcal{V}_{p}}(n_{c}-\mathrm{rank}_{v}(c)-1) \tag{18}
+\end{equation}
+where $\mathrm{rank}_{v}(c)$ is the position of candidate $c$ in voter $v$'s ranking (0-indexed).
+\begin{equation}
+  w_{p}=\arg\max_{c\in\mathcal{C}_{p}}\mathrm{score}_{p}(c) \tag{19}
+\end{equation}
+
+\subsection{Instant Runoff Voting (IRV)}
+IRV proceeds in rounds. In each round:
+\begin{enumerate}
+  \item Count first-place votes: $\mathrm{votes}_{p}(c)=\sum_{v\in\mathcal{V}_{p}}\mathbf{1}[\pi_{v}(1)=c]$.
+  \item If any candidate has $>n_{v}/2$ votes, that candidate wins.
+  \item Otherwise, eliminate the candidate with fewest first-place votes.
+  \item Redistribute votes from the eliminated candidate to each voter's next-ranked remaining candidate.
+  \item Repeat until a candidate has a majority.
+\end{enumerate}
+Formally, let $\mathcal{C}^{(r)}_{p}$ be the set of remaining candidates in round $r$, with $\mathcal{C}^{(0)}_{p}=\mathcal{C}_{p}$. In round $r$:
+\begin{equation}
+  \mathrm{votes}^{(r)}_{p}(c)=\sum_{v\in\mathcal{V}_{p}}\mathbf{1}\!\left[\pi_{v}\!\left(\min\{k:\pi_{v}(k)\in\mathcal{C}^{(r)}_{p}\}\right)=c\right] \tag{20}
+\end{equation}
+The elimination rule is:
+\begin{equation}
+  c^{(r)}_{\mathrm{elim}}=\arg\min_{c\in\mathcal{C}^{(r)}_{p}}\mathrm{votes}^{(r)}_{p}(c) \tag{21}
+\end{equation}
+and $\mathcal{C}^{(r+1)}_{p}=\mathcal{C}^{(r)}_{p}\setminus\{c^{(r)}_{\mathrm{elim}}\}$. The process terminates when $\exists c\in\mathcal{C}^{(r)}_{p}:\mathrm{votes}^{(r)}_{p}(c)>n_{v}/2$, and $w_{p}=c$.
+
+\section{Experimental Methodology}
+
+\subsection{Disagreement Rate}
+The primary measure of heterogeneity effects is the disagreement rate, defined as the fraction of profiles where the heterogeneous winner differs from the homogeneous winner.
+For a metric pair $(m_{\text{center}},m_{\text{extreme}})$ and threshold $\theta$, let:
+\begin{itemize}
+  \item $w^{\text{het}}_{p}$ be the winner under heterogeneous conditions (center uses $m_{\text{center}}$, extreme uses $m_{\text{extreme}}$),
+  \item $w^{\text{homo}}_{p}$ be the winner under homogeneous conditions (all voters use the baseline metric).
+\end{itemize}
+The disagreement rate is:
+\begin{equation}
+  D(m_{\text{center}},m_{\text{extreme}},\theta)=\frac{1}{N}\sum_{p=1}^{N}\mathbf{1}[w^{\text{het}}_{p}\ne w^{\text{homo}}_{p}]\times 100\% \tag{22}
+\end{equation}
+
+\subsection{Asymmetry Measure}
+For a metric pair $(A,B)$, we define the asymmetry as:
+\begin{equation}
+  \Delta_{A,B}(\theta)=|D(A\rightarrow B,\theta)-D(B\rightarrow A,\theta)| \tag{23}
+\end{equation}
+where $D(A\rightarrow B,\theta)$ denotes disagreement when $A$ is assigned to center voters and $B$ to extreme voters.
+
+\subsection{Voter Scaling Analysis}
+To understand how effects depend on voter count, we compute disagreement rates for different values of $n_{v}$:
+\begin{equation}
+  D(n_{v};m_{\text{center}},m_{\text{extreme}},\theta)=\frac{1}{N}\sum_{p=1}^{N}\mathbf{1}[w^{\text{het}}_{p}(n_{v})\ne w^{\text{homo}}_{p}(n_{v})] \tag{24}
+\end{equation}
+We test $n_{v}\in\{10,25,50,100,200,300,400,500\}$ and fit a linear trend:
+\begin{equation}
+  D(n_{v})=\alpha n_{v}+\beta+\epsilon \tag{25}
+\end{equation}
+where $\alpha$ is the slope (change per voter) and $\beta$ is the intercept.
+
+\subsection{Threshold Sweep}
+To detect phase transitions, we sweep the threshold parameter:
+\begin{equation}
+  \theta\in\{0.05,0.10,0.15,\ldots,0.95\} \tag{26}
+\end{equation}
+For each $\theta$, we compute $D(\theta)$ and analyze:
+\begin{itemize}
+  \item Inflection points: values where $\frac{d^{2}D}{d\theta^{2}}=0$,
+  \item Maximum curvature: $\max_{\theta}\left|\frac{d^{2}D}{d\theta^{2}}\right|$,
+  \item Sudden jumps: $\max_{\theta}\left|\frac{dD}{d\theta}\right|$.
+\end{itemize}
+
+\subsection{Dimensional Scaling}
+To understand dimensional dependence, we compute disagreement for different dimensions $d$:
+\begin{equation}
+  D(d;m_{\text{center}},m_{\text{extreme}},\theta)=\frac{1}{N}\sum_{p=1}^{N}\mathbf{1}[w^{\text{het}}_{p}(d)\ne w^{\text{homo}}_{p}(d)] \tag{27}
+\end{equation}
+We test $d\in\{1,2,3,4,5,7,10\}$ and fit a power law:
+\begin{equation}
+  D(d)=D_{0}\cdot d^{\alpha}\quad \text{for } d\le d_{\text{peak}} \tag{28}
+\end{equation}
+Using log-log regression:
+\begin{equation}
+  \log D(d)=\log D_{0}+\alpha\log d+\epsilon \tag{29}
+\end{equation}
+For $d>d_{\text{peak}}$, we fit a linear model:
+\begin{equation}
+  D(d)=D_{\text{peak}}+\beta(d-d_{\text{peak}})+\epsilon \tag{30}
+\end{equation}
+
+\subsection{Condorcet Metrics}
+
+\subsubsection{Condorcet Winner}
+A candidate $c$ is a Condorcet winner if they beat all other candidates in pairwise majority comparisons. Formally, define the pairwise margin:
+\begin{equation}
+  m_{c,c'}=\sum_{v\in\mathcal{V}_{p}}\mathbf{1}[\pi_{v}(c)<\pi_{v}(c')]
+  -\sum_{v\in\mathcal{V}_{p}}\mathbf{1}[\pi_{v}(c')<\pi_{v}(c)] \tag{31}
+\end{equation}
+where $\pi_{v}(c)<\pi_{v}(c')$ means voter $v$ prefers $c$ to $c'$ (lower rank number = higher preference). Candidate $c$ is a Condorcet winner if:
+\begin{equation}
+  \mathrm{CW}(c)\Leftrightarrow \forall c'\ne c:\; m_{c,c'}>0 \tag{32}
+\end{equation}
+Equivalently, $c$ beats $c'$ in a pairwise majority vote if $m_{c,c'}>0$, which occurs when more than half of voters prefer $c$ to $c'$.
+
+\subsubsection{Condorcet Cycle}
+A profile has a Condorcet cycle if no Condorcet winner exists:
+\begin{equation}
+  \mathrm{Cycle}_{p}=\mathbf{1}[\nexists c\in\mathcal{C}_{p}:\mathrm{CW}(c)] \tag{33}
+\end{equation}
+The cycle rate is:
+\begin{equation}
+  C=\frac{1}{N}\sum_{p=1}^{N}\mathrm{Cycle}_{p}\times 100\% \tag{34}
+\end{equation}
+
+\subsubsection{Condorcet Efficiency}
+The Condorcet efficiency of a voting rule is the fraction of profiles where the rule selects the Condorcet winner (when one exists):
+\begin{equation}
+  E=\frac{1}{N_{\mathrm{CW}}}\sum_{p:\exists \mathrm{CW}}\mathbf{1}[w_{p}=\mathrm{CW}_{p}]\times 100\% \tag{35}
+\end{equation}
+where $N_{\mathrm{CW}}$ is the number of profiles with a Condorcet winner, and $\mathrm{CW}_{p}$ is the Condorcet winner in profile $p$.
+
+\subsection{Experimental Configuration}
+
+\subsubsection{Base Parameters}
+All experiments use the following base configuration:
+\begin{itemize}
+  \item Number of profiles: $N=200$ (minimum for statistical significance).
+  \item Number of voters: $n_{v}=100$ (base case, with scaling tests from 10 to 500).
+  \item Number of candidates: $n_{c}=5$.
+  \item Dimensions: $d\in\{1,2,3,4,5,7,10\}$.
+  \item Threshold values: $\theta\in\{0.05,0.10,\ldots,0.95\}$ (19 points).
+  \item Random seed: fixed at 42 for reproducibility.
+  \item Geometry method: uniform distribution in $[-1,1]^{d}$ (corrected geometry).
+  \item Utility function: linear (as defined above).
+\end{itemize}
+
+\subsubsection{Metric Pairs Tested}
+We test all ordered pairs of the four metrics:
+\begin{equation}
+  \mathcal{M}=\{\mathrm{L1},\mathrm{L2},\mathrm{Cosine},\mathrm{Chebyshev}\} \tag{36}
+\end{equation}
+For each pair $(A,B)\in\mathcal{M}\times\mathcal{M}$ with $A\ne B$, we test both directions:
+\begin{itemize}
+  \item $A\rightarrow B$: center voters use $A$, extreme voters use $B$.
+  \item $B\rightarrow A$: center voters use $B$, extreme voters use $A$.
+\end{itemize}
+This yields $4\times 3=12$ ordered pairs.
+
+\subsubsection{Experimental Phases}
+
+\subsubsection{Phase 1: Voter Scaling}
+For metric pair (L1, Cosine) with $\theta=0.5$ and $d=2$:
+\begin{equation}
+  \{D(n_{v}):n_{v}\in\{10,25,50,100,200,300,400,500\}\} \tag{37}
+\end{equation}
+
+\subsubsection{Phase 2: Threshold Sweep}
+For metric pair (L1, Cosine) with $n_{v}=100$ and $d=2$:
+\begin{equation}
+  \{D(\theta):\theta\in\{0.05,0.10,\ldots,0.95\}\} \tag{38}
+\end{equation}
+
+\subsubsection{Phase 3: Dimensional Scaling}
+For metric pair (L1, Cosine) with $n_{v}=100$ and $\theta=0.5$:
+\begin{equation}
+  \{D(d):d\in\{1,2,3,4,5,7,10\}\} \tag{39}
+\end{equation}
+
+\subsubsection{Phase 4: Metric Pair Interactions}
+For all 12 ordered pairs with $n_{v}=100$, $d=2$, and $\theta=0.5$:
+\begin{equation}
+  \{D(A\rightarrow B),D(B\rightarrow A),\Delta_{A,B}:(A,B)\in\mathcal{M}\times\mathcal{M},A\ne B\} \tag{40}
+\end{equation}
+
+\subsubsection{Phase 5: Verification}
+Re-run Phase 4 with $n_{v}=500$ to verify conclusions at higher voter counts.
+
+\subsection{Statistical Analysis}
+
+\subsubsection{Coefficient of Variation}
+To assess stability of effects across voter counts, we compute the coefficient of variation:
+\begin{equation}
+  \mathrm{CV}=\frac{\sigma_{D}}{\mu_{D}} \tag{41}
+\end{equation}
+where $\mu_{D}$ and $\sigma_{D}$ are the mean and standard deviation of disagreement rates across voter counts.
+
+\subsubsection{Power Law Fitting}
+For dimensional scaling, we fit:
+\begin{equation}
+  \log D(d)=\alpha\log d+\beta+\epsilon \tag{42}
+\end{equation}
+and compute the coefficient of determination:
+\begin{equation}
+  R^{2}=1-\frac{\mathrm{SS}_{\mathrm{res}}}{\mathrm{SS}_{\mathrm{tot}}} \tag{43}
+\end{equation}
+where:
+\begin{align}
+  \mathrm{SS}_{\mathrm{res}} &= \sum_{d}\left(\log D(d)-\widehat{\log D}(d)\right)^{2} \tag{44}\\
+  \mathrm{SS}_{\mathrm{tot}} &= \sum_{d}\left(\log D(d)-\overline{\log D}\right)^{2} \tag{45}
+\end{align}
+
+\subsection{Interaction Strength Hierarchy}
+For each voting rule $R$, we rank metric pairs by average disagreement:
+\begin{equation}
+  S_{A,B}=\frac{D(A\rightarrow B)+D(B\rightarrow A)}{2} \tag{46}
+\end{equation}
+Pairs are sorted in descending order of $S_{A,B}$ to form the hierarchy.
+
+\section{Implementation and Validation}
+
+\subsection{Implementation Details}
+
+\subsubsection{Numerical Precision}
+\begin{itemize}
+  \item Distance computations use double precision (64-bit floating point).
+  \item Utility normalization uses maximum distance per voter to avoid division by zero.
+  \item Ranking tie-breaking uses $\epsilon=10^{-9}$ tolerance.
+  \item All random number generation uses NumPy's Mersenne Twister with fixed seed.
+\end{itemize}
+
+\subsubsection{Computational Complexity}
+For a single profile with $n_{v}$ voters and $n_{c}$ candidates in $d$ dimensions:
+\begin{itemize}
+  \item Distance computation: $O(n_{v}\cdot n_{c}\cdot d)$.
+  \item Utility computation: $O(n_{v}\cdot n_{c})$.
+  \item Ranking computation: $O(n_{v}\cdot n_{c}\log n_{c})$ (sorting).
+  \item Plurality: $O(n_{v})$.
+  \item Borda: $O(n_{v}\cdot n_{c})$.
+  \item IRV: $O(n_{v}\cdot n_{c}^{2})$ worst case.
+\end{itemize}
+Total per profile: $O(n_{v}\cdot n_{c}^{2}\cdot d)$ in the worst case (IRV).
+
+\subsubsection{Reproducibility}
+All experiments use:
+\begin{itemize}
+  \item Fixed random seed: 42.
+  \item Deterministic algorithms (no parallelization that could affect order).
+  \item Exact same geometry generation across heterogeneous and homogeneous runs.
+\end{itemize}
+This ensures that differences in outcomes are solely due to metric heterogeneity, not random variation.
+
+\subsection{Validation}
+
+\subsubsection{Methodology Validation}
+A critical validation step is ensuring that the homogeneous baseline uses a different metric from the center metric in heterogeneous conditions. If both use the same metric (e.g., L2), center voters will have identical preferences in both conditions, leading to artificially low disagreement rates. The corrected methodology uses metric pairs where both metrics differ (e.g., L1--Cosine) to reveal true heterogeneity effects.
+
+\subsubsection{Statistical Validation}
+\begin{itemize}
+  \item Minimum 200 profiles per configuration for statistical significance.
+  \item Multiple independent runs with different random seeds (when testing robustness).
+  \item Cross-validation across voting rules.
+  \item Verification at higher voter counts (500 voters).
+\end{itemize}
+
+\section{Summary of Key Findings}
+The mathematical framework described above enables investigation of several phenomena:
+
+\subsection{Asymmetric Metric Interactions}
+The order of metric assignment matters: $D(A\rightarrow B,\theta)\ne D(B\rightarrow A,\theta)$ for most metric pairs $(A,B)$. The asymmetry magnitude is:
+\begin{equation}
+  \Delta_{A,B}(\theta)=|D(A\rightarrow B,\theta)-D(B\rightarrow A,\theta)| \tag{47}
+\end{equation}
+
+\subsection{Dimensional Scaling}
+Disagreement rates scale with dimension following a power law:
+\begin{equation}
+  D(d)\sim d^{\alpha} \tag{48}
+\end{equation}
+with scaling exponent $\alpha$ typically in the range $[9.0,9.5]$ for the L1--Cosine metric pair.
+
+\subsection{Voter Count Dependence}
+Disagreement rates decrease with voter count:
+\begin{equation}
+  D(n_{v})=\alpha n_{v}+\beta \tag{49}
+\end{equation}
+with negative slope $\alpha<0$, indicating stronger heterogeneity effects in smaller electorates.
+
+\subsection{Interaction Strength Hierarchy}
+Different metric pairs create systematically different effects. Cosine-based assignments (Cosine $\rightarrow$ any other metric) show the strongest interactions ($\sim 58$--$62\%$ disagreement), while L2-based assignments show minimal effects due to methodology constraints.
+
+\subsection{Conclusion}
+This mathematical specification provides a complete description of the spatial voting simulator with heterogeneous distance metrics. The simulator enables systematic investigation of how different distance metrics affect voting outcomes, with rigorous experimental methodology and statistical analysis.
+
+The key innovation is the heterogeneous distance assignment, which models cognitive diversity in how voters perceive policy distances. This framework allows investigation of phenomena such as asymmetric metric interactions, dimensional scaling laws, and voter count dependencies.
+
+The mathematical framework is fully specified, enabling replication and extension of the research. All experimental parameters, statistical measures, and computational procedures are precisely defined to ensure reproducibility.
+
+\end{document}
