@@ -62,3 +62,6 @@ If you want to speed things up, you could:
 3. Run visualizations separately (comment out others in `main()`)
 4. Reduce threshold count in #3 from 19 to 10 points (saves ~1 hour)
 
+
+
+

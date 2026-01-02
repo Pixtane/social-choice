@@ -1,0 +1,354 @@
+{
+  "voter_scaling": {
+    "stable": {},
+    "changing": {},
+    "trends": {
+      "plurality": {
+        "slope": -0.017416354206132512,
+        "mean": 16.9375,
+        "std": 4.065383591987354,
+        "cv": 0.24002264749599128,
+        "min": 12.0,
+        "max": 25.5,
+        "range": 13.5
+      },
+      "borda": {
+        "slope": -0.008579491266347043,
+        "mean": 14.6875,
+        "std": 2.357667014232502,
+        "cv": 0.1605220094785668,
+        "min": 11.5,
+        "max": 19.0,
+        "range": 7.5
+      },
+      "irv": {
+        "slope": -0.012796728636191409,
+        "mean": 17.9375,
+        "std": 4.01121474743001,
+        "cv": 0.22362172807847516,
+        "min": 11.5,
+        "max": 23.0,
+        "range": 11.5
+      }
+    }
+  },
+  "threshold_sweep": {
+    "plurality": {
+      "max_disagreement": 15.5,
+      "max_disagreement_threshold": 0.05,
+      "min_disagreement": 15.5,
+      "min_disagreement_threshold": 0.05,
+      "range": 0.0,
+      "inflection_points": [],
+      "max_curvature_threshold": 0.15,
+      "max_jump": 0.0,
+      "max_jump_threshold": 0.05,
+      "mean": 15.5,
+      "std": 0.0
+    },
+    "borda": {
+      "max_disagreement": 17.5,
+      "max_disagreement_threshold": 0.05,
+      "min_disagreement": 17.5,
+      "min_disagreement_threshold": 0.05,
+      "range": 0.0,
+      "inflection_points": [],
+      "max_curvature_threshold": 0.15,
+      "max_jump": 0.0,
+      "max_jump_threshold": 0.05,
+      "mean": 17.5,
+      "std": 0.0
+    },
+    "irv": {
+      "max_disagreement": 21.0,
+      "max_disagreement_threshold": 0.05,
+      "min_disagreement": 21.0,
+      "min_disagreement_threshold": 0.05,
+      "range": 0.0,
+      "inflection_points": [],
+      "max_curvature_threshold": 0.15,
+      "max_jump": 0.0,
+      "max_jump_threshold": 0.05,
+      "mean": 21.0,
+      "std": 0.0
+    }
+  },
+  "dimensional_scaling": {
+    "plurality": {
+      "peak_dimension": 10,
+      "peak_disagreement": 31.5,
+      "scaling_exponent": 9.388864811310924,
+      "r_squared": 0.5536325750975767,
+      "post_peak_slope": null,
+      "min_dimension": 1,
+      "max_dimension": 10,
+      "min_disagreement": 0.0,
+      "max_disagreement": 31.5
+    },
+    "borda": {
+      "peak_dimension": 10,
+      "peak_disagreement": 53.0,
+      "scaling_exponent": 9.496400269236862,
+      "r_squared": 0.573821211061492,
+      "post_peak_slope": null,
+      "min_dimension": 1,
+      "max_dimension": 10,
+      "min_disagreement": 0.0,
+      "max_disagreement": 53.0
+    },
+    "irv": {
+      "peak_dimension": 10,
+      "peak_disagreement": 49.5,
+      "scaling_exponent": 9.439319381733085,
+      "r_squared": 0.5553595647099604,
+      "post_peak_slope": null,
+      "min_dimension": 1,
+      "max_dimension": 10,
+      "min_disagreement": 0.0,
+      "max_disagreement": 49.5
+    }
+  },
+  "metric_pairs": {
+    "asymmetries": {
+      "plurality": {
+        "l1_l2": 0.0,
+        "l1_cosine": 0.0,
+        "l1_chebyshev": 0.0,
+        "l2_l1": 0.0,
+        "l2_cosine": 0.0,
+        "l2_chebyshev": 0.0,
+        "cosine_l1": 0.0,
+        "cosine_l2": 0.0,
+        "cosine_chebyshev": 0.0,
+        "chebyshev_l1": 0.0,
+        "chebyshev_l2": 0.0,
+        "chebyshev_cosine": 0.0
+      },
+      "borda": {
+        "l1_l2": 0.0,
+        "l1_cosine": 0.0,
+        "l1_chebyshev": 0.0,
+        "l2_l1": 0.0,
+        "l2_cosine": 0.0,
+        "l2_chebyshev": 0.0,
+        "cosine_l1": 0.0,
+        "cosine_l2": 0.0,
+        "cosine_chebyshev": 0.0,
+        "chebyshev_l1": 0.0,
+        "chebyshev_l2": 0.0,
+        "chebyshev_cosine": 0.0
+      },
+      "irv": {
+        "l1_l2": 0.0,
+        "l1_cosine": 0.0,
+        "l1_chebyshev": 0.0,
+        "l2_l1": 0.0,
+        "l2_cosine": 0.0,
+        "l2_chebyshev": 0.0,
+        "cosine_l1": 0.0,
+        "cosine_l2": 0.0,
+        "cosine_chebyshev": 0.0,
+        "chebyshev_l1": 0.0,
+        "chebyshev_l2": 0.0,
+        "chebyshev_cosine": 0.0
+      }
+    },
+    "hierarchy": {
+      "plurality": [
+        {
+          "pair": "cosine_l1",
+          "strength": 57.99999999999999
+        },
+        {
+          "pair": "cosine_l2",
+          "strength": 57.99999999999999
+        },
+        {
+          "pair": "cosine_chebyshev",
+          "strength": 57.99999999999999
+        },
+        {
+          "pair": "l1_l2",
+          "strength": 15.5
+        },
+        {
+          "pair": "l1_cosine",
+          "strength": 15.5
+        },
+        {
+          "pair": "l1_chebyshev",
+          "strength": 15.5
+        },
+        {
+          "pair": "chebyshev_l1",
+          "strength": 11.0
+        },
+        {
+          "pair": "chebyshev_l2",
+          "strength": 11.0
+        },
+        {
+          "pair": "chebyshev_cosine",
+          "strength": 11.0
+        },
+        {
+          "pair": "l2_l1",
+          "strength": 0.0
+        },
+        {
+          "pair": "l2_cosine",
+          "strength": 0.0
+        },
+        {
+          "pair": "l2_chebyshev",
+          "strength": 0.0
+        }
+      ],
+      "borda": [
+        {
+          "pair": "cosine_l1",
+          "strength": 57.49999999999999
+        },
+        {
+          "pair": "cosine_l2",
+          "strength": 57.49999999999999
+        },
+        {
+          "pair": "cosine_chebyshev",
+          "strength": 57.49999999999999
+        },
+        {
+          "pair": "l1_l2",
+          "strength": 17.5
+        },
+        {
+          "pair": "l1_cosine",
+          "strength": 17.5
+        },
+        {
+          "pair": "l1_chebyshev",
+          "strength": 17.5
+        },
+        {
+          "pair": "chebyshev_l1",
+          "strength": 14.000000000000002
+        },
+        {
+          "pair": "chebyshev_l2",
+          "strength": 14.000000000000002
+        },
+        {
+          "pair": "chebyshev_cosine",
+          "strength": 14.000000000000002
+        },
+        {
+          "pair": "l2_l1",
+          "strength": 0.0
+        },
+        {
+          "pair": "l2_cosine",
+          "strength": 0.0
+        },
+        {
+          "pair": "l2_chebyshev",
+          "strength": 0.0
+        }
+      ],
+      "irv": [
+        {
+          "pair": "cosine_l1",
+          "strength": 62.0
+        },
+        {
+          "pair": "cosine_l2",
+          "strength": 62.0
+        },
+        {
+          "pair": "cosine_chebyshev",
+          "strength": 62.0
+        },
+        {
+          "pair": "l1_l2",
+          "strength": 21.0
+        },
+        {
+          "pair": "l1_cosine",
+          "strength": 21.0
+        },
+        {
+          "pair": "l1_chebyshev",
+          "strength": 21.0
+        },
+        {
+          "pair": "chebyshev_l1",
+          "strength": 14.499999999999998
+        },
+        {
+          "pair": "chebyshev_l2",
+          "strength": 14.499999999999998
+        },
+        {
+          "pair": "chebyshev_cosine",
+          "strength": 14.499999999999998
+        },
+        {
+          "pair": "l2_l1",
+          "strength": 0.0
+        },
+        {
+          "pair": "l2_cosine",
+          "strength": 0.0
+        },
+        {
+          "pair": "l2_chebyshev",
+          "strength": 0.0
+        }
+      ]
+    },
+    "interaction_strengths": {
+      "plurality": {
+        "l1_l2": 15.5,
+        "l1_cosine": 15.5,
+        "l1_chebyshev": 15.5,
+        "l2_l1": 0.0,
+        "l2_cosine": 0.0,
+        "l2_chebyshev": 0.0,
+        "cosine_l1": 57.99999999999999,
+        "cosine_l2": 57.99999999999999,
+        "cosine_chebyshev": 57.99999999999999,
+        "chebyshev_l1": 11.0,
+        "chebyshev_l2": 11.0,
+        "chebyshev_cosine": 11.0
+      },
+      "borda": {
+        "l1_l2": 17.5,
+        "l1_cosine": 17.5,
+        "l1_chebyshev": 17.5,
+        "l2_l1": 0.0,
+        "l2_cosine": 0.0,
+        "l2_chebyshev": 0.0,
+        "cosine_l1": 57.49999999999999,
+        "cosine_l2": 57.49999999999999,
+        "cosine_chebyshev": 57.49999999999999,
+        "chebyshev_l1": 14.000000000000002,
+        "chebyshev_l2": 14.000000000000002,
+        "chebyshev_cosine": 14.000000000000002
+      },
+      "irv": {
+        "l1_l2": 21.0,
+        "l1_cosine": 21.0,
+        "l1_chebyshev": 21.0,
+        "l2_l1": 0.0,
+        "l2_cosine": 0.0,
+        "l2_chebyshev": 0.0,
+        "cosine_l1": 62.0,
+        "cosine_l2": 62.0,
+        "cosine_chebyshev": 62.0,
+        "chebyshev_l1": 14.499999999999998,
+        "chebyshev_l2": 14.499999999999998,
+        "chebyshev_cosine": 14.499999999999998
+      }
+    }
+  },
+  "condorcet_paradox": {}
+}

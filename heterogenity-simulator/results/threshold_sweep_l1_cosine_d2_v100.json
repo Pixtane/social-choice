@@ -1,0 +1,751 @@
+{
+  "center_metric": "l1",
+  "extreme_metric": "cosine",
+  "dimension": 2,
+  "n_voters": 100,
+  "thresholds": [
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.25,
+    0.3,
+    0.35,
+    0.39999999999999997,
+    0.44999999999999996,
+    0.49999999999999994,
+    0.5499999999999999,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.7999999999999999,
+    0.85,
+    0.9,
+    0.95
+  ],
+  "data": {
+    "0.05": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.10": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.15": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.20": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.25": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.30": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.35": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.40": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.45": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.50": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.55": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.60": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.65": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.70": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.75": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.80": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.85": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.90": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    },
+    "0.95": {
+      "plurality": {
+        "disagreement_rate": 15.5,
+        "vse_het": 0.8612232894175071,
+        "vse_homo": 0.8196263473644595,
+        "vse_difference": 0.04159694205304765,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 56.41025641025641,
+        "condorcet_efficiency_homo": 47.252747252747255,
+        "condorcet_efficiency_delta": 9.157509157509153
+      },
+      "borda": {
+        "disagreement_rate": 17.5,
+        "vse_het": 0.9893381407884388,
+        "vse_homo": 0.9617227300740291,
+        "vse_difference": 0.02761541071440976,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 87.6923076923077,
+        "condorcet_efficiency_homo": 84.61538461538461,
+        "condorcet_efficiency_delta": 3.07692307692308
+      },
+      "irv": {
+        "disagreement_rate": 21.0,
+        "vse_het": 0.9569725739960837,
+        "vse_homo": 0.9473662272361355,
+        "vse_difference": 0.009606346759948203,
+        "cycle_rate_het": 93.0,
+        "cycle_rate_homo": 95.0,
+        "cycle_rate_delta": -2.0,
+        "condorcet_efficiency_het": 76.92307692307692,
+        "condorcet_efficiency_homo": 75.27472527472527,
+        "condorcet_efficiency_delta": 1.6483516483516496
+      }
+    }
+  }
+}
