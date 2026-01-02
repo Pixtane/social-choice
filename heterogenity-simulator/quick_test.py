@@ -16,7 +16,7 @@ def main():
     print("=" * 80)
     print("QUICK TEST: Verifying Research Pipeline")
     print("=" * 80)
-    
+
     # Minimal config for testing
     config = ResearchConfig(
         base_n_profiles=10,  # Very small for testing
@@ -29,9 +29,9 @@ def main():
         metrics=['l2', 'cosine'],  # Just 2 metrics
         voting_rules=['plurality']  # Just one rule
     )
-    
+
     researcher = HeterogeneityResearcher(config)
-    
+
     print("\nRunning minimal voter scaling test...")
     result = researcher.experiment_voter_scaling(
         center_metric='l2',
@@ -39,7 +39,7 @@ def main():
         threshold=0.5,
         dimension=2
     )
-    
+
     print("\n" + "=" * 80)
     print("TEST COMPLETE")
     print("=" * 80)
@@ -50,8 +50,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-

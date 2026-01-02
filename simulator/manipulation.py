@@ -567,3 +567,4 @@ def compute_manipulation_impact(
 
 
 
+

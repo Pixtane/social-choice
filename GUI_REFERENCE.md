@@ -333,3 +333,4 @@ python run_gui.py
 **Version**: 1.0.0 | **Date**: December 30, 2025
 
 **More help**: See `GUI_INDEX.md` for complete documentation index
+

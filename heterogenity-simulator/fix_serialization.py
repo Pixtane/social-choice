@@ -22,7 +22,7 @@ def make_serializable(obj: Any) -> Any:
             return float(obj)
         elif np.issubdtype(type(obj), np.bool_):
             return bool(obj)
-    
+
     # Handle standard types
     if isinstance(obj, dict):
         return {key: make_serializable(value) for key, value in obj.items()}
@@ -37,19 +37,19 @@ def make_serializable(obj: Any) -> Any:
 def fix_json_file(filepath: Path):
     """Fix serialization issues in a JSON file."""
     print(f"Processing {filepath.name}...")
-    
+
     try:
         # Try to load
         with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        
+
         # Convert to serializable
         data_fixed = make_serializable(data)
-        
+
         # Write back
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data_fixed, f, indent=2, ensure_ascii=False)
-        
+
         print(f"  [OK] Fixed {filepath.name}")
         return True
     except json.JSONDecodeError as e:
@@ -62,18 +62,17 @@ def fix_json_file(filepath: Path):
 
 def main():
     results_dir = Path("heterogenity-simulator/results")
-    
+
     json_files = list(results_dir.glob("*.json"))
     print(f"Found {len(json_files)} JSON files to process\n")
-    
+
     fixed_count = 0
     for filepath in json_files:
         if fix_json_file(filepath):
             fixed_count += 1
-    
+
     print(f"\nFixed {fixed_count}/{len(json_files)} files")
 
 
 if __name__ == "__main__":
     main()
-
