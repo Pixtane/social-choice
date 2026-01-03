@@ -41,7 +41,7 @@ class TestResult:
 
 class HeterogeneityTestSuite:
     """Systematic test suite for heterogeneity research."""
-    
+
     def __init__(
         self,
         base_n_profiles: int = 100,
@@ -51,7 +51,7 @@ class HeterogeneityTestSuite:
     ):
         """
         Initialize test suite.
-        
+
         Args:
             base_n_profiles: Default number of profiles per test
             base_n_voters: Default number of voters
@@ -63,10 +63,17 @@ class HeterogeneityTestSuite:
         self.base_n_candidates = base_n_candidates
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         self.results: List[TestResult] = []
-        self.rng = np.random.default_rng(42)
-    
+        self.base_rng_seed = 42
+        self._seed_counter = 0  # Counter for generating unique seeds
+
+    def _get_next_seed(self) -> int:
+        """Get next unique seed for independent Monte Carlo runs."""
+        seed = self.base_rng_seed + self._seed_counter
+        self._seed_counter += 1
+        return seed
+
     def test_baseline_characterization(
         self,
         voting_rules: Optional[List[str]] = None,
@@ -74,28 +81,28 @@ class HeterogeneityTestSuite:
     ) -> Dict[str, Any]:
         """
         Phase 1: Characterize baseline homogeneous distance metrics.
-        
+
         Tests all 4 metrics (L1, L2, Cosine, Chebyshev) separately.
         """
         if voting_rules is None:
             voting_rules = ['plurality', 'borda', 'irv', 'approval', 'star', 'schulze']
-        
+
         if n_profiles is None:
             n_profiles = self.base_n_profiles
-        
+
         print("=" * 80)
         print("PHASE 1: BASELINE CHARACTERIZATION")
         print("=" * 80)
         print(f"Testing {len(voting_rules)} voting rules with {n_profiles} profiles")
         print()
-        
+
         baseline_results = {}
         metrics = ['l1', 'l2', 'cosine', 'chebyshev']
-        
+
         for metric in metrics:
             print(f"Testing {metric.upper()}...", end=" ", flush=True)
             start_time = time.perf_counter()
-            
+
             config = SimulationConfig(
                 n_profiles=n_profiles,
                 n_voters=self.base_n_voters,
@@ -106,11 +113,12 @@ class HeterogeneityTestSuite:
                     function='linear',
                     distance_metric=metric,
                     heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
-                )
+                ),
+                rng_seed=self._get_next_seed()
             )
-            
+
             result = run_experiment(config, save_results=False, verbose=False)
-            
+
             # Extract metrics
             metric_data = {}
             for rule in voting_rules:
@@ -122,20 +130,20 @@ class HeterogeneityTestSuite:
                         'condorcet_efficiency': rule_result.aggregate_metrics.condorcet_efficiency,
                         'cycle_percentage': rule_result.aggregate_metrics.cycle_percentage,
                     }
-            
+
             elapsed = time.perf_counter() - start_time
             print(f"Done ({elapsed:.2f}s)")
-            
+
             baseline_results[metric] = metric_data
-        
+
         # Save results
         output_file = self.output_dir / "baseline_characterization.json"
         with open(output_file, 'w') as f:
             json.dump(baseline_results, f, indent=2)
-        
+
         print(f"\nResults saved to: {output_file}")
         return baseline_results
-    
+
     def test_threshold_sweep(
         self,
         center_metric: str = 'l2',
@@ -146,7 +154,7 @@ class HeterogeneityTestSuite:
     ) -> Dict[str, Any]:
         """
         Phase 2a: Sweep threshold parameter for center-extreme strategy.
-        
+
         Args:
             center_metric: Metric for center voters
             extreme_metric: Metric for extreme voters
@@ -156,30 +164,34 @@ class HeterogeneityTestSuite:
         """
         if thresholds is None:
             thresholds = np.arange(0.1, 1.0, 0.1)
-        
+
         if voting_rules is None:
             voting_rules = ['plurality', 'borda', 'irv', 'approval', 'star']
-        
+
         if n_profiles is None:
             n_profiles = self.base_n_profiles
-        
+
         print("=" * 80)
         print(f"PHASE 2a: THRESHOLD SWEEP ({center_metric.upper()} + {extreme_metric.upper()})")
         print("=" * 80)
         print(f"Testing {len(thresholds)} thresholds with {n_profiles} profiles")
         print()
-        
+
         sweep_results = {
             'center_metric': center_metric,
             'extreme_metric': extreme_metric,
             'thresholds': thresholds.tolist(),
             'results': {}
         }
-        
+
         for threshold in thresholds:
             print(f"Threshold {threshold:.1f}...", end=" ", flush=True)
             start_time = time.perf_counter()
-            
+
+            # Get unique seeds for this iteration
+            seed_het = self._get_next_seed()
+            seed_homo = self._get_next_seed()
+
             config = SimulationConfig(
                 n_profiles=n_profiles,
                 n_voters=self.base_n_voters,
@@ -196,11 +208,12 @@ class HeterogeneityTestSuite:
                         extreme_metric=extreme_metric,
                         extreme_threshold=float(threshold)
                     )
-                )
+                ),
+                rng_seed=seed_het
             )
-            
+
             result = run_experiment(config, save_results=False, verbose=False)
-            
+
             # Also run homogeneous baseline for comparison
             config_homo = SimulationConfig(
                 n_profiles=n_profiles,
@@ -212,45 +225,46 @@ class HeterogeneityTestSuite:
                     function='linear',
                     distance_metric=center_metric,
                     heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
-                )
+                ),
+                rng_seed=seed_homo
             )
             result_homo = run_experiment(config_homo, save_results=False, verbose=False)
-            
+
             # Compute comparison metrics
             threshold_data = {}
             for rule in voting_rules:
                 if rule in result.rule_results and rule in result_homo.rule_results:
                     het_result = result.rule_results[rule]
                     homo_result = result_homo.rule_results[rule]
-                    
+
                     # Compute disagreement
                     winners_het = np.array([m.winner_index for m in het_result.profile_metrics])
                     winners_homo = np.array([m.winner_index for m in homo_result.profile_metrics])
                     disagreement = np.mean(winners_het != winners_homo) * 100
-                    
+
                     threshold_data[rule] = {
                         'vse_heterogeneous': het_result.aggregate_metrics.vse_mean,
                         'vse_homogeneous': homo_result.aggregate_metrics.vse_mean,
-                        'vse_difference': (het_result.aggregate_metrics.vse_mean - 
+                        'vse_difference': (het_result.aggregate_metrics.vse_mean -
                                          homo_result.aggregate_metrics.vse_mean),
                         'disagreement_rate': disagreement,
                         'condorcet_efficiency_het': het_result.aggregate_metrics.condorcet_efficiency,
                         'condorcet_efficiency_homo': homo_result.aggregate_metrics.condorcet_efficiency,
                     }
-            
+
             sweep_results['results'][f"{threshold:.1f}"] = threshold_data
-            
+
             elapsed = time.perf_counter() - start_time
             print(f"Done ({elapsed:.2f}s)")
-        
+
         # Save results
         output_file = self.output_dir / f"threshold_sweep_{center_metric}_{extreme_metric}.json"
         with open(output_file, 'w') as f:
             json.dump(sweep_results, f, indent=2)
-        
+
         print(f"\nResults saved to: {output_file}")
         return sweep_results
-    
+
     def test_all_metric_pairs(
         self,
         thresholds: Optional[np.ndarray] = None,
@@ -259,21 +273,21 @@ class HeterogeneityTestSuite:
     ) -> Dict[str, Any]:
         """
         Phase 2b: Test all metric pairs with threshold sweep.
-        
+
         Tests all combinations of center/extreme metrics.
         """
         if thresholds is None:
             thresholds = np.array([0.3, 0.5, 0.7])  # Key thresholds
-        
+
         if voting_rules is None:
             voting_rules = ['plurality', 'borda', 'irv']
-        
+
         if n_profiles is None:
             n_profiles = 50  # Smaller for comprehensive test
-        
+
         metrics = ['l1', 'l2', 'cosine', 'chebyshev']
         metric_pairs = [(c, e) for c in metrics for e in metrics if c != e]
-        
+
         print("=" * 80)
         print("PHASE 2b: ALL METRIC PAIRS")
         print("=" * 80)
@@ -281,13 +295,13 @@ class HeterogeneityTestSuite:
         print(f"Each with {len(thresholds)} thresholds")
         print(f"{n_profiles} profiles per configuration")
         print()
-        
+
         all_results = {}
-        
+
         for center_metric, extreme_metric in metric_pairs:
             pair_name = f"{center_metric}_{extreme_metric}"
             print(f"\nTesting {pair_name}...")
-            
+
             pair_results = self.test_threshold_sweep(
                 center_metric=center_metric,
                 extreme_metric=extreme_metric,
@@ -295,17 +309,17 @@ class HeterogeneityTestSuite:
                 voting_rules=voting_rules,
                 n_profiles=n_profiles
             )
-            
+
             all_results[pair_name] = pair_results
-        
+
         # Save combined results
         output_file = self.output_dir / "all_metric_pairs.json"
         with open(output_file, 'w') as f:
             json.dump(all_results, f, indent=2)
-        
+
         print(f"\nAll results saved to: {output_file}")
         return all_results
-    
+
     def test_geometry_effects(
         self,
         geometries: Optional[List[str]] = None,
@@ -315,7 +329,7 @@ class HeterogeneityTestSuite:
     ) -> Dict[str, Any]:
         """
         Phase 3a: Test heterogeneity effects across different geometries.
-        
+
         Args:
             geometries: List of geometry methods to test
             het_config: Heterogeneous distance configuration
@@ -324,7 +338,7 @@ class HeterogeneityTestSuite:
         """
         if geometries is None:
             geometries = ['uniform', 'polarized', 'clustered', 'single_peaked']
-        
+
         if het_config is None:
             het_config = HeterogeneousDistanceConfig(
                 enabled=True,
@@ -333,25 +347,29 @@ class HeterogeneityTestSuite:
                 extreme_metric='cosine',
                 extreme_threshold=0.5
             )
-        
+
         if voting_rules is None:
             voting_rules = ['plurality', 'borda', 'irv']
-        
+
         if n_profiles is None:
             n_profiles = self.base_n_profiles
-        
+
         print("=" * 80)
         print("PHASE 3a: GEOMETRY EFFECTS")
         print("=" * 80)
         print(f"Testing {len(geometries)} geometries with {n_profiles} profiles")
         print()
-        
+
         geometry_results = {}
-        
+
         for geometry in geometries:
             print(f"Testing {geometry}...", end=" ", flush=True)
             start_time = time.perf_counter()
-            
+
+            # Get unique seeds for this iteration
+            seed_het = self._get_next_seed()
+            seed_homo = self._get_next_seed()
+
             # Heterogeneous
             config_het = SimulationConfig(
                 n_profiles=n_profiles,
@@ -363,10 +381,11 @@ class HeterogeneityTestSuite:
                     function='linear',
                     distance_metric='l2',
                     heterogeneous_distance=het_config
-                )
+                ),
+                rng_seed=seed_het
             )
             result_het = run_experiment(config_het, save_results=False, verbose=False)
-            
+
             # Homogeneous baseline
             config_homo = SimulationConfig(
                 n_profiles=n_profiles,
@@ -378,40 +397,41 @@ class HeterogeneityTestSuite:
                     function='linear',
                     distance_metric='l2',
                     heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
-                )
+                ),
+                rng_seed=seed_homo
             )
             result_homo = run_experiment(config_homo, save_results=False, verbose=False)
-            
+
             # Compare
             geometry_data = {}
             for rule in voting_rules:
                 if rule in result_het.rule_results and rule in result_homo.rule_results:
                     het_result = result_het.rule_results[rule]
                     homo_result = result_homo.rule_results[rule]
-                    
+
                     winners_het = np.array([m.winner_index for m in het_result.profile_metrics])
                     winners_homo = np.array([m.winner_index for m in homo_result.profile_metrics])
                     disagreement = np.mean(winners_het != winners_homo) * 100
-                    
+
                     geometry_data[rule] = {
                         'disagreement_rate': disagreement,
-                        'vse_difference': (het_result.aggregate_metrics.vse_mean - 
+                        'vse_difference': (het_result.aggregate_metrics.vse_mean -
                                          homo_result.aggregate_metrics.vse_mean),
                     }
-            
+
             geometry_results[geometry] = geometry_data
-            
+
             elapsed = time.perf_counter() - start_time
             print(f"Done ({elapsed:.2f}s)")
-        
+
         # Save results
         output_file = self.output_dir / "geometry_effects.json"
         with open(output_file, 'w') as f:
             json.dump(geometry_results, f, indent=2)
-        
+
         print(f"\nResults saved to: {output_file}")
         return geometry_results
-    
+
     def test_dimensionality_effects(
         self,
         dimensions: Optional[List[int]] = None,
@@ -421,7 +441,7 @@ class HeterogeneityTestSuite:
     ) -> Dict[str, Any]:
         """
         Phase 3c: Test how heterogeneity effects change with dimensionality.
-        
+
         Args:
             dimensions: List of dimensions to test
             het_config: Heterogeneous distance configuration
@@ -430,7 +450,7 @@ class HeterogeneityTestSuite:
         """
         if dimensions is None:
             dimensions = [1, 2, 3, 5, 10]
-        
+
         if het_config is None:
             het_config = HeterogeneousDistanceConfig(
                 enabled=True,
@@ -439,25 +459,29 @@ class HeterogeneityTestSuite:
                 extreme_metric='cosine',
                 extreme_threshold=0.5
             )
-        
+
         if voting_rules is None:
             voting_rules = ['plurality', 'borda', 'irv']
-        
+
         if n_profiles is None:
             n_profiles = self.base_n_profiles
-        
+
         print("=" * 80)
         print("PHASE 3c: DIMENSIONALITY EFFECTS")
         print("=" * 80)
         print(f"Testing {len(dimensions)} dimensions with {n_profiles} profiles")
         print()
-        
+
         dim_results = {}
-        
+
         for n_dim in dimensions:
             print(f"Testing {n_dim}D...", end=" ", flush=True)
             start_time = time.perf_counter()
-            
+
+            # Get unique seeds for this iteration
+            seed_het = self._get_next_seed()
+            seed_homo = self._get_next_seed()
+
             # Heterogeneous
             config_het = SimulationConfig(
                 n_profiles=n_profiles,
@@ -469,10 +493,11 @@ class HeterogeneityTestSuite:
                     function='linear',
                     distance_metric='l2',
                     heterogeneous_distance=het_config
-                )
+                ),
+                rng_seed=seed_het
             )
             result_het = run_experiment(config_het, save_results=False, verbose=False)
-            
+
             # Homogeneous baseline
             config_homo = SimulationConfig(
                 n_profiles=n_profiles,
@@ -484,47 +509,48 @@ class HeterogeneityTestSuite:
                     function='linear',
                     distance_metric='l2',
                     heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
-                )
+                ),
+                rng_seed=seed_homo
             )
             result_homo = run_experiment(config_homo, save_results=False, verbose=False)
-            
+
             # Compare
             dim_data = {}
             for rule in voting_rules:
                 if rule in result_het.rule_results and rule in result_homo.rule_results:
                     het_result = result_het.rule_results[rule]
                     homo_result = result_homo.rule_results[rule]
-                    
+
                     winners_het = np.array([m.winner_index for m in het_result.profile_metrics])
                     winners_homo = np.array([m.winner_index for m in homo_result.profile_metrics])
                     disagreement = np.mean(winners_het != winners_homo) * 100
-                    
+
                     dim_data[rule] = {
                         'disagreement_rate': disagreement,
-                        'vse_difference': (het_result.aggregate_metrics.vse_mean - 
+                        'vse_difference': (het_result.aggregate_metrics.vse_mean -
                                          homo_result.aggregate_metrics.vse_mean),
                     }
-            
+
             dim_results[n_dim] = dim_data
-            
+
             elapsed = time.perf_counter() - start_time
             print(f"Done ({elapsed:.2f}s)")
-        
+
         # Save results
         output_file = self.output_dir / "dimensionality_effects.json"
         with open(output_file, 'w') as f:
             json.dump(dim_results, f, indent=2)
-        
+
         print(f"\nResults saved to: {output_file}")
         return dim_results
-    
+
     def run_full_suite(
         self,
         quick_mode: bool = False
     ) -> Dict[str, Any]:
         """
         Run the complete test suite.
-        
+
         Args:
             quick_mode: If True, use smaller parameters for faster execution
         """
@@ -532,21 +558,21 @@ class HeterogeneityTestSuite:
         print("HETEROGENEITY RESEARCH - FULL TEST SUITE")
         print("=" * 80)
         print()
-        
+
         if quick_mode:
             n_profiles = 20
             print("QUICK MODE: Using reduced parameters")
         else:
             n_profiles = self.base_n_profiles
-        
+
         all_results = {}
-        
+
         # Phase 1: Baseline
         print("\n" + "=" * 80)
         all_results['baseline'] = self.test_baseline_characterization(
             n_profiles=n_profiles
         )
-        
+
         # Phase 2: Threshold sweep (key pair)
         print("\n" + "=" * 80)
         all_results['threshold_sweep'] = self.test_threshold_sweep(
@@ -554,34 +580,34 @@ class HeterogeneityTestSuite:
             extreme_metric='cosine',
             n_profiles=n_profiles
         )
-        
+
         # Phase 3: Context effects
         print("\n" + "=" * 80)
         all_results['geometry_effects'] = self.test_geometry_effects(
             n_profiles=n_profiles
         )
-        
+
         all_results['dimensionality_effects'] = self.test_dimensionality_effects(
             n_profiles=n_profiles
         )
-        
+
         # Save combined results
         output_file = self.output_dir / "full_suite_results.json"
         with open(output_file, 'w') as f:
             json.dump(all_results, f, indent=2)
-        
+
         print("\n" + "=" * 80)
         print("FULL SUITE COMPLETE")
         print(f"All results saved to: {output_file}")
         print("=" * 80)
-        
+
         return all_results
 
 
 def main():
     """Main entry point for running tests."""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Run heterogeneity research tests")
     parser.add_argument(
         '--quick', action='store_true',
@@ -593,11 +619,11 @@ def main():
         default='all',
         help='Which phase to run'
     )
-    
+
     args = parser.parse_args()
-    
+
     suite = HeterogeneityTestSuite()
-    
+
     if args.phase == 'all':
         suite.run_full_suite(quick_mode=args.quick)
     elif args.phase == 'baseline':
@@ -612,4 +638,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

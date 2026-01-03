@@ -194,7 +194,7 @@ Our simulation framework implements a comprehensive Monte Carlo approach to elec
     \item \textbf{Spatial Sampling}: Voters and candidates are sampled uniformly from $[-1,1]^d$ to enable full angular range for cosine distance.
     \item \textbf{Voter Counts}: Base experiments use $n=100$ voters per profile, with scaling tests from 10 to 500 voters.
     \item \textbf{Candidate Count}: Fixed at $M=5$ candidates per profile.
-    \item \textbf{Random Seed}: Fixed seed (42) for reproducibility.
+    \item \textbf{Random Seeds}: Monte Carlo experiments use unique seeds (42, 43, 44, \ldots) for each run to ensure statistical independence. Visualizations and single-run scripts use fixed seed 42 for reproducibility.
 \end{itemize}
 
 For each profile, we compute:
@@ -209,29 +209,29 @@ For each profile, we compute:
 
 \subsection{Relative Utility Normalization: Best-Worst Scaling}
 
-A fundamental challenge in spatial voting is interpersonal utility comparison. We solve this through per-voter normalization to the $[0,1]$ range using a \textit{linear} utility function (not Gaussian). All experiments in this study use linear utility consistently.
+Comparing utilities across voters presents a fundamental challenge in spatial voting models, as different voters may perceive distances differently depending on their assigned metric. To address this, we employ a per-voter normalization scheme that maps utilities to the $[0,1]$ interval using a \textit{linear} utility transformation. Throughout this study, we consistently use linear utility functions rather than Gaussian or other non-linear forms.
 
 \begin{definition}[Linear Utility with Best-Worst Scaling]
-    For voter $v$ with position $\mathbf{x}_v$ and candidate $c$ with position $\mathbf{y}_c$:
+    Given voter $v$ at position $\mathbf{x}_v$ and candidate $c$ at position $\mathbf{y}_c$, we first compute raw utilities from distances:
     \begin{align}
-        u_{v,c} = 1 - \frac{d(\mathbf{x}_v, \mathbf{y}_c)}{d_{\max,v}}
+        \tilde{u}_{v,c} = -d(\mathbf{x}_v, \mathbf{y}_c)
     \end{align}
-    where $d_{\max,v}$ is the maximum possible distance from voter $v$ to any point in the hypercube, computed as the distance to the "opposite corner":
+    where $d$ denotes the distance metric assigned to voter $v$ (which may vary across voters in heterogeneous metric configurations). These raw utilities are then normalized per-voter via best-worst scaling:
     \begin{align}
-        d_{\max,v} = d(\mathbf{x}_v, \text{opposite}(\mathbf{x}_v))
+        u_{v,c} = \frac{\tilde{u}_{v,c} - \min_{c'} \tilde{u}_{v,c'}}{\max_{c'} \tilde{u}_{v,c'} - \min_{c'} \tilde{u}_{v,c'}}
     \end{align}
+    This transformation guarantees that each voter's most preferred candidate (nearest in their assigned metric) receives utility 1, their least preferred candidate (farthest) receives utility 0, and all other candidates receive utilities linearly interpolated between these bounds.
 \end{definition}
 
-This normalization ensures:
+The best-worst scaling normalization provides several key properties:
 \begin{itemize}
-    \item $u_{v,c} \in [0,1]$ for all voters and candidates
-    \item Each voter's best candidate (closest) has utility 1
-    \item Each voter's worst candidate (farthest) has utility 0
-    \item Utilities are comparable across voters despite different distance metrics
-    \item \textbf{Linear relationship}: Utility decreases linearly with distance (not exponentially as in Gaussian models)
+    \item \textbf{Bounded utilities}: $u_{v,c} \in [0,1]$ for all voter-candidate pairs, enabling meaningful aggregation across voters
+    \item \textbf{Best candidate normalization}: Each voter's closest candidate (under their assigned metric) always receives utility 1
+    \item \textbf{Worst candidate normalization}: Each voter's farthest candidate always receives utility 0
+    \item \textbf{Metric preservation}: Utilities faithfully encode the distance relationships computed using each voter's specific distance metric
+    \item \textbf{Linear decay}: Utility decreases linearly with distance, in contrast to exponential decay in Gaussian utility models
+    \item \textbf{Profile-relative scaling}: Utilities are normalized relative only to the candidates present in each electoral profile, with no absolute distance thresholds
 \end{itemize}
-
-The opposite corner is defined coordinate-wise: for each dimension $i$, we choose the bound ($-1$ or $+1$) that is farthest from $x_{v,i}$.
 
 \subsubsection{Disagreement Measure Decomposition}
 

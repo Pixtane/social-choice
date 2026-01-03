@@ -94,6 +94,7 @@ class HeterogeneityResearcher:
         self.output_dir = Path(config.output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.rng = np.random.default_rng(config.rng_seed)
+        self._seed_counter = 0  # Counter for generating unique seeds
 
         # Results storage
         self.results = {
@@ -101,6 +102,12 @@ class HeterogeneityResearcher:
             'timestamp': datetime.now().isoformat(),
             'experiments': {}
         }
+
+    def _get_next_seed(self) -> int:
+        """Get next unique seed for independent Monte Carlo runs."""
+        seed = self.config.rng_seed + self._seed_counter
+        self._seed_counter += 1
+        return seed
 
     def compute_disagreement(
         self,
@@ -178,8 +185,11 @@ class HeterogeneityResearcher:
         voting_rules: List[str],
         dimension: int,
         baseline_metric: str,
+        rng_seed: Optional[int] = None
     ) -> ExperimentResult:
         """Run a homogeneous simulation using a single baseline distance metric."""
+        if rng_seed is None:
+            rng_seed = self._get_next_seed()
         config_homo = SimulationConfig(
             n_profiles=n_profiles,
             n_voters=n_voters,
@@ -191,7 +201,7 @@ class HeterogeneityResearcher:
                 distance_metric=baseline_metric,
                 heterogeneous_distance=HeterogeneousDistanceConfig(enabled=False)
             ),
-            rng_seed=self.config.rng_seed
+            rng_seed=rng_seed
         )
         return run_experiment(config_homo, save_results=False, verbose=False)
 
@@ -359,6 +369,11 @@ class HeterogeneityResearcher:
             print(f"\nTesting with {n_voters} voters...", end=" ", flush=True)
             start_time = time.perf_counter()
 
+            # Get unique seeds for this iteration
+            seed_het = self._get_next_seed()
+            seed_homo_center = self._get_next_seed()
+            seed_homo_extreme = self._get_next_seed()
+
             # Heterogeneous
             config_het = SimulationConfig(
                 n_profiles=self.config.base_n_profiles,
@@ -378,7 +393,7 @@ class HeterogeneityResearcher:
                         extreme_threshold=threshold
                     )
                 ),
-                rng_seed=self.config.rng_seed
+                rng_seed=seed_het
             )
             result_het = run_experiment(config_het, save_results=False, verbose=False)
             results['effective_radius_by_voters'][str(n_voters)] = self.compute_effective_radius_stats(result_het)
@@ -392,6 +407,7 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=center_metric,
+                rng_seed=seed_homo_center
             )
             result_homo_extreme = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
@@ -400,6 +416,7 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=extreme_metric,
+                rng_seed=seed_homo_extreme
             )
 
             voter_data = {}
@@ -485,6 +502,11 @@ class HeterogeneityResearcher:
             print(f"Threshold {threshold:.2f}...", end=" ", flush=True)
             start_time = time.perf_counter()
 
+            # Get unique seeds for this iteration
+            seed_het = self._get_next_seed()
+            seed_homo_center = self._get_next_seed()
+            seed_homo_extreme = self._get_next_seed()
+
             # Heterogeneous
             config_het = SimulationConfig(
                 n_profiles=self.config.base_n_profiles,
@@ -504,7 +526,7 @@ class HeterogeneityResearcher:
                         extreme_threshold=float(threshold)
                     )
                 ),
-                rng_seed=self.config.rng_seed
+                rng_seed=seed_het
             )
             result_het = run_experiment(config_het, save_results=False, verbose=False)
             results['effective_radius_by_threshold'][f"{threshold:.2f}"] = self.compute_effective_radius_stats(result_het)
@@ -518,6 +540,7 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=center_metric,
+                rng_seed=seed_homo_center
             )
             result_homo_extreme = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
@@ -526,6 +549,7 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=extreme_metric,
+                rng_seed=seed_homo_extreme
             )
 
             threshold_data = {}
@@ -610,6 +634,11 @@ class HeterogeneityResearcher:
             print(f"\nTesting dimension {dimension}...", end=" ", flush=True)
             start_time = time.perf_counter()
 
+            # Get unique seeds for this iteration
+            seed_het = self._get_next_seed()
+            seed_homo_center = self._get_next_seed()
+            seed_homo_extreme = self._get_next_seed()
+
             # Heterogeneous
             config_het = SimulationConfig(
                 n_profiles=self.config.base_n_profiles,
@@ -629,7 +658,7 @@ class HeterogeneityResearcher:
                         extreme_threshold=threshold
                     )
                 ),
-                rng_seed=self.config.rng_seed
+                rng_seed=seed_het
             )
             result_het = run_experiment(config_het, save_results=False, verbose=False)
             results['effective_radius_by_dimension'][str(dimension)] = self.compute_effective_radius_stats(result_het)
@@ -643,6 +672,7 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=center_metric,
+                rng_seed=seed_homo_center
             )
             result_homo_extreme = self._run_homogeneous_baseline(
                 n_profiles=self.config.base_n_profiles,
@@ -651,6 +681,7 @@ class HeterogeneityResearcher:
                 voting_rules=self.config.voting_rules,
                 dimension=dimension,
                 baseline_metric=extreme_metric,
+                rng_seed=seed_homo_extreme
             )
 
             dim_data = {}
@@ -740,6 +771,12 @@ class HeterogeneityResearcher:
                 print(f"\nTesting {pair_name}...", end=" ", flush=True)
                 start_time = time.perf_counter()
 
+                # Get unique seeds for this iteration
+                seed_het_ab = self._get_next_seed()
+                seed_het_ba = self._get_next_seed()
+                seed_homo_center_ab = self._get_next_seed()
+                seed_homo_center_ba = self._get_next_seed()
+
                 # Heterogeneous (A -> B)
                 config_het = SimulationConfig(
                     n_profiles=self.config.base_n_profiles,
@@ -759,7 +796,7 @@ class HeterogeneityResearcher:
                             extreme_threshold=threshold
                         )
                     ),
-                    rng_seed=self.config.rng_seed
+                    rng_seed=seed_het_ab
                 )
                 result_het_ab = run_experiment(config_het, save_results=False, verbose=False)
                 effective_radius_ab = self.compute_effective_radius_stats(result_het_ab)
@@ -784,7 +821,7 @@ class HeterogeneityResearcher:
                             extreme_threshold=threshold
                         )
                     ),
-                    rng_seed=self.config.rng_seed
+                    rng_seed=seed_het_ba
                 )
                 result_het_ba = run_experiment(config_het_rev, save_results=False, verbose=False)
                 effective_radius_ba = self.compute_effective_radius_stats(result_het_ba)
@@ -799,6 +836,7 @@ class HeterogeneityResearcher:
                     voting_rules=self.config.voting_rules,
                     dimension=dimension,
                     baseline_metric=center_metric,
+                    rng_seed=seed_homo_center_ab
                 )
                 result_homo_center_ba = self._run_homogeneous_baseline(
                     n_profiles=self.config.base_n_profiles,
@@ -807,6 +845,7 @@ class HeterogeneityResearcher:
                     voting_rules=self.config.voting_rules,
                     dimension=dimension,
                     baseline_metric=extreme_metric,
+                    rng_seed=seed_homo_center_ba
                 )
                 # Secondary comparison baseline aligned with each heterogeneous run's extreme metric.
                 # These are the same two homogeneous runs as above, just swapped.

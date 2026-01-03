@@ -15,15 +15,15 @@ from .heterogeneous_distance import create_strategy
 def utilities_to_rankings(utilities: np.ndarray, epsilon: float = 1e-9) -> np.ndarray:
     """
     Convert utilities to preference rankings.
-    
+
     Args:
         utilities: (n_voters, n_candidates) utility matrix
         epsilon: Tolerance for considering utilities as tied
-    
+
     Returns:
         (n_voters, n_candidates) ranking matrix where ranking[v] is a permutation
         of [0, 1, ..., n_candidates-1] in preference order (best first)
-    
+
     Notes:
         - Epsilon-ties are broken arbitrarily (by index order via argsort stability)
     """
@@ -39,23 +39,23 @@ def compute_distances(
 ) -> np.ndarray:
     """
     Compute distances between voters and candidates.
-    
+
     Args:
         voter_positions: (n_voters, n_dim) array of voter positions
         candidate_positions: (n_candidates, n_dim) array of candidate positions
         metric: Distance metric to use ('l2', 'l1', 'linf', 'cosine')
-    
+
     Returns:
         (n_voters, n_candidates) distance matrix
     """
     n_voters = voter_positions.shape[0]
     n_candidates = candidate_positions.shape[0]
     distances = np.zeros((n_voters, n_candidates))
-    
+
     for v in range(n_voters):
         for c in range(n_candidates):
             diff = voter_positions[v] - candidate_positions[c]
-            
+
             if metric == 'l2':
                 distances[v, c] = np.linalg.norm(diff, ord=2)
             elif metric == 'l1':
@@ -72,7 +72,7 @@ def compute_distances(
                 distances[v, c] = 1.0 - cos_sim
             else:
                 raise ValueError(f"Unknown metric: {metric}")
-    
+
     return distances
 
 
@@ -119,16 +119,16 @@ def _pointwise_distance(
 
 class UtilityComputer:
     """Computes utilities from spatial distances."""
-    
+
     def __init__(self, config: UtilityConfig):
         """
         Initialize utility computer.
-        
+
         Args:
             config: Utility configuration
         """
         self.config = config
-    
+
     def compute_distances(
         self,
         voter_positions: np.ndarray,
@@ -137,11 +137,11 @@ class UtilityComputer:
     ) -> np.ndarray:
         """
         Compute distances between voters and candidates.
-        
+
         Args:
             voter_positions: (n_voters, n_dim) array
             candidate_positions: (n_candidates, n_dim) array
-        
+
         Returns:
             (n_voters, n_candidates) distance matrix
         """
@@ -163,7 +163,7 @@ class UtilityComputer:
             candidate_positions,
             self.config.distance_metric,
         )
-    
+
     def compute_utilities(
         self,
         distances: np.ndarray,
@@ -174,21 +174,21 @@ class UtilityComputer:
     ) -> np.ndarray:
         """
         Convert distances to utilities.
-        
+
         Args:
             distances: (n_voters, n_candidates) distance matrix
             n_dim: Number of spatial dimensions
-        
+
         Returns:
             (n_voters, n_candidates) utility matrix
         """
         utility_func = self.config.function
-        
+
         if utility_func == 'gaussian':
             # Gaussian: u = exp(-d² / (2 * sigma²))
             sigma = self.config.sigma_factor * np.sqrt(n_dim)
             utilities = np.exp(-distances**2 / (2 * sigma**2))
-        
+
         elif utility_func == 'quadratic':
             # Quadratic: u = max(0, 1 - (d / d_max)²)
             d_max = self.config.d_max
@@ -197,40 +197,16 @@ class UtilityComputer:
                 # bounds (e.g. to [-1,1]^n_dim), set UtilityConfig.d_max explicitly.
                 d_max = np.sqrt(n_dim)
             utilities = np.maximum(0.0, 1.0 - (distances / d_max)**2)
-        
+
         elif utility_func == 'linear':
-            # Linear: per-voter normalization.
-            # u_v(c) = 1 - d_v(x_v, y_c) / d_max,v
-            # where d_max,v = d_v(x_v, opposite_corner(x_v)).
-            if voter_positions is None:
-                raise ValueError("linear utility requires voter_positions for per-voter normalization")
+            # Linear: utility directly reflects distance (inverted so closer = higher utility).
+            # Utilities are computed as negative distances, then normalized per-voter
+            # in main.py to ensure best candidate = 1, worst candidate = 0.
+            # No per-voter normalization by opposite corner - utilities directly reflect
+            # the raw distances computed with each voter's metric.
+            utilities = -distances  # Closer candidates have higher (less negative) utilities
 
-            # Geometry bounds (default matches legacy [0, 1])
-            pmin = geometry.position_min if geometry is not None else 0.0
-            pmax = geometry.position_max if geometry is not None else 1.0
-
-            # Determine metric per voter (heterogeneous or homogeneous)
-            het = self.config.heterogeneous_distance
-            if het is not None and getattr(het, "enabled", False):
-                strategy = create_strategy(het, position_min=pmin, position_max=pmax)
-                voter_metrics = strategy.get_voter_metrics(voter_positions)
-            else:
-                voter_metrics = np.full((voter_positions.shape[0],), self.config.distance_metric, dtype=object)
-
-            # Compute opposite corners and per-voter max distances
-            opposite = _compute_opposite_corner(voter_positions, pmin, pmax)
-            d_max_v = np.empty((voter_positions.shape[0],), dtype=float)
-            for metric in np.unique(voter_metrics):
-                mask = voter_metrics == metric
-                if np.any(mask):
-                    d_max_v[mask] = _pointwise_distance(voter_positions[mask], opposite[mask], metric)
-
-            # Safe divide (degenerate geometries only)
-            safe_dmax = np.where(d_max_v > 1e-12, d_max_v, 1.0)
-            utilities = 1.0 - (distances / safe_dmax[:, np.newaxis])
-            utilities = np.clip(utilities, 0.0, 1.0)
-        
         else:
             raise ValueError(f"Unknown utility function: {utility_func}")
-        
+
         return utilities
