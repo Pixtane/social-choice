@@ -1,0 +1,27 @@
+{
+  "config": {
+    "base_n_profiles": 200,
+    "base_n_voters": 100,
+    "base_n_candidates": 5,
+    "voter_scaling_range": [
+      10,
+      25,
+      50,
+      100,
+      200,
+      300,
+      400,
+      500
+    ],
+    "verification_n_voters": 500,
+    "verification_n_profiles": 200,
+    "dimensions": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      7,
+      10
+    ],
+    "thresholds": 

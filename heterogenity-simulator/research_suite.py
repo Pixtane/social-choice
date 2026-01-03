@@ -117,6 +117,58 @@ class HeterogeneityResearcher:
         disagreement = np.mean(het_winners != homo_winners) * 100
         return disagreement
 
+    def compute_disagreement_decomposition(
+        self,
+        result_het: ExperimentResult,
+        result_homo_center: ExperimentResult,
+        result_homo_extreme: ExperimentResult,
+        rule: str
+    ) -> Dict[str, float]:
+        """
+        Compute disagreement decomposition per METHODOLOGY.md.
+
+        Returns:
+            - strong_disagreement: het ≠ center AND het ≠ extreme (outcome creation)
+            - extreme_aligned_disagreement: het = extreme AND het ≠ center (outcome amplification)
+            - total_disagreement: strong + extreme_aligned
+            - simple_disagreement_vs_center: het ≠ center (for validation)
+        """
+        if rule not in result_het.rule_results or rule not in result_homo_center.rule_results or rule not in result_homo_extreme.rule_results:
+            return {
+                'strong_disagreement': 0.0,
+                'extreme_aligned_disagreement': 0.0,
+                'total_disagreement': 0.0,
+                'simple_disagreement_vs_center': 0.0,
+                'decomposition_valid': True
+            }
+
+        het_winners = result_het.rule_results[rule].winners
+        center_winners = result_homo_center.rule_results[rule].winners
+        extreme_winners = result_homo_extreme.rule_results[rule].winners
+
+        # Strong disagreement: het ≠ center AND het ≠ extreme
+        strong_mask = (het_winners != center_winners) & (het_winners != extreme_winners)
+        strong_disagreement = np.mean(strong_mask) * 100
+
+        # Extreme-aligned disagreement: het = extreme AND het ≠ center
+        extreme_aligned_mask = (het_winners == extreme_winners) & (het_winners != center_winners)
+        extreme_aligned_disagreement = np.mean(extreme_aligned_mask) * 100
+
+        # Total disagreement (should equal simple disagreement vs center)
+        total_disagreement = strong_disagreement + extreme_aligned_disagreement
+
+        # Simple disagreement vs center (for validation)
+        simple_disagreement = np.mean(het_winners != center_winners) * 100
+
+        return {
+            'strong_disagreement': float(strong_disagreement),
+            'extreme_aligned_disagreement': float(extreme_aligned_disagreement),
+            'total_disagreement': float(total_disagreement),
+            'simple_disagreement_vs_center': float(simple_disagreement),
+            # Validation: total should equal simple
+            'decomposition_valid': bool(np.abs(total_disagreement - simple_disagreement) < 0.01)
+        }
+
     def _run_homogeneous_baseline(
         self,
         *,
@@ -352,6 +404,12 @@ class HeterogeneityResearcher:
 
             voter_data = {}
             for rule in self.config.voting_rules:
+                # Disagreement decomposition
+                decomp = self.compute_disagreement_decomposition(
+                    result_het, result_homo_center, result_homo_extreme, rule
+                )
+
+                # Legacy simple disagreements
                 disagreement = self.compute_disagreement(result_het, result_homo_center, rule)
                 condorcet_metrics = self.compute_condorcet_metrics(result_het, result_homo_center, rule)
                 disagreement_extreme_baseline = self.compute_disagreement(result_het, result_homo_extreme, rule)
@@ -364,6 +422,13 @@ class HeterogeneityResearcher:
                 homo_metrics_extreme = result_homo_extreme.rule_results[rule].aggregate_metrics
 
                 voter_data[rule] = {
+                    # Decomposition (primary)
+                    'strong_disagreement': decomp['strong_disagreement'],
+                    'extreme_aligned_disagreement': decomp['extreme_aligned_disagreement'],
+                    'total_disagreement': decomp['total_disagreement'],
+                    'decomposition_valid': decomp['decomposition_valid'],
+
+                    # Legacy simple disagreements
                     'disagreement_rate': disagreement,
                     'vse_het': het_metrics.vse_mean,
                     'vse_homo': homo_metrics.vse_mean,
@@ -465,6 +530,12 @@ class HeterogeneityResearcher:
 
             threshold_data = {}
             for rule in self.config.voting_rules:
+                # Disagreement decomposition
+                decomp = self.compute_disagreement_decomposition(
+                    result_het, result_homo_center, result_homo_extreme, rule
+                )
+
+                # Legacy simple disagreements
                 disagreement = self.compute_disagreement(result_het, result_homo_center, rule)
                 condorcet_metrics = self.compute_condorcet_metrics(result_het, result_homo_center, rule)
                 disagreement_extreme_baseline = self.compute_disagreement(result_het, result_homo_extreme, rule)
@@ -477,6 +548,13 @@ class HeterogeneityResearcher:
                 homo_metrics_extreme = result_homo_extreme.rule_results[rule].aggregate_metrics
 
                 threshold_data[rule] = {
+                    # Decomposition (primary)
+                    'strong_disagreement': decomp['strong_disagreement'],
+                    'extreme_aligned_disagreement': decomp['extreme_aligned_disagreement'],
+                    'total_disagreement': decomp['total_disagreement'],
+                    'decomposition_valid': decomp['decomposition_valid'],
+
+                    # Legacy simple disagreements
                     'disagreement_rate': disagreement,
                     'vse_het': het_metrics.vse_mean,
                     'vse_homo': homo_metrics.vse_mean,
@@ -577,6 +655,10 @@ class HeterogeneityResearcher:
 
             dim_data = {}
             for rule in self.config.voting_rules:
+                # Compute disagreement decomposition
+                decomp = self.compute_disagreement_decomposition(result_het, result_homo_center, result_homo_extreme, rule)
+
+                # Compute simple disagreement for backward compatibility
                 disagreement = self.compute_disagreement(result_het, result_homo_center, rule)
                 condorcet_metrics = self.compute_condorcet_metrics(result_het, result_homo_center, rule)
                 disagreement_extreme_baseline = self.compute_disagreement(result_het, result_homo_extreme, rule)
@@ -589,13 +671,24 @@ class HeterogeneityResearcher:
                 homo_metrics_extreme = result_homo_extreme.rule_results[rule].aggregate_metrics
 
                 dim_data[rule] = {
+                    # Disagreement decomposition (primary)
+                    'strong_disagreement': decomp['strong_disagreement'],
+                    'extreme_aligned_disagreement': decomp['extreme_aligned_disagreement'],
+                    'total_disagreement': decomp['total_disagreement'],
+                    'decomposition_valid': decomp['decomposition_valid'],
+
+                    # Legacy simple disagreement (for validation)
                     'disagreement_rate': disagreement,
+                    'disagreement_rate_extreme_baseline': disagreement_extreme_baseline,
+
+                    # VSE
                     'vse_het': het_metrics.vse_mean,
                     'vse_homo': homo_metrics.vse_mean,
                     'vse_difference': het_metrics.vse_mean - homo_metrics.vse_mean,
-                    'disagreement_rate_extreme_baseline': disagreement_extreme_baseline,
                     'vse_homo_extreme_baseline': homo_metrics_extreme.vse_mean,
                     'vse_difference_extreme_baseline': het_metrics.vse_mean - homo_metrics_extreme.vse_mean,
+
+                    # Condorcet metrics
                     **{f'{k}_extreme_baseline': v for k, v in condorcet_metrics_extreme_baseline.items()},
                     **condorcet_metrics
                 }
@@ -722,7 +815,15 @@ class HeterogeneityResearcher:
 
                 pair_data = {}
                 for rule in self.config.voting_rules:
-                    # Default: compare each heterogeneous run to the homogeneous run using its center metric
+                    # Disagreement decomposition for both directions
+                    decomp_ab = self.compute_disagreement_decomposition(
+                        result_het_ab, result_homo_center_ab, result_homo_extreme_ab, rule
+                    )
+                    decomp_ba = self.compute_disagreement_decomposition(
+                        result_het_ba, result_homo_center_ba, result_homo_extreme_ba, rule
+                    )
+
+                    # Legacy simple disagreements
                     disagreement_ab = self.compute_disagreement(result_het_ab, result_homo_center_ab, rule)
                     disagreement_ba = self.compute_disagreement(result_het_ba, result_homo_center_ba, rule)
                     asymmetry = abs(disagreement_ab - disagreement_ba)
@@ -746,6 +847,17 @@ class HeterogeneityResearcher:
                     )
 
                     pair_data[rule] = {
+                        # Decomposition (primary)
+                        'strong_disagreement_ab': decomp_ab['strong_disagreement'],
+                        'extreme_aligned_disagreement_ab': decomp_ab['extreme_aligned_disagreement'],
+                        'total_disagreement_ab': decomp_ab['total_disagreement'],
+                        'strong_disagreement_ba': decomp_ba['strong_disagreement'],
+                        'extreme_aligned_disagreement_ba': decomp_ba['extreme_aligned_disagreement'],
+                        'total_disagreement_ba': decomp_ba['total_disagreement'],
+                        'decomposition_valid_ab': decomp_ab['decomposition_valid'],
+                        'decomposition_valid_ba': decomp_ba['decomposition_valid'],
+
+                        # Legacy simple disagreements
                         'disagreement_ab': disagreement_ab,
                         'disagreement_ba': disagreement_ba,
                         'asymmetry': asymmetry,

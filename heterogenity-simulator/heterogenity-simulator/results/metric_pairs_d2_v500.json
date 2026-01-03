@@ -5,14 +5,6 @@
   "pairs": {
     "l1_l2": {
       "plurality": {
-        "strong_disagreement_ab": 3.0,
-        "extreme_aligned_disagreement_ab": 6.5,
-        "total_disagreement_ab": 9.5,
-        "strong_disagreement_ba": 2.5,
-        "extreme_aligned_disagreement_ba": 6.5,
-        "total_disagreement_ba": 9.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 9.5,
         "disagreement_ba": 9.0,
         "asymmetry": 0.5,
@@ -45,14 +37,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -4.436905652313278
       },
       "borda": {
-        "strong_disagreement_ab": 0.5,
-        "extreme_aligned_disagreement_ab": 6.0,
-        "total_disagreement_ab": 6.5,
-        "strong_disagreement_ba": 0.5,
-        "extreme_aligned_disagreement_ba": 7.000000000000001,
-        "total_disagreement_ba": 7.500000000000001,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 6.5,
         "disagreement_ba": 7.5,
         "asymmetry": 1.0,
@@ -85,14 +69,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 6.72347473020622
       },
       "irv": {
-        "strong_disagreement_ab": 0.5,
-        "extreme_aligned_disagreement_ab": 4.0,
-        "total_disagreement_ab": 4.5,
-        "strong_disagreement_ba": 2.5,
-        "extreme_aligned_disagreement_ba": 3.5000000000000004,
-        "total_disagreement_ba": 6.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 4.5,
         "disagreement_ba": 6.0,
         "asymmetry": 1.5,
@@ -127,14 +103,6 @@
     },
     "l1_cosine": {
       "plurality": {
-        "strong_disagreement_ab": 7.5,
-        "extreme_aligned_disagreement_ab": 3.0,
-        "total_disagreement_ab": 10.5,
-        "strong_disagreement_ba": 12.0,
-        "extreme_aligned_disagreement_ba": 6.0,
-        "total_disagreement_ba": 18.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 10.5,
         "disagreement_ba": 18.0,
         "asymmetry": 7.5,
@@ -167,14 +135,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -22.02486107988308
       },
       "borda": {
-        "strong_disagreement_ab": 3.0,
-        "extreme_aligned_disagreement_ab": 3.5000000000000004,
-        "total_disagreement_ab": 6.5,
-        "strong_disagreement_ba": 11.5,
-        "extreme_aligned_disagreement_ba": 49.0,
-        "total_disagreement_ba": 60.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 6.5,
         "disagreement_ba": 60.5,
         "asymmetry": 54.0,
@@ -207,14 +167,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 1.4743198535316253
       },
       "irv": {
-        "strong_disagreement_ab": 5.0,
-        "extreme_aligned_disagreement_ab": 5.5,
-        "total_disagreement_ab": 10.5,
-        "strong_disagreement_ba": 8.5,
-        "extreme_aligned_disagreement_ba": 5.0,
-        "total_disagreement_ba": 13.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 10.5,
         "disagreement_ba": 13.5,
         "asymmetry": 3.0,
@@ -249,14 +201,6 @@
     },
     "l1_chebyshev": {
       "plurality": {
-        "strong_disagreement_ab": 4.0,
-        "extreme_aligned_disagreement_ab": 10.0,
-        "total_disagreement_ab": 14.0,
-        "strong_disagreement_ba": 3.0,
-        "extreme_aligned_disagreement_ba": 12.0,
-        "total_disagreement_ba": 15.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 14.000000000000002,
         "disagreement_ba": 15.0,
         "asymmetry": 0.9999999999999982,
@@ -289,14 +233,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -4.7039036432194905
       },
       "borda": {
-        "strong_disagreement_ab": 1.5,
-        "extreme_aligned_disagreement_ab": 8.0,
-        "total_disagreement_ab": 9.5,
-        "strong_disagreement_ba": 0.0,
-        "extreme_aligned_disagreement_ba": 9.0,
-        "total_disagreement_ba": 9.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 9.5,
         "disagreement_ba": 9.0,
         "asymmetry": 0.5,
@@ -329,14 +265,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 9.052437403358383
       },
       "irv": {
-        "strong_disagreement_ab": 2.0,
-        "extreme_aligned_disagreement_ab": 5.0,
-        "total_disagreement_ab": 7.0,
-        "strong_disagreement_ba": 5.0,
-        "extreme_aligned_disagreement_ba": 6.0,
-        "total_disagreement_ba": 11.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 7.000000000000001,
         "disagreement_ba": 11.0,
         "asymmetry": 3.999999999999999,
@@ -371,14 +299,6 @@
     },
     "l2_l1": {
       "plurality": {
-        "strong_disagreement_ab": 2.5,
-        "extreme_aligned_disagreement_ab": 6.5,
-        "total_disagreement_ab": 9.0,
-        "strong_disagreement_ba": 3.0,
-        "extreme_aligned_disagreement_ba": 6.5,
-        "total_disagreement_ba": 9.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 9.0,
         "disagreement_ba": 9.5,
         "asymmetry": 0.5,
@@ -411,14 +331,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -1.5306122448979593
       },
       "borda": {
-        "strong_disagreement_ab": 0.5,
-        "extreme_aligned_disagreement_ab": 7.000000000000001,
-        "total_disagreement_ab": 7.500000000000001,
-        "strong_disagreement_ba": 0.5,
-        "extreme_aligned_disagreement_ba": 6.0,
-        "total_disagreement_ba": 6.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 7.5,
         "disagreement_ba": 6.5,
         "asymmetry": 1.0,
@@ -451,14 +363,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -0.5102040816326507
       },
       "irv": {
-        "strong_disagreement_ab": 2.5,
-        "extreme_aligned_disagreement_ab": 3.5000000000000004,
-        "total_disagreement_ab": 6.0,
-        "strong_disagreement_ba": 0.5,
-        "extreme_aligned_disagreement_ba": 4.0,
-        "total_disagreement_ba": 4.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 6.0,
         "disagreement_ba": 4.5,
         "asymmetry": 1.5,
@@ -493,14 +397,6 @@
     },
     "l2_cosine": {
       "plurality": {
-        "strong_disagreement_ab": 5.0,
-        "extreme_aligned_disagreement_ab": 5.5,
-        "total_disagreement_ab": 10.5,
-        "strong_disagreement_ba": 5.0,
-        "extreme_aligned_disagreement_ba": 7.000000000000001,
-        "total_disagreement_ba": 12.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 10.5,
         "disagreement_ba": 12.0,
         "asymmetry": 1.5,
@@ -533,14 +429,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -24.017384731670447
       },
       "borda": {
-        "strong_disagreement_ab": 3.0,
-        "extreme_aligned_disagreement_ab": 3.0,
-        "total_disagreement_ab": 6.0,
-        "strong_disagreement_ba": 7.5,
-        "extreme_aligned_disagreement_ba": 58.5,
-        "total_disagreement_ba": 66.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 6.0,
         "disagreement_ba": 66.0,
         "asymmetry": 60.0,
@@ -573,14 +461,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -3.2123960695389258
       },
       "irv": {
-        "strong_disagreement_ab": 3.5000000000000004,
-        "extreme_aligned_disagreement_ab": 6.5,
-        "total_disagreement_ab": 10.0,
-        "strong_disagreement_ba": 6.0,
-        "extreme_aligned_disagreement_ba": 6.0,
-        "total_disagreement_ba": 12.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 10.0,
         "disagreement_ba": 12.0,
         "asymmetry": 2.0,
@@ -615,14 +495,6 @@
     },
     "l2_chebyshev": {
       "plurality": {
-        "strong_disagreement_ab": 1.0,
-        "extreme_aligned_disagreement_ab": 5.0,
-        "total_disagreement_ab": 6.0,
-        "strong_disagreement_ba": 1.5,
-        "extreme_aligned_disagreement_ba": 7.000000000000001,
-        "total_disagreement_ba": 8.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 6.0,
         "disagreement_ba": 8.5,
         "asymmetry": 2.5,
@@ -655,14 +527,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -2.551020408163268
       },
       "borda": {
-        "strong_disagreement_ab": 0.0,
-        "extreme_aligned_disagreement_ab": 6.5,
-        "total_disagreement_ab": 6.5,
-        "strong_disagreement_ba": 0.5,
-        "extreme_aligned_disagreement_ba": 6.0,
-        "total_disagreement_ba": 6.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 6.5,
         "disagreement_ba": 6.5,
         "asymmetry": 0.0,
@@ -695,14 +559,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 0.0
       },
       "irv": {
-        "strong_disagreement_ab": 1.0,
-        "extreme_aligned_disagreement_ab": 3.0,
-        "total_disagreement_ab": 4.0,
-        "strong_disagreement_ba": 1.0,
-        "extreme_aligned_disagreement_ba": 4.5,
-        "total_disagreement_ba": 5.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 4.0,
         "disagreement_ba": 5.5,
         "asymmetry": 1.5,
@@ -737,14 +593,6 @@
     },
     "cosine_l1": {
       "plurality": {
-        "strong_disagreement_ab": 12.0,
-        "extreme_aligned_disagreement_ab": 6.0,
-        "total_disagreement_ab": 18.0,
-        "strong_disagreement_ba": 7.5,
-        "extreme_aligned_disagreement_ba": 3.0,
-        "total_disagreement_ba": 10.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 18.0,
         "disagreement_ba": 10.5,
         "asymmetry": 7.5,
@@ -777,14 +625,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 11.86458854650747
       },
       "borda": {
-        "strong_disagreement_ab": 11.5,
-        "extreme_aligned_disagreement_ab": 49.0,
-        "total_disagreement_ab": 60.5,
-        "strong_disagreement_ba": 3.0,
-        "extreme_aligned_disagreement_ba": 3.5000000000000004,
-        "total_disagreement_ba": 6.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 60.5,
         "disagreement_ba": 6.5,
         "asymmetry": 54.0,
@@ -817,14 +657,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 4.146707657110184
       },
       "irv": {
-        "strong_disagreement_ab": 8.5,
-        "extreme_aligned_disagreement_ab": 5.0,
-        "total_disagreement_ab": 13.5,
-        "strong_disagreement_ba": 5.0,
-        "extreme_aligned_disagreement_ba": 5.5,
-        "total_disagreement_ba": 10.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 13.5,
         "disagreement_ba": 10.5,
         "asymmetry": 3.0,
@@ -859,14 +691,6 @@
     },
     "cosine_l2": {
       "plurality": {
-        "strong_disagreement_ab": 5.0,
-        "extreme_aligned_disagreement_ab": 7.000000000000001,
-        "total_disagreement_ab": 12.0,
-        "strong_disagreement_ba": 5.0,
-        "extreme_aligned_disagreement_ba": 5.5,
-        "total_disagreement_ba": 10.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 12.0,
         "disagreement_ba": 10.5,
         "asymmetry": 1.5,
@@ -899,14 +723,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 7.547304026177265
       },
       "borda": {
-        "strong_disagreement_ab": 7.5,
-        "extreme_aligned_disagreement_ab": 58.5,
-        "total_disagreement_ab": 66.0,
-        "strong_disagreement_ba": 3.0,
-        "extreme_aligned_disagreement_ba": 3.0,
-        "total_disagreement_ba": 6.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 66.0,
         "disagreement_ba": 6.0,
         "asymmetry": 60.0,
@@ -939,14 +755,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 9.29719732536634
       },
       "irv": {
-        "strong_disagreement_ab": 6.0,
-        "extreme_aligned_disagreement_ab": 6.0,
-        "total_disagreement_ab": 12.0,
-        "strong_disagreement_ba": 3.5000000000000004,
-        "extreme_aligned_disagreement_ba": 6.5,
-        "total_disagreement_ba": 10.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 12.0,
         "disagreement_ba": 10.0,
         "asymmetry": 2.0,
@@ -981,14 +789,6 @@
     },
     "cosine_chebyshev": {
       "plurality": {
-        "strong_disagreement_ab": 8.5,
-        "extreme_aligned_disagreement_ab": 10.0,
-        "total_disagreement_ab": 18.5,
-        "strong_disagreement_ba": 6.5,
-        "extreme_aligned_disagreement_ba": 6.0,
-        "total_disagreement_ba": 12.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 18.5,
         "disagreement_ba": 12.5,
         "asymmetry": 6.0,
@@ -1021,14 +821,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 9.983429991714992
       },
       "borda": {
-        "strong_disagreement_ab": 6.5,
-        "extreme_aligned_disagreement_ab": 62.0,
-        "total_disagreement_ab": 68.5,
-        "strong_disagreement_ba": 3.0,
-        "extreme_aligned_disagreement_ba": 3.5000000000000004,
-        "total_disagreement_ba": 6.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 68.5,
         "disagreement_ba": 6.5,
         "asymmetry": 62.0,
@@ -1061,14 +853,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": 10.574678014611735
       },
       "irv": {
-        "strong_disagreement_ab": 4.5,
-        "extreme_aligned_disagreement_ab": 7.5,
-        "total_disagreement_ab": 12.0,
-        "strong_disagreement_ba": 4.0,
-        "extreme_aligned_disagreement_ba": 8.0,
-        "total_disagreement_ba": 12.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 12.0,
         "disagreement_ba": 12.0,
         "asymmetry": 0.0,
@@ -1103,14 +887,6 @@
     },
     "chebyshev_l1": {
       "plurality": {
-        "strong_disagreement_ab": 3.0,
-        "extreme_aligned_disagreement_ab": 12.0,
-        "total_disagreement_ab": 15.0,
-        "strong_disagreement_ba": 4.0,
-        "extreme_aligned_disagreement_ba": 10.0,
-        "total_disagreement_ba": 14.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 15.0,
         "disagreement_ba": 14.000000000000002,
         "asymmetry": 0.9999999999999982,
@@ -1143,14 +919,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -0.13591855981803747
       },
       "borda": {
-        "strong_disagreement_ab": 0.0,
-        "extreme_aligned_disagreement_ab": 9.0,
-        "total_disagreement_ab": 9.0,
-        "strong_disagreement_ba": 1.5,
-        "extreme_aligned_disagreement_ba": 8.0,
-        "total_disagreement_ba": 9.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 9.0,
         "disagreement_ba": 9.5,
         "asymmetry": 0.5,
@@ -1183,14 +951,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -2.776622007711296
       },
       "irv": {
-        "strong_disagreement_ab": 5.0,
-        "extreme_aligned_disagreement_ab": 6.0,
-        "total_disagreement_ab": 11.0,
-        "strong_disagreement_ba": 2.0,
-        "extreme_aligned_disagreement_ba": 5.0,
-        "total_disagreement_ba": 7.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 11.0,
         "disagreement_ba": 7.000000000000001,
         "asymmetry": 3.999999999999999,
@@ -1225,14 +985,6 @@
     },
     "chebyshev_l2": {
       "plurality": {
-        "strong_disagreement_ab": 1.5,
-        "extreme_aligned_disagreement_ab": 7.000000000000001,
-        "total_disagreement_ab": 8.5,
-        "strong_disagreement_ba": 1.0,
-        "extreme_aligned_disagreement_ba": 5.0,
-        "total_disagreement_ba": 6.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 8.5,
         "disagreement_ba": 6.0,
         "asymmetry": 2.5,
@@ -1265,14 +1017,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -1.397104388485161
       },
       "borda": {
-        "strong_disagreement_ab": 0.5,
-        "extreme_aligned_disagreement_ab": 6.0,
-        "total_disagreement_ab": 6.5,
-        "strong_disagreement_ba": 0.0,
-        "extreme_aligned_disagreement_ba": 6.5,
-        "total_disagreement_ba": 6.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 6.5,
         "disagreement_ba": 6.5,
         "asymmetry": 0.0,
@@ -1305,14 +1049,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -1.9576361895104526
       },
       "irv": {
-        "strong_disagreement_ab": 1.0,
-        "extreme_aligned_disagreement_ab": 4.5,
-        "total_disagreement_ab": 5.5,
-        "strong_disagreement_ba": 1.0,
-        "extreme_aligned_disagreement_ba": 3.0,
-        "total_disagreement_ba": 4.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 5.5,
         "disagreement_ba": 4.0,
         "asymmetry": 1.5,
@@ -1347,14 +1083,6 @@
     },
     "chebyshev_cosine": {
       "plurality": {
-        "strong_disagreement_ab": 6.5,
-        "extreme_aligned_disagreement_ab": 6.0,
-        "total_disagreement_ab": 12.5,
-        "strong_disagreement_ba": 8.5,
-        "extreme_aligned_disagreement_ba": 10.0,
-        "total_disagreement_ba": 18.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 12.5,
         "disagreement_ba": 18.5,
         "asymmetry": 6.0,
@@ -1387,14 +1115,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -24.30520634282075
       },
       "borda": {
-        "strong_disagreement_ab": 3.0,
-        "extreme_aligned_disagreement_ab": 3.5000000000000004,
-        "total_disagreement_ab": 6.5,
-        "strong_disagreement_ba": 6.5,
-        "extreme_aligned_disagreement_ba": 62.0,
-        "total_disagreement_ba": 68.5,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 6.5,
         "disagreement_ba": 68.5,
         "asymmetry": 62.0,
@@ -1427,14 +1147,6 @@
         "condorcet_efficiency_delta_ba_extreme_baseline": -5.635455429280228
       },
       "irv": {
-        "strong_disagreement_ab": 4.0,
-        "extreme_aligned_disagreement_ab": 8.0,
-        "total_disagreement_ab": 12.0,
-        "strong_disagreement_ba": 4.5,
-        "extreme_aligned_disagreement_ba": 7.5,
-        "total_disagreement_ba": 12.0,
-        "decomposition_valid_ab": true,
-        "decomposition_valid_ba": true,
         "disagreement_ab": 12.0,
         "disagreement_ba": 12.0,
         "asymmetry": 0.0,

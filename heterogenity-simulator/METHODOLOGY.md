@@ -6,7 +6,7 @@ This document describes the comprehensive research methodology used to investiga
 
 ## Research Objectives
 
-1. **Verify and correct** original findings from FINDINGS.md
+1. **Verify and correct** original findings from FINDINGS.md and FINDINGS-2.md (as they used wrong math for simulator)
 2. **Discover new phenomena** in heterogeneous distance metrics
 3. **Understand voter scaling effects** - how results change with voter count
 4. **Characterize phase transitions** in threshold parameter space
@@ -24,7 +24,7 @@ This document describes the comprehensive research methodology used to investiga
 - **Voting rules tested**: Plurality, Borda, IRV
 - **Random seed**: 42 (for reproducibility)
 - **Geometry domain**: Voters and candidates are sampled uniformly from the hypercube $[-1,1]^{d}$.
-  - This enables cosine distance to express the full angular range ($0^\circ$ to $180^\circ$), instead of being limited by the first orthant of $[0,1]^d$.
+  - This enables cosine distance to express the full angular range ($0^\circ$ to $180^\circ$), instead of being limited by the first orthant of $[0,1]^d$ (like it was in FINDINGS.md and FINDINGS-2.md).
 
 ### Voter Scaling Analysis
 
@@ -53,9 +53,9 @@ This document describes the comprehensive research methodology used to investiga
 **Method**:
 
 - Test thresholds: 0.05 to 0.95 in 0.05 increments (19 points)
+- Run 200 profiles with homogeneous baseline
 - For each threshold:
   - Run 200 profiles with heterogeneous metrics
-  - Run 200 profiles with homogeneous baseline
   - Compute disagreement rates and Condorcet metrics
 
 **Analysis**:
@@ -71,7 +71,7 @@ This document describes the comprehensive research methodology used to investiga
 
 **Method**:
 
-- Test dimensions: [1, 2, 3, 4, 5, 7, 10]
+- Test dimensions: [1, 2, 3, 5, 10, 100]
 - For each dimension:
   - Run 200 profiles with heterogeneous metrics (L2 center, Cosine extreme, threshold=0.5)
   - Run 200 profiles with homogeneous baseline
@@ -99,6 +99,7 @@ This document describes the comprehensive research methodology used to investiga
   - Compute disagreement rates for both directions against the center-metric baseline
   - Optionally also compute disagreement rates against the extreme-metric baseline
   - Calculate asymmetry: |D(A->B) - D(B->A)|
+  - To ensure computational efficiency, each metric’s 200-profile simulation is run only once and reused across all pairwise comparisons, avoiding redundant executions.
 
 **Analysis**:
 
@@ -119,13 +120,40 @@ This document describes the comprehensive research methodology used to investiga
 
 ## Statistical Methods
 
-### Disagreement Rate
+### Disagreement Measures
 
-The primary metric is the **disagreement rate**: the percentage of profiles where the heterogeneous winner differs from the homogeneous winner.
+The central quantities of interest are **disagreement measures**, which quantify when heterogeneous metric aggregation alters the election outcome relative to homogeneous baselines.
+
+The basic **disagreement rate** is defined as the percentage of profiles for which the heterogeneous winner differs from the homogeneous winner:
 
 $$D = \frac{1}{N} \sum_{i=1}^{N} \mathbf{1}[w_i^{het} \neq w_i^{homo}] \times 100\%$$
 
-where $w_i^{het}$ and $w_i^{homo}$ are the winners for profile $i$ under heterogeneous and homogeneous conditions.
+where $w_i^{het}$ and $w_i^{homo}$ are the winners for profile $i$ under heterogeneous and homogeneous conditions, respectively.
+
+In practice, this aggregate measure is **not computed directly**. Instead, it is decomposed into two disjoint components — **strong disagreement** and **extreme-aligned disagreement** — whose sum recovers the total disagreement rate.
+
+#### Strong Disagreement Rate
+
+The primary metric is the **strong disagreement rate**, defined as the percentage of profiles in which the heterogeneous rule selects a winner that differs from **both** homogeneous baselines (center and extreme metrics):
+
+$$D_{\text{strong}} =\frac{1}{N}\sum_{i=1}^{N}\mathbf{1}\!\left[w_i^{\text{het}} \neq w_i^{\text{homo, center}}\;\land\;w_i^{\text{het}} \neq w_i^{\text{homo, extreme}}\right]\times 100\%$$
+
+This metric isolates cases where metric heterogeneity induces a genuinely novel outcome not explainable as alignment with either homogeneous reference.
+
+#### Extreme-Aligned Disagreement (Secondary Analysis)
+
+Profiles in which the heterogeneous winner coincides with the extreme-metric homogeneous winner are treated separately and are **not** counted as strong disagreements. For these cases, we report the **extreme-aligned disagreement rate**:
+
+$$D_{\text{ext-align}} = \frac{1}{N}\sum_{i=1}^{N}\mathbf{1}\!\left[w_i^{\text{het}} = w_i^{\text{homo, extreme}}\;\land\;w_i^{\text{het}} \neq w_i^{\text{homo, center}}\right]\times 100\%$$
+
+For extreme-aligned profiles, we additionally analyze **candidate-level vote shares** under the heterogeneous rule, reporting the proportion of votes received by each candidate. These quantities are reported both individually and, where appropriate, aggregated using the same averaging framework as above.
+
+##### Interpretation
+
+- **Strong disagreement** reflects outcome creation induced by metric heterogeneity.
+- **Extreme-aligned disagreement** reflects outcome amplification toward an extreme metric.
+
+This decomposition prevents qualitatively distinct effects of heterogeneity from being conflated within a single disagreement statistic and enables more precise interpretation of outcome shifts.
 
 ### Condorcet Metrics
 
@@ -134,10 +162,57 @@ where $w_i^{het}$ and $w_i^{homo}$ are the winners for profile $i$ under heterog
 
 ### Asymmetry Calculation
 
-For metric pair (A, B):
-$$\Delta_{A,B} = |D_{A \to B} - D_{B \to A}|$$
+Asymmetry measures the directional sensitivity of disagreement to swapping metrics between center and extreme voters. Since disagreement is decomposed into distinct mechanisms, asymmetry is computed **separately for each component**.
 
-where $D_{A \to B}$ is disagreement when A is assigned to center voters and B to extreme voters.
+#### Strong Disagreement Asymmetry
+
+$$
+\Delta^{\text{strong}}_{A,B}
+=
+\left|
+D^{\text{strong}}_{A \to B}
+-
+D^{\text{strong}}_{B \to A}
+\right|
+$$
+
+This quantity captures asymmetry in **outcome creation**, measuring how strongly novel outcomes depend on whether metric $A$ or $B$ is assigned to center voters.
+
+#### Extreme-Aligned Disagreement Asymmetry
+
+$$
+\Delta^{\text{ext-align}}_{A,B}
+=
+\left|
+D^{\text{ext-align}}_{A \to B}
+-
+D^{\text{ext-align}}_{B \to A}
+\right|
+$$
+
+This quantity captures asymmetry in **outcome amplification**, indicating whether one metric exerts a stronger pull when assigned to extreme voters rather than to the center.
+
+#### (Optional) Total Asymmetry
+
+For descriptive purposes only, a total disagreement rate may be defined as
+
+$$
+D^{\text{total}} = D^{\text{strong}} + D^{\text{ext-align}}
+$$
+
+with corresponding asymmetry
+
+$$
+\Delta^{\text{total}}_{A,B}
+=
+\left|
+D^{\text{total}}_{A \to B}
+-
+D^{\text{total}}_{B \to A}
+\right|
+$$
+
+This aggregate asymmetry is reported only for visualization and is not used for mechanistic interpretation, as it conflates distinct sources of disagreement.
 
 ### Power Law Fitting
 
@@ -220,7 +295,7 @@ All results are saved as JSON files in `heterogenity-simulator/results/`:
 
 1. **Run experiments** using `research_suite.py`
 2. **Analyze results** using `analyze_results.py`
-3. **Generate findings** in `FINDINGS-2.md`
+3. **Generate findings** in `FINDINGS-3.md`
 4. **Document methodology** in this file
 
 ## Quality Assurance
