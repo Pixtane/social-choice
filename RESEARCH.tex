@@ -30,7 +30,7 @@
 \maketitle
 
 \begin{abstract}
-    This paper presents a comprehensive mathematical and computational analysis of distance metric heterogeneity in multidimensional spatial voting models. We investigate how different distance metrics (L1, L2, and Cosine) affect voting outcomes when voters use heterogeneous distance functions based on their position in ideological space. Through Monte Carlo simulations across dimensions 1--10, we demonstrate that dimensionality acts as a stabilizer, with voting rules converging to similar outcomes as dimension increases. We provide theoretical foundations for the concentration of measure phenomenon in high-dimensional preference spaces and empirical evidence of the "Cosine Miracle"---the absence of Condorcet cycles when Cosine distance is used. Our findings reveal that metric heterogeneity has diminishing effects in high dimensions, suggesting that democratic stability emerges naturally from the geometric properties of high-dimensional issue spaces.
+    This paper presents a comprehensive mathematical and computational analysis of distance metric heterogeneity in multidimensional spatial voting models. We investigate how different distance metrics (L1, L2, Cosine, and Chebyshev) affect voting outcomes when voters use heterogeneous distance functions based on their position in ideological space. Through Monte Carlo simulations across dimensions 1--10, we demonstrate that metric heterogeneity effects persist across all tested dimensions, with disagreement rates ranging from 4--18.5\% depending on voting rule and metric configuration. We provide theoretical foundations for the concentration of measure phenomenon, showing that voter centrality converges to $\sqrt{1/3} \approx 0.577$ in high dimensions. Our key finding is a dramatic rule-dependent and directional asymmetry: when Cosine distance is assigned to centrist voters under Borda count, disagreement reaches 60\% (vs 8.5\% for L2-center), representing a 51.5 percentage point asymmetry. We decompose disagreement into strong (novel outcomes) and extreme-aligned (amplification) components, revealing that the mechanism of heterogeneity effects depends critically on both voting rule and metric assignment direction. These findings demonstrate that metric heterogeneity remains a significant factor even in high-dimensional spaces, with complex interactions between dimensionality, metric properties, and aggregation mechanisms that cannot be explained by simple convergence arguments.
 \end{abstract}
 
 \section{Introduction}
@@ -45,16 +45,17 @@ This paper addresses a fundamental question: \textit{How does distance metric he
 
 \subsection{Scientific Novelty}
 
-Our contribution lies in the comparative analysis of Minkowski metrics (L1, L2) versus directional metrics (Cosine) through the lens of measure concentration theory. We demonstrate that:
+Our contribution lies in the comparative analysis of Minkowski metrics (L1, L2, Chebyshev) versus directional metrics (Cosine) through the lens of measure concentration theory. We demonstrate that:
 
 \begin{enumerate}
-    \item Voter centrality in high-dimensional hypercubes concentrates near $\sqrt{1/3} \approx 0.577$, independent of dimension (Finding 5).
-    \item Metric heterogeneity effects diminish with increasing dimension, with voting rules converging to identical outcomes.
-    \item Cosine distance exhibits unique properties---the "Cosine Miracle"---characterized by zero Condorcet cycles in our simulations.
-    \item The effective radius for center-extreme voter classification converges to a percentile-based threshold as dimension increases.
+    \item Voter centrality in high-dimensional hypercubes concentrates near $\sqrt{1/3} \approx 0.577$, independent of dimension (Theorem 2.3).
+    \item Metric heterogeneity effects persist across all tested dimensions (1--10), with disagreement rates of 4--18.5\% that do not exhibit simple monotonic convergence.
+    \item Voting rules exhibit dramatic directional asymmetries: Borda count shows extreme sensitivity to metric assignment direction, with Cosine-center configurations producing 60\% disagreement vs 8.5\% for L2-center (a 51.5pp asymmetry).
+    \item Disagreement decomposes into strong (novel outcomes) and extreme-aligned (amplification) components, with proportions varying dramatically by rule and configuration (10--93\% strong disagreement depending on direction).
+    \item The effective radius for center-extreme voter classification converges to a percentile-based threshold as dimension increases, enabling dimension-independent classification strategies.
 \end{enumerate}
 
-These findings have profound implications for democratic theory: high-dimensional issue spaces naturally stabilize voting outcomes, making metric choice less critical as complexity increases.
+These findings have profound implications for democratic theory: metric heterogeneity remains a significant factor even in high-dimensional spaces, with rule-dependent and directional effects that interact complexly with aggregation mechanisms.
 
 \section{Theoretical Foundations of Preference Geometry}
 
