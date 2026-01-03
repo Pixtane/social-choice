@@ -1,0 +1,41 @@
+\babel@toc {ukrainian}{}\relax 
+\contentsline {section}{ПЕРЕЛІК УМОВНИХ ПОЗНАЧЕНЬ, СИМВОЛІВ, СКОРОЧЕНЬ, ТЕРМІНІВ}{3}{section*.2}%
+\contentsline {section}{ВСТУП}{4}{section*.3}%
+\contentsline {section}{\numberline {1}РОЗДІЛ 1}{6}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Просторові моделі та метрики відстані}{6}{subsection.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1}Метрики Мінковського}{6}{subsubsection.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.2}Напрямкові метрики: Косинусна відстань}{6}{subsubsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.2}Прокляття вимірності}{6}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1}Аналітичне наближення середньої відстані}{7}{subsubsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.3}Концентрація міри та ефективний радіус}{8}{subsection.1.3}%
+\contentsline {subsubsection}{\numberline {1.3.1}Емпіричне підтвердження}{9}{subsubsection.1.3.1}%
+\contentsline {section}{\numberline {2}РОЗДІЛ 2}{10}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Рамки Монте-Карло для електоральних симуляцій}{10}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Відносна нормалізація корисності: Масштабування найкраще-найгірше}{11}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Декомпозиція міри розбіжності}{12}{subsubsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.3}Математична логіка правил агрегації}{13}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}Метод Борда}{13}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.2}Ранжовані пари (метод Кондорсе)}{13}{subsubsection.2.3.2}%
+\contentsline {subsubsection}{\numberline {2.3.3}Голосування за оцінкою (кардинальне)}{13}{subsubsection.2.3.3}%
+\contentsline {subsubsection}{\numberline {2.3.4}Відносна більшість та IRV}{13}{subsubsection.2.3.4}%
+\contentsline {subsection}{\numberline {2.4}Збіжність вимірності}{14}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Емпіричні докази}{14}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}Аналіз декомпозиції: Сильна проти екстремально-вирівняної розбіжності}{16}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Візуалізація сильних розбіжностей}{16}{subsubsection.2.4.3}%
+\contentsline {subsubsection}{\numberline {2.4.4}Теоретичне пояснення}{17}{subsubsection.2.4.4}%
+\contentsline {section}{\numberline {3}РОЗДІЛ 3}{19}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Вплив метрик на парадокси Кондорсе}{19}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Взаємодія Борда-Косинусна}{19}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Взаємодії метрик Мінковського}{19}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Перевірки ефективності задоволеності виборців (VSE)}{20}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Порівняльна продуктивність за правилами}{20}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Ефекти гетерогенності метрик на VSE}{21}{subsubsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.3}Висновки до розділу 2}{21}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Висновки до розділу 3}{22}{subsection.3.4}%
+\contentsline {section}{ВИСНОВКИ}{22}{section*.12}%
+\contentsline {subsection}{\numberline {3.5}Основні результати дослідження}{22}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}Теоретичне та прикладне значення результатів}{23}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}Достовірність результатів}{23}{subsection.3.7}%
+\contentsline {subsection}{\numberline {3.8}Практичні рекомендації}{23}{subsection.3.8}%
+\contentsline {subsection}{\numberline {3.9}Напрямки майбутніх досліджень}{24}{subsection.3.9}%
+\contentsline {section}{СПИСОК ВИКОРИСТАНИХ ДЖЕРЕЛ}{26}{section*.14}%
