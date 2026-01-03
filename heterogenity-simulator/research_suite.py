@@ -19,6 +19,20 @@ import sys
 import os
 from datetime import datetime
 
+
+def make_json_serializable(obj):
+    """Convert numpy arrays and other non-serializable types to JSON-compatible types."""
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, (np.integer, np.floating)):
+        return obj.item()
+    elif isinstance(obj, dict):
+        return {k: make_json_serializable(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [make_json_serializable(item) for item in obj]
+    else:
+        return obj
+
 # Add parent directory to path
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
@@ -466,7 +480,7 @@ class HeterogeneityResearcher:
         # Save results
         output_file = self.output_dir / f"voter_scaling_{center_metric}_{extreme_metric}_d{dimension}.json"
         with open(output_file, 'w') as f:
-            json.dump(results, f, indent=2)
+            json.dump(make_json_serializable(results), f, indent=2)
 
         print(f"\nResults saved to: {output_file}")
         return results
@@ -598,7 +612,7 @@ class HeterogeneityResearcher:
         # Save results
         output_file = self.output_dir / f"threshold_sweep_{center_metric}_{extreme_metric}_d{dimension}_v{n_voters}.json"
         with open(output_file, 'w') as f:
-            json.dump(results, f, indent=2)
+            json.dump(make_json_serializable(results), f, indent=2)
 
         print(f"\nResults saved to: {output_file}")
         return results
@@ -733,7 +747,7 @@ class HeterogeneityResearcher:
         # Save results
         output_file = self.output_dir / f"dimensional_scaling_{center_metric}_{extreme_metric}_v{n_voters}.json"
         with open(output_file, 'w') as f:
-            json.dump(results, f, indent=2)
+            json.dump(make_json_serializable(results), f, indent=2)
 
         print(f"\nResults saved to: {output_file}")
         return results
@@ -925,7 +939,7 @@ class HeterogeneityResearcher:
         # Save results
         output_file = self.output_dir / f"metric_pairs_d{dimension}_v{n_voters}.json"
         with open(output_file, 'w') as f:
-            json.dump(results, f, indent=2)
+            json.dump(make_json_serializable(results), f, indent=2)
 
         print(f"\nResults saved to: {output_file}")
         return results
@@ -1002,7 +1016,8 @@ class HeterogeneityResearcher:
         # Save all results
         output_file = self.output_dir / "full_research_suite.json"
         with open(output_file, 'w') as f:
-            json.dump(self.results, f, indent=2)
+            serializable_results = make_json_serializable(self.results)
+            json.dump(serializable_results, f, indent=2)
 
         total_time = time.perf_counter() - overall_start
         print("\n" + "=" * 80)

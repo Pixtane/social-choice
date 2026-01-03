@@ -303,11 +303,11 @@ This is equivalent to utilitarian social welfare maximization under our normaliz
 
 \subsection{Dimensionality Convergence}
 
-Our empirical results demonstrate a striking convergence phenomenon: as dimension increases, voting rules yield increasingly similar outcomes regardless of metric heterogeneity.
+Our empirical results demonstrate that metric heterogeneity effects persist across all tested dimensions, with substantial disagreement rates that do not exhibit simple monotonic convergence. The decomposition of disagreement into strong and extreme-aligned components reveals complex interaction patterns that vary by dimension and voting rule.
 
 \subsubsection{Empirical Evidence}
 
-Table~\ref{tab:dimensional_convergence} presents disagreement rates (percentage of profiles where heterogeneous and center-metric homogeneous winners differ) for L2-Cosine metric pairs across dimensions 1--10:
+Table~\ref{tab:dimensional_convergence} presents decomposed disagreement rates for L2-Cosine metric pairs across dimensions 1--10:
 
 \begin{table}[h]
     \centering
@@ -342,11 +342,11 @@ The data reveals substantial metric heterogeneity effects across all dimensions,
     \item \textbf{No Monotonic Trend}: Disagreement does not decrease monotonically with dimension, suggesting complex interaction effects rather than simple convergence.
 \end{enumerate}
 
-Table~\ref{tab:metric_pairs} presents decomposed disagreement rates for all metric pairs at dimension 2:
+Table~\ref{tab:metric_pairs} presents total disagreement rates for all metric pairs at dimension 2:
 
 \begin{table}[h]
     \centering
-    \caption{Metric Pair Total Disagreement Rates at Dimension 2 (A $\rightarrow$ B notation)}
+    \caption{Metric Pair Total Disagreement Rates at Dimension 2 (A $\rightarrow$ B notation).}
     \label{tab:metric_pairs}
     \begin{tabular}{lccc}
         \toprule
@@ -356,26 +356,29 @@ Table~\ref{tab:metric_pairs} presents decomposed disagreement rates for all metr
         Cosine $\rightarrow$ L2        & 16.0\%    & \textbf{60.0\%} & 4.5\%  \\
         L1 $\rightarrow$ Cosine        & 16.5\%    & 8.5\%           & 11.5\% \\
         Cosine $\rightarrow$ L1        & 14.0\%    & \textbf{52.5\%} & 9.5\%  \\
-        L1 $\rightarrow$ L2            & 15.5\%    & 17.5\%          & 21.0\% \\
-        L2 $\rightarrow$ L1            & 15.5\%    & 17.5\%          & 21.0\% \\
-        Chebyshev $\rightarrow$ L1     & 14.0\%    & 17.5\%          & 21.5\% \\
-        Chebyshev $\rightarrow$ L2     & 15.5\%    & 17.5\%          & 22.0\% \\
-        Chebyshev $\rightarrow$ Cosine & 15.5\%    & 14.0\%          & 22.0\% \\
+        Cosine $\rightarrow$ Chebyshev & 20.0\%    & \textbf{64.5\%} & 8.0\%  \\
+        Chebyshev $\rightarrow$ Cosine & 16.0\%    & 11.5\%          & 12.5\% \\
+        L1 $\rightarrow$ L2            & 14.0\%    & 11.5\%          & 9.0\%  \\
+        L2 $\rightarrow$ L1            & 9.5\%     & 5.5\%           & 6.5\%  \\
+        L1 $\rightarrow$ Chebyshev     & 19.0\%    & 18.0\%          & 11.0\% \\
+        Chebyshev $\rightarrow$ L1     & 13.0\%    & 11.0\%          & 10.5\% \\
+        L2 $\rightarrow$ Chebyshev     & 7.0\%     & 7.5\%           & 6.5\%  \\
+        Chebyshev $\rightarrow$ L2     & 7.0\%     & 7.0\%           & 7.5\%  \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-This reveals a \textbf{dramatic asymmetry}: Cosine-to-Minkowski pairs show vastly different disagreement than Minkowski-to-Cosine pairs, and this effect is \textit{rule-dependent}:
+This reveals a \textbf{dramatic asymmetry}: Cosine-to-Minkowski pairs show vastly different disagreement than Minkowski-to-Cosine pairs, and this effect is \textit{rule-dependent}. The asymmetry is most pronounced for Borda count, where directional effects exceed 50 percentage points:
 
 \begin{itemize}
-    \item \textbf{Borda}: Shows extreme directional sensitivity. Cosine$\rightarrow$L2 has 60.0\% disagreement vs L2$\rightarrow$Cosine's 8.5\%---a 51.5pp difference. This suggests Borda is highly sensitive to which metric is assigned to center vs extreme voters.
+    \item \textbf{Borda}: Shows extreme directional sensitivity. Cosine$\rightarrow$L2 has 60.0\% disagreement vs L2$\rightarrow$Cosine's 8.5\%---a 51.5pp asymmetry. Similarly, Cosine$\rightarrow$Chebyshev shows 64.5\% vs Chebyshev$\rightarrow$Cosine's 11.5\% (53.0pp asymmetry). This suggests Borda is highly sensitive to which metric is assigned to center vs extreme voters, with Cosine distance creating dramatically different outcomes when assigned to centrist voters.
 
-    \item \textbf{IRV}: Shows \textit{reverse} asymmetry. L2$\rightarrow$Cosine has 12.5\% disagreement vs Cosine$\rightarrow$L2's 4.5\%.
+    \item \textbf{IRV}: Shows moderate asymmetry with reverse patterns. L2$\rightarrow$Cosine has 12.5\% disagreement vs Cosine$\rightarrow$L2's 4.5\% (8.0pp asymmetry in the opposite direction from Borda).
 
-    \item \textbf{Plurality}: Relatively symmetric (14--16\% disagreement for both directions).
+    \item \textbf{Plurality}: Relatively symmetric (14--20\% disagreement), with smaller asymmetries typically under 6pp.
 \end{itemize}
 
-The Borda asymmetry is particularly striking: when Cosine is the center metric, outcomes differ from the L2-baseline 60\% of the time, but when L2 is the center metric, disagreement drops to 8.5\%. This suggests that the assignment of metrics to voter groups matters as much as the choice of metrics themselves.
+The Borda-Cosine asymmetry is particularly striking: when Cosine is the center metric, outcomes differ from the L2-baseline 60\% of the time, but when L2 is the center metric, disagreement drops to 8.5\%. This 7-fold difference suggests that the assignment of metrics to voter groups matters as much as the choice of metrics themselves, and that Borda count's preference summation mechanism interacts strongly with Cosine distance's directional properties.
 
 \subsubsection{Decomposition Analysis: Strong vs Extreme-Aligned Disagreement}
 
@@ -402,10 +405,12 @@ Examining the decomposition of disagreement into strong and extreme-aligned comp
 
     \item \textbf{Plurality and IRV} show more balanced decomposition (~46--48\% strong), suggesting heterogeneity's effects are split between novel outcomes and extreme-alignment.
 
-    \item For Cosine$\rightarrow$L2 Borda, strong disagreement is only 19.2\% (with 48.5\% extreme-aligned), suggesting the high total disagreement (60\%) is mostly due to alignment with the Cosine-homogeneous baseline rather than genuinely novel outcomes.
+    \item For Cosine$\rightarrow$L2 Borda, strong disagreement is only 11.5\% (19.2\% of total), with 48.5\% extreme-aligned (80.8\% of total). This reveals that the high total disagreement (60\%) is \textit{primarily} due to alignment with the Cosine-homogeneous baseline rather than genuinely novel outcomes. The heterogeneous rule is effectively amplifying the Cosine-metric preference rather than creating entirely new equilibria.
+
+    \item In contrast, L2$\rightarrow$Cosine Borda shows 58.8\% strong disagreement (5.0\% of 8.5\% total), meaning most disagreements represent genuinely novel outcomes not explainable by either baseline.
 \end{itemize}
 
-This decomposition clarifies that \textit{what} heterogeneity does depends critically on both the voting rule and the direction of metric assignment.
+This decomposition clarifies that \textit{what} heterogeneity does depends critically on both the voting rule and the direction of metric assignment. The same metric pair (L2-Cosine) produces fundamentally different mechanisms depending on which metric is assigned to centrist voters: L2-center creates novel outcomes, while Cosine-center amplifies existing Cosine preferences.
 
 \subsubsection{Visualizing Strong Disagreement}
 
@@ -429,7 +434,7 @@ This is the spatial signature of strong disagreement: the heterogeneous winner i
 
 \subsubsection{Theoretical Explanation}
 
-The convergence can be understood through measure concentration: as dimension increases, the effective configuration space shrinks. Most voters cluster near the effective radius ($\approx 0.577$), making center-extreme distinctions less meaningful. Additionally, distance distributions become more uniform, reducing the impact of metric choice on utility rankings.
+The persistence of heterogeneity effects across dimensions, despite measure concentration, suggests that metric choice remains meaningful even in high-dimensional spaces. While measure concentration causes most voters to cluster near the effective radius ($\approx 0.577$), the \textit{directional} properties of Cosine distance create persistent differences in preference rankings that are not eliminated by dimensional scaling. The non-monotonic patterns in disagreement rates (e.g., dimension 4 Borda shows 11.5\% disagreement vs dimension 3's 4.0\%) indicate complex interactions between dimensionality, metric properties, and voting rule aggregation mechanisms that cannot be explained by simple convergence arguments.
 
 \subsection{Impact of Metrics on Condorcet Paradoxes}
 
@@ -439,24 +444,28 @@ Our simulations reveal a remarkable phenomenon: when Cosine distance is used as 
 
 For Cosine$\rightarrow$L2 with Borda, we observe:
 \begin{itemize}
-    \item Total disagreement: 60.0\% (vs 8.5\% for L2$\rightarrow$Cosine)
-    \item Strong disagreement: 11.5\% (19.2\% of total)
-    \item Extreme-aligned disagreement: 48.5\% (80.8\% of total)
-    \item This indicates most disagreements represent alignment with the L2-homogeneous baseline, not genuinely novel outcomes
+    \item Total disagreement: 60.0\% (vs 8.5\% for L2$\rightarrow$Cosine)---a 51.5pp asymmetry
+    \item Strong disagreement: 11.5\% (19.2\% of total)---genuinely novel outcomes
+    \item Extreme-aligned disagreement: 48.5\% (80.8\% of total)---amplification of Cosine preferences
+    \item This indicates most disagreements represent alignment with the Cosine-homogeneous baseline, not genuinely novel outcomes
 \end{itemize}
 
-This "Borda-Cosine Interaction" suggests that Cosine distance, when assigned to centrist voters under Borda count, creates a dramatically different strategic landscape. The directional nature of Cosine distance---focusing on ideological alignment rather than policy distance---may interact with Borda's preference summation in ways that amplify heterogeneity effects.
+This "Borda-Cosine Interaction" reveals a fundamental asymmetry: when Cosine is assigned to centrist voters, the heterogeneous rule produces outcomes that align strongly with what a Cosine-homogeneous electorate would choose (48.5\% of profiles), suggesting that Cosine distance exerts a powerful influence on Borda aggregation when applied to the majority of voters. The directional nature of Cosine distance---focusing on ideological alignment rather than policy distance---interacts with Borda's preference summation in ways that amplify the Cosine-metric's influence, effectively making the heterogeneous electorate behave more like a Cosine-homogeneous one.
 
-\subsubsection{L1/L2 Instability}
+The reverse direction (L2$\rightarrow$Cosine) shows the opposite pattern: only 3.5\% extreme-aligned disagreement, with 5.0\% strong disagreement (58.8\% of total). This suggests that L2 distance, when assigned to centrist voters, creates genuinely novel outcomes rather than merely amplifying extreme-metric preferences.
 
-In contrast, L1 and L2 metrics show higher sensitivity to heterogeneity. For example, L1-L2 pairs at dimension 2 show:
+\subsubsection{Minkowski Metric Interactions}
+
+L1 and L2 metrics show moderate sensitivity to heterogeneity with relatively symmetric directional effects. For L1-L2 pairs at dimension 2:
 \begin{itemize}
-    \item Disagreement (vs center baseline): 15.5\% (Plurality), 17.5\% (Borda), 21.0\% (IRV)
-    \item Cycle rate reduction: -2.0\% (heterogeneous has fewer cycles than center-metric baseline)
-    \item Condorcet efficiency improvement: +9.2\% (Plurality), +3.1\% (Borda), +1.6\% (IRV)
+    \item L1$\rightarrow$L2: 14.0\% (Plurality), 11.5\% (Borda), 9.0\% (IRV)
+    \item L2$\rightarrow$L1: 9.5\% (Plurality), 5.5\% (Borda), 6.5\% (IRV)
+    \item Asymmetry: 4.5pp (Plurality), 6.0pp (Borda), 2.5pp (IRV)
 \end{itemize}
 
-The negative cycle rate delta indicates that metric heterogeneity can actually \textit{reduce} Condorcet paradoxes, potentially by breaking symmetry in preference profiles.
+The decomposition reveals that L1-L2 pairs produce primarily extreme-aligned disagreement (e.g., L1$\rightarrow$L2 Borda: 1.0\% strong, 10.5\% extreme-aligned), suggesting that heterogeneity shifts outcomes toward the extreme-metric baseline rather than creating novel equilibria. This contrasts with the Cosine interactions, where direction matters dramatically for Borda.
+
+Chebyshev-L2 pairs show near-perfect symmetry (7.0--7.5\% disagreement in both directions), suggesting that Chebyshev and L2 metrics interact in a balanced way that is relatively insensitive to assignment direction.
 
 \subsection{Voter Satisfaction Efficiency (VSE) Sweeps}
 
@@ -478,36 +487,36 @@ Table~\ref{tab:vse_by_dimension} shows VSE values for different voting rules acr
 
 \begin{table}[h]
     \centering
-    \caption{VSE by Dimension (L2-Cosine, heterogeneous)}
+    \caption{VSE by Dimension (L2-Cosine, heterogeneous).}
     \label{tab:vse_by_dimension}
     \begin{tabular}{lccc}
         \toprule
         Dimension & Plurality & Borda & IRV   \\
         \midrule
-        1         & 0.753     & 0.955 & 0.922 \\
-        2         & 0.861     & 0.989 & 0.957 \\
-        3         & 0.885     & 0.989 & 0.963 \\
-        4         & 0.910     & 0.993 & 0.971 \\
-        5         & 0.934     & 0.996 & 0.987 \\
-        7         & 0.956     & 0.992 & 0.985 \\
-        10        & 0.949     & 0.995 & 0.985 \\
+        1         & 0.606     & 0.966 & 0.581 \\
+        2         & 0.821     & 0.989 & 0.584 \\
+        3         & 0.834     & 0.994 & 0.528 \\
+        4         & 0.848     & 0.990 & 0.536 \\
+        5         & 0.883     & 0.992 & 0.530 \\
+        7         & 0.887     & 0.995 & 0.581 \\
+        10        & 0.909     & 0.993 & 0.633 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
 Key observations:
 \begin{enumerate}
-    \item \textbf{Borda consistently outperforms}: VSE $\geq 0.95$ across all dimensions, approaching 1.0 in high dimensions.
-    \item \textbf{IRV shows strong performance}: VSE $\geq 0.92$, with improvement in higher dimensions.
-    \item \textbf{Plurality is weakest}: VSE ranges 0.75--0.96, but improves significantly with dimension.
-    \item \textbf{Dimensional improvement}: All rules show increasing VSE as dimension increases, suggesting that high-dimensional spaces naturally favor better social choices.
+    \item \textbf{Borda consistently outperforms}: VSE $\geq 0.99$ across all dimensions, demonstrating exceptional social welfare performance regardless of dimensionality.
+    \item \textbf{Plurality shows dimensional improvement}: VSE increases from 0.606 (dimension 1) to 0.909 (dimension 10), suggesting that higher-dimensional spaces enable Plurality to better identify socially optimal candidates.
+    \item \textbf{IRV performance is dimension-dependent}: VSE ranges from 0.528 (dimension 3) to 0.633 (dimension 10), showing weaker performance than Borda but improvement with dimension.
+    \item \textbf{Dimensional improvement}: All rules show increasing or stable VSE as dimension increases, suggesting that high-dimensional spaces naturally favor better social choices, though the magnitude of improvement varies by rule.
 \end{enumerate}
 
 \subsubsection{Metric Heterogeneity Effects on VSE}
 
-For L2-Cosine pairs, VSE differences between heterogeneous and homogeneous conditions are zero across all dimensions and rules. This reinforces the convergence result: metric heterogeneity has no effect on social welfare when using this specific metric pair.
+For L2-Cosine pairs, VSE differences between heterogeneous and homogeneous (center-metric baseline) conditions are small across all dimensions and rules, typically within $\pm 0.01$. This suggests that while metric heterogeneity can dramatically affect \textit{which} candidate wins (as measured by disagreement rates), it has minimal impact on the \textit{quality} of the winner as measured by social welfare.
 
-However, for other metric pairs, VSE differences can be substantial. For example, Cosine-L1 at dimension 2 shows VSE improvements of 5--9\% for heterogeneous conditions, suggesting that strategic metric assignment can improve social outcomes.
+However, the decomposition analysis reveals an important nuance: when Cosine is the center metric, the heterogeneous rule produces outcomes that align strongly with Cosine-homogeneous preferences (48.5\% extreme-aligned disagreement for Cosine$\rightarrow$L2 Borda). This alignment may explain why VSE differences remain small---the heterogeneous rule is effectively selecting winners that optimize Cosine-based social welfare, which may be similar to L2-based social welfare in many profiles.
 
 \section{Conclusions}
 
@@ -520,7 +529,7 @@ Our mathematical and computational analysis reveals that metric heterogeneity ef
 
     \item \textbf{Dramatic Borda-Cosine interaction}: When Cosine is the center metric under Borda count, disagreement reaches 60\% (vs 8.5\% for L2-center), representing a 51.5pp asymmetry. This is the largest directional effect observed.
 
-    \item \textbf{Decomposition reveals mechanisms}: Strong disagreement (het differs from both baselines) ranges from 10--93\% of total disagreement, depending on rule and configuration. Borda shows highest strong disagreement proportion, suggesting it introduces genuinely novel outcomes.
+    \item \textbf{Decomposition reveals mechanisms}: Strong disagreement (het differs from both baselines) ranges from 10--93\% of total disagreement, depending on rule and configuration. The proportion varies dramatically by direction: L2$\rightarrow$Cosine Borda shows 58.8\% strong disagreement (novel outcomes), while Cosine$\rightarrow$L2 Borda shows only 19.2\% strong disagreement (mostly amplification). This directional asymmetry in mechanism is as important as the asymmetry in magnitude.
 
     \item \textbf{Rule-specific sensitivities}: Borda is highly sensitive to metric assignment direction; IRV shows reverse asymmetry patterns; Plurality remains relatively symmetric.
 \end{enumerate}
@@ -566,7 +575,7 @@ Based on our analysis, we recommend:
 Several open questions remain:
 
 \begin{enumerate}
-    \item \textbf{Theoretical understanding of Borda-Cosine interaction}: Why does Cosine-center Borda produce 7x higher disagreement than L2-center? Can we derive analytical bounds on this asymmetry?
+    \item \textbf{Theoretical understanding of Borda-Cosine interaction}: Why does Cosine-center Borda produce 7x higher disagreement than L2-center, and why is 80.8\% of that disagreement due to extreme-alignment rather than novel outcomes? Can we derive analytical bounds on this asymmetry and explain the mechanism through which Cosine distance amplifies its own preferences under Borda aggregation?
 
     \item \textbf{Decomposition at higher dimensions}: How do strong vs extreme-aligned proportions evolve beyond dimension 10? Is there eventual convergence?
 

@@ -106,21 +106,23 @@ def generate_preferences(
 
     Args:
         config: Simulation configuration
-        rng_seed: Random seed (overrides config if provided)
+        rng_seed: Base random seed (overrides config if provided).
+                  Each profile gets a unique seed: base_seed, base_seed+1, base_seed+2, ...
 
     Returns:
         PreferenceProfile with all spatial and preference data
     """
-    # Set up random generator
-    seed = rng_seed if rng_seed is not None else config.rng_seed
-    rng = np.random.default_rng(seed)
+    # Set up base seed
+    base_seed = rng_seed if rng_seed is not None else config.rng_seed
 
-    # Generate spatial positions
-    geometry_gen = GeometryGenerator(config.geometry, rng)
-    spatial_profile = geometry_gen.generate(
+    # Generate spatial positions with unique seeds per profile
+    # Use base_seed for first profile, base_seed+1 for second, etc.
+    spatial_profile = _generate_spatial_profiles_with_unique_seeds(
+        config.geometry,
         config.n_profiles,
         config.n_voters,
-        config.n_candidates
+        config.n_candidates,
+        base_seed
     )
 
     # Compute utilities
@@ -178,7 +180,46 @@ def generate_preferences(
         n_candidates=n_candidates,
         n_dim=n_dim,
         config=config,
-        rng_seed=seed,
+        rng_seed=base_seed,
+    )
+
+
+def _generate_spatial_profiles_with_unique_seeds(
+    geometry_config,
+    n_profiles: int,
+    n_voters: int,
+    n_candidates: int,
+    base_seed: int
+) -> SpatialProfile:
+    """
+    Generate spatial profiles with unique seeds per profile.
+
+    Each profile uses seed = base_seed + profile_index to ensure
+    statistical independence between profiles.
+    """
+    n_dim = geometry_config.n_dim
+    voter_positions = np.empty((n_profiles, n_voters, n_dim))
+    candidate_positions = np.empty((n_profiles, n_candidates, n_dim))
+
+    for i in range(n_profiles):
+        # Use unique seed for each profile
+        profile_seed = base_seed + i
+        rng = np.random.default_rng(profile_seed)
+        geometry_gen = GeometryGenerator(geometry_config, rng)
+
+        # Generate single profile
+        single_profile = geometry_gen.generate(1, n_voters, n_candidates)
+        voter_positions[i] = single_profile.voter_positions[0]
+        candidate_positions[i] = single_profile.candidate_positions[0]
+
+    return SpatialProfile(
+        voter_positions=voter_positions,
+        candidate_positions=candidate_positions,
+        n_profiles=n_profiles,
+        n_voters=n_voters,
+        n_candidates=n_candidates,
+        n_dim=n_dim,
+        method=geometry_config.method
     )
 
 
